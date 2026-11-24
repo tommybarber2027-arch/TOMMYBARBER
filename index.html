@@ -177,11 +177,11 @@
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
                     <div class="lg:col-span-8 space-y-5">
-                        <!-- Step 1: اختر الحلاق (يعرض الحلاقين فقط) -->
+                        <!-- Step 1: اختر الحلاق أو الأخصائي -->
                         <div class="space-y-2.5">
                             <div class="flex items-center gap-2">
                                 <span class="w-5 h-5 rounded-full bg-gold text-black font-black text-xs flex items-center justify-center">1</span>
-                                <h2 class="text-sm font-black text-white">اختر الحلاق</h2>
+                                <h2 class="text-sm font-black text-white">اختر الحلاق / أخصائي البشرة</h2>
                             </div>
                             <div id="pos-barbers-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"></div>
                         </div>
@@ -540,6 +540,7 @@
                     <div class="flex flex-wrap items-center gap-1.5">
                         <button onclick="setStaffFilter('all')" id="sf-all" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-black bg-gold text-black">الكل</button>
                         <button onclick="setStaffFilter('barber')" id="sf-barber" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">حلاقين</button>
+                        <button onclick="setStaffFilter('skincare')" id="sf-skincare" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">بشرة / بيديكير</button>
                         <button onclick="setStaffFilter('assistant')" id="sf-assistant" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">مساعدين</button>
                         <button onclick="setStaffFilter('cashier')" id="sf-cashier" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">كاشير</button>
                         <button onclick="setStaffFilter('manager')" id="sf-manager" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">مدير</button>
@@ -770,9 +771,10 @@
                         <input type="text" id="edit-barber-name" required placeholder="اكتب الاسم هنا..." class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
                     </div>
                     <div>
-                        <label class="block text-gray-400 mb-1">الوظيفة</label>
+                        <label class="block text-gray-400 mb-1">الوظيفة / التخصص</label>
                         <select id="edit-barber-role" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
                             <option value="barber">حلاق (صنايعي)</option>
+                            <option value="skincare">أخصائي بشرة وعناية / بيديكير</option>
                             <option value="assistant">مساعد حلاق</option>
                             <option value="cashier">كاشير</option>
                             <option value="manager">مدير</option>
@@ -1043,6 +1045,7 @@
                 { id: 'b2', name: 'فتحي', phone1: '01022223333', phone2: '', role: 'barber', payType: 'both', baseSalary: 3500, commissionPct: 25, skinPct: 10, shiftStart: '12:00', lateHourRate: 25 },
                 { id: 'b3', name: 'يوسف', phone1: '01033334444', phone2: '', role: 'barber', payType: 'salary', baseSalary: 6000, commissionPct: 0, skinPct: 10, shiftStart: '12:00', lateHourRate: 25 },
                 { id: 'b4', name: 'عبد الرحمن', phone1: '01044445555', phone2: '', role: 'barber', payType: 'both', baseSalary: 4000, commissionPct: 20, skinPct: 10, shiftStart: '13:00', lateHourRate: 25 },
+                { id: 'b8', name: 'مصطفى', phone1: '01088889999', phone2: '', role: 'skincare', payType: 'both', baseSalary: 3000, commissionPct: 25, skinPct: 25, shiftStart: '12:00', lateHourRate: 25 },
                 { id: 'b5', name: 'كريم', phone1: '01055556666', phone2: '', role: 'assistant', payType: 'both', baseSalary: 2500, commissionPct: 0, skinPct: 15, shiftStart: '11:30', lateHourRate: 15 },
                 { id: 'b6', name: 'omar', phone1: '01066667777', phone2: '', role: 'cashier', payType: 'salary', baseSalary: 4500, commissionPct: 0, skinPct: 0, shiftStart: '11:30', lateHourRate: 20 },
                 { id: 'b7', name: 'سعيد', phone1: '01077778888', phone2: '', role: 'cleaner', payType: 'salary', baseSalary: 3000, commissionPct: 0, skinPct: 0, shiftStart: '11:00', lateHourRate: 15 }
@@ -1468,21 +1471,26 @@
         }
 
         function renderPOS() {
-            // Only show barbers (role === 'barber') in POS chair selection
-            const activeBarbers = appState.barbers.filter(b => (b.role || 'barber') === 'barber');
+            // Show barbers and skincare/pedicure specialists in POS selection
+            const activeBarbers = appState.barbers.filter(b => {
+                const r = b.role || 'barber';
+                return r === 'barber' || r === 'skincare';
+            });
             if (!activeBarbers.some(b => b.id === selectedBarberId) && activeBarbers.length > 0) {
                 selectedBarberId = activeBarbers[0].id;
             }
 
             document.getElementById('pos-barbers-grid').innerHTML = activeBarbers.map(b => {
                 const isSel = selectedBarberId === b.id;
+                const isSkin = (b.role || 'barber') === 'skincare';
                 return `
-                    <button type="button" onclick="selectBarber('${b.id}')" class="relative bg-panelbg border ${isSel ? 'border-gold bg-golddark/40' : 'border-bordergold hover:border-gold/40'} rounded-2xl p-3.5 text-center transition flex flex-col items-center gap-2">
+                    <button type="button" onclick="selectBarber('${b.id}')" class="relative bg-panelbg border ${isSel ? 'border-gold bg-golddark/40' : 'border-bordergold hover:border-gold/40'} rounded-2xl p-3.5 text-center transition flex flex-col items-center gap-1.5">
                         ${isSel ? `<span class="absolute top-2 right-2 w-4 h-4 rounded-full bg-gold text-black text-[10px] font-black flex items-center justify-center">✓</span>` : ''}
                         <div class="w-12 h-12 rounded-full border ${isSel ? 'border-gold text-gold' : 'border-bordergold text-gray-400'} flex items-center justify-center text-lg">
-                            <i class="fa-regular fa-user"></i>
+                            <i class="fa-solid ${isSkin ? 'fa-spa' : 'fa-scissors'}"></i>
                         </div>
                         <span class="text-xs font-black ${isSel ? 'text-gold' : 'text-white'}">${b.name}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${isSkin ? 'bg-emerald-950/70 text-emerald-300 border border-emerald-800/50' : 'bg-darkbg text-gray-400'}">${isSkin ? 'بشرة / بيديكير' : 'حلاق'}</span>
                     </button>
                 `;
             }).join('');
@@ -2041,11 +2049,11 @@
 
             document.getElementById('rep-kpi-sales').textContent = fmt(totalSales);
             document.getElementById('rep-kpi-count').textContent = fmt(invs.length);
-            document.getElementById('rep-kpi-avg').textContent = fmt(avg);
-            document.getElementById('rep-kpi-disc').textContent = fmt(totalDisc);
-
-            // 1. Sales by Barber
-            const barbersOnly = appState.barbers.filter(b => (b.role || 'barber') === 'barber');
+            // 1. Sales by Barber & Skincare Specialists
+            const barbersOnly = appState.barbers.filter(b => {
+                const r = b.role || 'barber';
+                return r === 'barber' || r === 'skincare';
+            });
             const barberRows = barbersOnly.map(b => {
                 const calc = calculateStaffPayroll(b, invs);
                 return { name: b.name, count: calc.invCount, sales: calc.totalSales, comm: calc.totalComm, pct: b.commissionPct, payType: b.payType };
@@ -2370,6 +2378,7 @@
         function renderAttendanceSection() {
             const roleLabels = {
                 barber: 'حلاق (صنايعي)',
+                skincare: 'أخصائي بشرة / بيديكير',
                 assistant: 'مساعد حلاق',
                 cashier: 'كاشير',
                 manager: 'مدير',
@@ -2439,6 +2448,7 @@
         function renderBarbersManage() {
             const roleLabels = {
                 barber: 'حلاق (صنايعي)',
+                skincare: 'أخصائي بشرة / بيديكير',
                 assistant: 'مساعد حلاق',
                 cashier: 'كاشير',
                 manager: 'مدير',
