@@ -621,6 +621,31 @@
                     </form>
 
                     <div class="space-y-4">
+                        <!-- النسخ الاحتياطي وحماية قاعدة البيانات -->
+                        <div class="bg-panelbg border border-emerald-800/60 rounded-2xl p-4 space-y-3 text-xs">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2 text-emerald-400">
+                                    <i class="fa-solid fa-database text-base"></i>
+                                    <h3 class="text-sm font-black">قاعدة البيانات والنسخ الاحتياطي (Backup)</h3>
+                                </div>
+                                <span id="cloud-sync-badge" class="px-2.5 py-0.5 rounded-full bg-emerald-950 border border-emerald-700 text-emerald-300 text-[10px] font-bold">
+                                    <i class="fa-solid fa-cloud-check ml-1"></i> متصل بالسحابة
+                                </span>
+                            </div>
+                            <p class="text-gray-300 leading-relaxed">
+                                جميع بياناتك محفوظة تلقائياً على قاعدة البيانات السحابية وتعمل من أي جهاز. يمكنك أيضاً تحميل نسخة احتياطية كاملة على جهازك أو استرجاعها في أي وقت.
+                            </p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="downloadFullBackup()" class="bg-emerald-700 hover:bg-emerald-600 text-white font-black py-2.5 rounded-xl transition">
+                                    <i class="fa-solid fa-download ml-1"></i> تحميل نسخة احتياطية
+                                </button>
+                                <label class="cursor-pointer bg-darkbg hover:bg-cardbg border border-bordergold hover:border-gold text-gold font-black py-2.5 rounded-xl text-center transition">
+                                    <i class="fa-solid fa-upload ml-1"></i> استرجاع نسخة
+                                    <input type="file" accept=".json" onchange="restoreFullBackup(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+
                         <!-- تصفير بيانات التشغيل والبدء على نظيف -->
                         <div class="bg-panelbg border border-red-900/60 rounded-2xl p-4 space-y-3 text-xs">
                             <div class="flex items-center gap-2 text-red-400">
@@ -632,7 +657,7 @@
                             </p>
                             <div class="bg-darkbg border border-bordergold rounded-xl p-2.5 text-[11px] text-emerald-400 font-bold">
                                 <i class="fa-solid fa-shield-check ml-1"></i>
-                                لن يتم مسح: أسماء الحلاقين والعمالة، قاعدة العملاء، الأقسام والخدمات والأسعار، أو المستخدمين والصلاحيات.
+                                لن يتم مسح: أسماء الحلاقين والعمالة، الأقسام والخدمات والأسعار، أو المستخدمين والصلاحيات.
                             </div>
                             <button type="button" onclick="openResetOperationalModal()" class="w-full bg-red-950/60 hover:bg-red-700 text-red-200 hover:text-white border border-red-700 font-black py-2.5 rounded-xl transition">
                                 مسح الفواتير والحسابات التجريبية والبدء من جديد
@@ -690,8 +715,7 @@
                     <div class="flex justify-between"><span>طريقة الدفع:</span><span id="rec-payment">كاش</span></div>
                     <div class="flex justify-between text-sm font-black border-t border-gray-400 pt-1"><span>الإجمالي:</span><span id="rec-total">0 ج.م</span></div>
                 </div>
-                <p id="rec-pay-numbers" class="text-center text-[10px] font-bold text-gray-800 pt-1 border-t border-dashed border-gray-400 hidden"></p>
-                <p class="text-center text-[11px] font-bold pt-2 border-t border-dashed border-gray-400">شكراً لزيارتكم TOMMY BARBER</p>
+                <p class="text-center text-[11px] font-bold pt-2 border-t border-dashed border-gray-400">شكراً لزيارتكم مع تحيات TOMMY BARBER</p>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="window.print()" class="bg-gold text-black font-black py-2.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
@@ -912,19 +936,15 @@
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-settings" class="accent-gold"> الإعدادات وسجل المراجعة</label>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ الصلاحيات</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Client Registration Modal -->
+    <!-- Client Registration / Edit Modal -->
     <div id="client-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-panelbg border border-bordergold rounded-2xl max-w-sm w-full p-5 space-y-3">
             <div class="flex justify-between items-center border-b border-bordergold pb-2">
-                <h3 class="text-sm font-black text-gold">تسجيل عميل جديد</h3>
+                <h3 id="client-modal-title" class="text-sm font-black text-gold">تسجيل عميل جديد</h3>
                 <button onclick="closeModal('client-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form onsubmit="saveNewClient(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="edit-client-old-phone">
                 <div>
                     <label class="block text-gray-400 mb-1">اسم العميل (إجباري)</label>
                     <input type="text" id="new-client-name" required placeholder="الاسم بالكامل..." class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
@@ -947,8 +967,12 @@
             </div>
             <p class="text-gray-300 leading-relaxed">
                 هل أنت متأكد من مسح جميع <b>الفواتير والحسابات وسجل الحضور والانصراف والسُلف</b> للبدء من جديد؟
-                <br><span class="text-gold font-bold">سيتم الاحتفاظ بجميع الخدمات والأسعار والحلاقين والعملاء والمستخدمين كما هم.</span>
+                <br><span class="text-gold font-bold">سيتم الاحتفاظ بالخدمات والأسعار والحلاقين والمستخدمين كما هم.</span>
             </p>
+            <label class="flex items-center gap-2 bg-darkbg border border-bordergold rounded-xl p-2.5 text-gray-200 cursor-pointer">
+                <input type="checkbox" id="reset-include-clients" checked class="accent-gold">
+                <span>حذف قائمة العملاء التجريبيين أيضاً</span>
+            </label>
             <div class="grid grid-cols-2 gap-2 pt-1">
                 <button type="button" onclick="executeOperationalReset()" class="bg-red-600 hover:bg-red-500 text-white font-black py-2.5 rounded-xl">نعم، ابدأ على نظيف</button>
                 <button type="button" onclick="closeModal('reset-ops-modal')" class="bg-darkbg border border-bordergold text-gray-300 font-bold py-2.5 rounded-xl">إلغاء</button>
@@ -1768,13 +1792,6 @@
             document.getElementById('rec-subtotal').textContent = `${inv.subtotal} ج.م`;
             document.getElementById('rec-discount').textContent = `${inv.discount} ج.م`;
             document.getElementById('rec-total').textContent = `${inv.total} ج.م`;
-            const payNumEl = document.getElementById('rec-pay-numbers');
-            if (appState.salonInfo.paymentNumbers) {
-                payNumEl.textContent = appState.salonInfo.paymentNumbers;
-                payNumEl.classList.remove('hidden');
-            } else {
-                payNumEl.classList.add('hidden');
-            }
             document.getElementById('rec-items').innerHTML = inv.items.map(i =>
                 `<div class="flex justify-between"><span>${i.name} ${i.qty > 1 ? `(×${i.qty})` : ''}</span><b>${i.price * i.qty} ج.م</b></div>`
             ).join('');
@@ -1904,14 +1921,26 @@
         // =========================================================================
         // 2.5 CLIENTS DATABASE & DUPLICATE PREVENTION
         // =========================================================================
-        function openClientModal() {
-            document.getElementById('new-client-name').value = '';
-            document.getElementById('new-client-phone').value = '';
+        function openClientModal(phoneToEdit = null) {
+            if (phoneToEdit) {
+                const existing = (appState.clients || []).find(c => c.phone === phoneToEdit);
+                const invMatch = appState.invoices.find(i => i.clientPhone === phoneToEdit);
+                document.getElementById('client-modal-title').textContent = 'تعديل بيانات العميل';
+                document.getElementById('edit-client-old-phone').value = phoneToEdit;
+                document.getElementById('new-client-name').value = existing ? existing.name : (invMatch?.clientName || '');
+                document.getElementById('new-client-phone').value = phoneToEdit;
+            } else {
+                document.getElementById('client-modal-title').textContent = 'تسجيل عميل جديد';
+                document.getElementById('edit-client-old-phone').value = '';
+                document.getElementById('new-client-name').value = '';
+                document.getElementById('new-client-phone').value = '';
+            }
             document.getElementById('client-modal').classList.remove('hidden');
         }
 
         function saveNewClient(e) {
             e.preventDefault();
+            const oldPhone = document.getElementById('edit-client-old-phone').value.trim();
             const name = document.getElementById('new-client-name').value.trim();
             const phone = document.getElementById('new-client-phone').value.trim();
 
@@ -1921,23 +1950,54 @@
             }
 
             if (!appState.clients) appState.clients = [];
-            const duplicatePhone = appState.clients.find(c => c.phone === phone);
+            const duplicatePhone = appState.clients.find(c => c.phone === phone && c.phone !== oldPhone);
             if (duplicatePhone) {
                 showToast(`هذا الرقم مسجل مسبقاً باسم العميل: ${duplicatePhone.name}`, 'error');
                 return;
             }
 
-            appState.clients.unshift({
-                id: 'c-' + Date.now(),
-                name,
-                phone,
-                createdAt: getTodayISO()
-            });
-            logAudit(`تسجيل عميل جديد: ${name} (${phone})`);
+            if (oldPhone) {
+                const target = appState.clients.find(c => c.phone === oldPhone);
+                if (target) {
+                    target.name = name;
+                    target.phone = phone;
+                } else {
+                    appState.clients.unshift({ id: 'c-' + Date.now(), name, phone, createdAt: getTodayISO() });
+                }
+                appState.invoices.forEach(inv => {
+                    if (inv.clientPhone === oldPhone) {
+                        inv.clientName = name;
+                        inv.clientPhone = phone;
+                    }
+                });
+                logAudit(`تعديل بيانات العميل: ${name} (${phone})`);
+            } else {
+                appState.clients.unshift({
+                    id: 'c-' + Date.now(),
+                    name,
+                    phone,
+                    createdAt: getTodayISO()
+                });
+                logAudit(`تسجيل عميل جديد: ${name} (${phone})`);
+            }
             saveState();
             closeModal('client-modal');
-            renderClientsTable();
-            showToast('تم تسجيل العميل بنجاح');
+            renderAll();
+            showToast('تم حفظ بيانات العميل بنجاح');
+        }
+
+        function deleteClient(phone) {
+            appState.clients = (appState.clients || []).filter(c => c.phone !== phone);
+            appState.invoices.forEach(inv => {
+                if (inv.clientPhone === phone) {
+                    inv.clientPhone = '';
+                    inv.clientName = '';
+                }
+            });
+            logAudit(`حذف العميل صاحب الرقم: ${phone}`);
+            saveState();
+            renderAll();
+            showToast('تم حذف العميل');
         }
 
         function startInvoiceForClient(name, phone) {
@@ -1982,8 +2042,10 @@
                         <td class="p-3 text-center font-bold text-emerald-400">${c.visits} زيارة</td>
                         <td class="p-3 text-center font-black text-white">${fmt(c.spent)} ج.م</td>
                         <td class="p-3 text-center font-mono text-gray-400">${c.lastVisit}</td>
-                        <td class="p-3 text-left">
-                            <button onclick="startInvoiceForClient('${c.name}', '${c.phone}')" class="px-3 py-1 rounded-lg bg-gold text-black font-black hover:bg-goldhover transition">فاتورة جديدة</button>
+                        <td class="p-3 text-left whitespace-nowrap space-x-1 space-x-reverse">
+                            <button onclick="startInvoiceForClient('${c.name}', '${c.phone}')" class="px-2.5 py-1 rounded-lg bg-gold text-black font-black hover:bg-goldhover transition">فاتورة</button>
+                            <button onclick="openClientModal('${c.phone}')" class="px-2.5 py-1 rounded-lg border border-bordergold text-gray-300 hover:border-gold font-bold">تعديل</button>
+                            <button onclick="deleteClient('${c.phone}')" class="px-2.5 py-1 rounded-lg border border-red-900/50 bg-red-950/30 text-red-400 hover:bg-red-900/50 font-bold">حذف</button>
                         </td>
                     </tr>
                 `).join('');
@@ -2768,16 +2830,59 @@
         }
 
         function executeOperationalReset() {
+            const includeClients = document.getElementById('reset-include-clients')?.checked;
             appState.invoices = [];
             appState.attendanceRecords = {};
             appState.advances = [];
             appState.auditLogs = [];
-            logAudit('تم تصفير بيانات التشغيل (الفواتير والحضور والسُلف) والبدء على نظيف');
+            if (includeClients) {
+                appState.clients = [];
+            }
+            logAudit('تم تصفير بيانات التشغيل والبدء على نظيف');
             saveState();
             resetCurrentInvoice();
             renderAll();
             closeModal('reset-ops-modal');
             showToast('تم تصفير الفواتير والحسابات بنجاح! يمكنك البدء الآن من فاتورة رقم 1');
+        }
+
+        function downloadFullBackup() {
+            const dataStr = JSON.stringify(appState, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TOMMY_BARBER_Backup_${getTodayISO()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('تم تحميل النسخة الاحتياطية بنجاح');
+        }
+
+        function restoreFullBackup(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    if (!parsed || !parsed.catalog || !parsed.barbers) {
+                        showToast('ملف النسخة الاحتياطية غير صالح', 'error');
+                        return;
+                    }
+                    appState = {
+                        ...JSON.parse(JSON.stringify(defaultState)),
+                        ...parsed
+                    };
+                    logAudit('تم استرجاع نسخة احتياطية لقاعدة البيانات');
+                    saveState();
+                    renderAll();
+                    showToast('تم استرجاع جميع البيانات بنجاح!');
+                } catch (err) {
+                    showToast('حدث خطأ أثناء قراءة الملف', 'error');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
         }
 
         function renderAll() {
