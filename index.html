@@ -4,35 +4,1584 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOMMY BARBER - صالون رجالي</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        gold: '#D8B454',
-                        goldhover: '#E6C66B',
-                        golddark: '#2A2212',
-                        darkbg: '#0B0A08',
-                        panelbg: '#13110E',
-                        cardbg: '#181511',
-                        bordergold: '#332A18'
-                    },
-                    fontFamily: {
-                        sans: ['Cairo', 'sans-serif']
-                    }
-                }
-            }
-        };
-    </script>
+    <style>/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */
+@layer properties;
+@layer theme, base, components, utilities;
+@layer theme {
+  :root, :host {
+    --font-sans: Cairo,Tahoma,"Segoe UI",sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+    --color-red-200: oklch(88.5% 0.062 18.334);
+    --color-red-300: oklch(80.8% 0.114 19.571);
+    --color-red-400: oklch(70.4% 0.191 22.216);
+    --color-red-500: oklch(63.7% 0.237 25.331);
+    --color-red-600: oklch(57.7% 0.245 27.325);
+    --color-red-700: oklch(50.5% 0.213 27.518);
+    --color-red-800: oklch(44.4% 0.177 26.899);
+    --color-red-900: oklch(39.6% 0.141 25.723);
+    --color-red-950: oklch(25.8% 0.092 26.042);
+    --color-amber-300: oklch(87.9% 0.169 91.605);
+    --color-amber-400: oklch(82.8% 0.189 84.429);
+    --color-amber-800: oklch(47.3% 0.137 46.201);
+    --color-amber-950: oklch(27.9% 0.077 45.635);
+    --color-emerald-300: oklch(84.5% 0.143 164.978);
+    --color-emerald-400: oklch(76.5% 0.177 163.223);
+    --color-emerald-600: oklch(59.6% 0.145 163.225);
+    --color-emerald-700: oklch(50.8% 0.118 165.612);
+    --color-emerald-800: oklch(43.2% 0.095 166.913);
+    --color-emerald-950: oklch(26.2% 0.051 172.552);
+    --color-sky-300: oklch(82.8% 0.111 230.318);
+    --color-sky-400: oklch(74.6% 0.16 232.661);
+    --color-sky-800: oklch(44.3% 0.11 240.79);
+    --color-sky-950: oklch(29.3% 0.066 243.157);
+    --color-gray-200: oklch(92.8% 0.006 264.531);
+    --color-gray-300: oklch(87.2% 0.01 258.338);
+    --color-gray-400: oklch(70.7% 0.022 261.325);
+    --color-gray-500: oklch(55.1% 0.027 264.364);
+    --color-black: #000;
+    --color-white: #fff;
+    --spacing: 0.25rem;
+    --container-xs: 20rem;
+    --container-sm: 24rem;
+    --container-md: 28rem;
+    --text-xs: 0.75rem;
+    --text-xs--line-height: calc(1 / 0.75);
+    --text-sm: 0.875rem;
+    --text-sm--line-height: calc(1.25 / 0.875);
+    --text-base: 1rem;
+    --text-base--line-height: calc(1.5 / 1);
+    --text-lg: 1.125rem;
+    --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
+    --text-2xl: 1.5rem;
+    --text-2xl--line-height: calc(2 / 1.5);
+    --text-3xl: 1.875rem;
+    --text-3xl--line-height: calc(2.25 / 1.875);
+    --font-weight-bold: 700;
+    --font-weight-black: 900;
+    --leading-tight: 1.25;
+    --leading-snug: 1.375;
+    --leading-relaxed: 1.625;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-2xl: 1rem;
+    --radius-3xl: 1.5rem;
+    --blur-sm: 8px;
+    --default-transition-duration: 150ms;
+    --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --default-font-family: var(--font-sans);
+    --default-mono-font-family: var(--font-mono);
+    --color-gold: #D8B454;
+    --color-goldhover: #E6C66B;
+    --color-golddark: #2A2212;
+    --color-darkbg: #0B0A08;
+    --color-panelbg: #13110E;
+    --color-cardbg: #181511;
+    --color-bordergold: #332A18;
+  }
+}
+@layer base {
+  *, ::after, ::before, ::backdrop, ::file-selector-button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+  html, :host {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    tab-size: 4;
+    font-family: var(--default-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+    font-feature-settings: var(--default-font-feature-settings, normal);
+    font-variation-settings: var(--default-font-variation-settings, normal);
+    -webkit-tap-highlight-color: transparent;
+  }
+  hr {
+    height: 0;
+    color: inherit;
+    border-top-width: 1px;
+  }
+  abbr:where([title]) {
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  a {
+    color: inherit;
+    -webkit-text-decoration: inherit;
+    text-decoration: inherit;
+  }
+  b, strong {
+    font-weight: bolder;
+  }
+  code, kbd, samp, pre {
+    font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
+    font-feature-settings: var(--default-mono-font-feature-settings, normal);
+    font-variation-settings: var(--default-mono-font-variation-settings, normal);
+    font-size: 1em;
+  }
+  small {
+    font-size: 80%;
+  }
+  sub, sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+  }
+  sub {
+    bottom: -0.25em;
+  }
+  sup {
+    top: -0.5em;
+  }
+  table {
+    text-indent: 0;
+    border-color: inherit;
+    border-collapse: collapse;
+  }
+  :-moz-focusring:where(:not(iframe)) {
+    outline: auto;
+  }
+  progress {
+    vertical-align: baseline;
+  }
+  summary {
+    display: list-item;
+  }
+  ol, ul, menu {
+    list-style: none;
+  }
+  img, svg, video, canvas, audio, iframe, embed, object {
+    display: block;
+    vertical-align: middle;
+  }
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+  button, input, select, optgroup, textarea, ::file-selector-button {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+  :where(select:is([multiple], [size])) optgroup {
+    font-weight: bolder;
+  }
+  :where(select:is([multiple], [size])) optgroup option {
+    padding-inline-start: 20px;
+  }
+  ::file-selector-button {
+    margin-inline-end: 4px;
+  }
+  ::placeholder {
+    opacity: 1;
+  }
+  @supports (not (-webkit-appearance: -apple-pay-button))  or (contain-intrinsic-size: 1px) {
+    ::placeholder {
+      color: currentcolor;
+      @supports (color: color-mix(in lab, red, red)) {
+        color: color-mix(in oklab, currentcolor 50%, transparent);
+      }
+    }
+  }
+  textarea {
+    resize: vertical;
+  }
+  ::-webkit-search-decoration {
+    -webkit-appearance: none;
+  }
+  ::-webkit-date-and-time-value {
+    min-height: 1lh;
+    text-align: inherit;
+  }
+  ::-webkit-datetime-edit {
+    display: inline-flex;
+  }
+  ::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+  ::-webkit-datetime-edit, ::-webkit-datetime-edit-year-field, ::-webkit-datetime-edit-month-field, ::-webkit-datetime-edit-day-field, ::-webkit-datetime-edit-hour-field, ::-webkit-datetime-edit-minute-field, ::-webkit-datetime-edit-second-field, ::-webkit-datetime-edit-millisecond-field, ::-webkit-datetime-edit-meridiem-field {
+    padding-block: 0;
+  }
+  ::-webkit-calendar-picker-indicator {
+    line-height: 1;
+  }
+  :-moz-ui-invalid {
+    box-shadow: none;
+  }
+  button, input:where([type="button"], [type="reset"], [type="submit"]), ::file-selector-button {
+    appearance: button;
+  }
+  ::-webkit-inner-spin-button, ::-webkit-outer-spin-button {
+    height: auto;
+  }
+  [hidden]:where(:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}
+@layer utilities {
+  .pointer-events-auto {
+    pointer-events: auto;
+  }
+  .pointer-events-none {
+    pointer-events: none;
+  }
+  .visible {
+    visibility: visible;
+  }
+  .absolute {
+    position: absolute;
+  }
+  .fixed {
+    position: fixed;
+  }
+  .relative {
+    position: relative;
+  }
+  .sticky {
+    position: sticky;
+  }
+  .inset-0 {
+    inset: 0px;
+  }
+  .inset-x-0 {
+    inset-inline: 0px;
+  }
+  .top-0 {
+    top: 0px;
+  }
+  .top-2 {
+    top: calc(var(--spacing) * 2);
+  }
+  .top-2\.5 {
+    top: calc(var(--spacing) * 2.5);
+  }
+  .top-4 {
+    top: calc(var(--spacing) * 4);
+  }
+  .top-20 {
+    top: calc(var(--spacing) * 20);
+  }
+  .right-2 {
+    right: calc(var(--spacing) * 2);
+  }
+  .right-2\.5 {
+    right: calc(var(--spacing) * 2.5);
+  }
+  .bottom-0 {
+    bottom: 0px;
+  }
+  .left-4 {
+    left: calc(var(--spacing) * 4);
+  }
+  .z-40 {
+    z-index: 40;
+  }
+  .z-50 {
+    z-index: 50;
+  }
+  .z-\[100\] {
+    z-index: 100;
+  }
+  .order-1 {
+    order: 1;
+  }
+  .order-2 {
+    order: 2;
+  }
+  .order-3 {
+    order: 3;
+  }
+  .col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+  .col-span-3 {
+    grid-column: span 3 / span 3;
+  }
+  .col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+  .col-span-5 {
+    grid-column: span 5 / span 5;
+  }
+  .col-span-6 {
+    grid-column: span 6 / span 6;
+  }
+  .mx-auto {
+    margin-inline: auto;
+  }
+  .mt-0\.5 {
+    margin-top: calc(var(--spacing) * 0.5);
+  }
+  .mt-1 {
+    margin-top: var(--spacing);
+  }
+  .mt-1\.5 {
+    margin-top: calc(var(--spacing) * 1.5);
+  }
+  .mr-1 {
+    margin-right: var(--spacing);
+  }
+  .mr-2 {
+    margin-right: calc(var(--spacing) * 2);
+  }
+  .mb-1 {
+    margin-bottom: var(--spacing);
+  }
+  .mb-3 {
+    margin-bottom: calc(var(--spacing) * 3);
+  }
+  .ml-1 {
+    margin-left: var(--spacing);
+  }
+  .ml-2 {
+    margin-left: calc(var(--spacing) * 2);
+  }
+  .block {
+    display: block;
+  }
+  .flex {
+    display: flex;
+  }
+  .grid {
+    display: grid;
+  }
+  .hidden {
+    display: none;
+  }
+  .inline-block {
+    display: inline-block;
+  }
+  .table {
+    display: table;
+  }
+  .h-2 {
+    height: calc(var(--spacing) * 2);
+  }
+  .h-3 {
+    height: calc(var(--spacing) * 3);
+  }
+  .h-3\.5 {
+    height: calc(var(--spacing) * 3.5);
+  }
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
+  .h-5 {
+    height: calc(var(--spacing) * 5);
+  }
+  .h-8 {
+    height: calc(var(--spacing) * 8);
+  }
+  .h-9 {
+    height: calc(var(--spacing) * 9);
+  }
+  .h-10 {
+    height: calc(var(--spacing) * 10);
+  }
+  .h-11 {
+    height: calc(var(--spacing) * 11);
+  }
+  .h-12 {
+    height: calc(var(--spacing) * 12);
+  }
+  .h-14 {
+    height: calc(var(--spacing) * 14);
+  }
+  .h-24 {
+    height: calc(var(--spacing) * 24);
+  }
+  .h-40 {
+    height: calc(var(--spacing) * 40);
+  }
+  .h-full {
+    height: 100%;
+  }
+  .max-h-56 {
+    max-height: calc(var(--spacing) * 56);
+  }
+  .max-h-\[90vh\] {
+    max-height: 90vh;
+  }
+  .max-h-\[290px\] {
+    max-height: 290px;
+  }
+  .min-h-\[115px\] {
+    min-height: 115px;
+  }
+  .min-h-\[135px\] {
+    min-height: 135px;
+  }
+  .min-h-\[180px\] {
+    min-height: 180px;
+  }
+  .min-h-screen {
+    min-height: 100vh;
+  }
+  .w-3 {
+    width: calc(var(--spacing) * 3);
+  }
+  .w-3\.5 {
+    width: calc(var(--spacing) * 3.5);
+  }
+  .w-4 {
+    width: calc(var(--spacing) * 4);
+  }
+  .w-5 {
+    width: calc(var(--spacing) * 5);
+  }
+  .w-8 {
+    width: calc(var(--spacing) * 8);
+  }
+  .w-9 {
+    width: calc(var(--spacing) * 9);
+  }
+  .w-10 {
+    width: calc(var(--spacing) * 10);
+  }
+  .w-11 {
+    width: calc(var(--spacing) * 11);
+  }
+  .w-12 {
+    width: calc(var(--spacing) * 12);
+  }
+  .w-14 {
+    width: calc(var(--spacing) * 14);
+  }
+  .w-24 {
+    width: calc(var(--spacing) * 24);
+  }
+  .w-full {
+    width: 100%;
+  }
+  .max-w-\[1600px\] {
+    max-width: 1600px;
+  }
+  .max-w-md {
+    max-width: var(--container-md);
+  }
+  .max-w-sm {
+    max-width: var(--container-sm);
+  }
+  .max-w-xs {
+    max-width: var(--container-xs);
+  }
+  .flex-1 {
+    flex: 1;
+  }
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+  .border-collapse {
+    border-collapse: collapse;
+  }
+  .transform {
+    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
+  }
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+  .items-center {
+    align-items: center;
+  }
+  .items-end {
+    align-items: flex-end;
+  }
+  .items-start {
+    align-items: flex-start;
+  }
+  .items-stretch {
+    align-items: stretch;
+  }
+  .justify-between {
+    justify-content: space-between;
+  }
+  .justify-center {
+    justify-content: center;
+  }
+  .justify-end {
+    justify-content: flex-end;
+  }
+  .gap-1 {
+    gap: var(--spacing);
+  }
+  .gap-1\.5 {
+    gap: calc(var(--spacing) * 1.5);
+  }
+  .gap-2 {
+    gap: calc(var(--spacing) * 2);
+  }
+  .gap-2\.5 {
+    gap: calc(var(--spacing) * 2.5);
+  }
+  .gap-3 {
+    gap: calc(var(--spacing) * 3);
+  }
+  .gap-3\.5 {
+    gap: calc(var(--spacing) * 3.5);
+  }
+  .gap-4 {
+    gap: calc(var(--spacing) * 4);
+  }
+  .gap-5 {
+    gap: calc(var(--spacing) * 5);
+  }
+  :where(.space-y-0\.5 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 0.5) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 0.5) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-1 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(var(--spacing) * var(--tw-space-y-reverse));
+    margin-block-end: calc(var(--spacing) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-1\.5 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 1.5) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 1.5) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-2 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 2) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-2\.5 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 2.5) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 2.5) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-3 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 3) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-3\.5 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 3.5) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 3.5) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-4 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 4) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 4) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-5 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 5) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 5) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  :where(.space-y-6 > :not(:last-child)) {
+    --tw-space-y-reverse: 0;
+    margin-block-start: calc(calc(var(--spacing) * 6) * var(--tw-space-y-reverse));
+    margin-block-end: calc(calc(var(--spacing) * 6) * calc(1 - var(--tw-space-y-reverse)));
+  }
+  .gap-x-2 {
+    column-gap: calc(var(--spacing) * 2);
+  }
+  :where(.space-x-1 > :not(:last-child)) {
+    --tw-space-x-reverse: 0;
+    margin-inline-start: calc(var(--spacing) * var(--tw-space-x-reverse));
+    margin-inline-end: calc(var(--spacing) * calc(1 - var(--tw-space-x-reverse)));
+  }
+  :where(.space-x-reverse > :not(:last-child)) {
+    --tw-space-x-reverse: 1;
+  }
+  .gap-y-2\.5 {
+    row-gap: calc(var(--spacing) * 2.5);
+  }
+  :where(.divide-y > :not(:last-child)) {
+    --tw-divide-y-reverse: 0;
+    border-bottom-style: var(--tw-border-style);
+    border-top-style: var(--tw-border-style);
+    border-top-width: calc(1px * var(--tw-divide-y-reverse));
+    border-bottom-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
+  }
+  :where(.divide-bordergold\/30 > :not(:last-child)) {
+    border-color: color-mix(in srgb, #332A18 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 30%, transparent);
+    }
+  }
+  :where(.divide-bordergold\/40 > :not(:last-child)) {
+    border-color: color-mix(in srgb, #332A18 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 40%, transparent);
+    }
+  }
+  :where(.divide-bordergold\/50 > :not(:last-child)) {
+    border-color: color-mix(in srgb, #332A18 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 50%, transparent);
+    }
+  }
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .overflow-hidden {
+    overflow: hidden;
+  }
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+  .rounded-2xl {
+    border-radius: var(--radius-2xl);
+  }
+  .rounded-3xl {
+    border-radius: var(--radius-3xl);
+  }
+  .rounded-full {
+    border-radius: calc(infinity * 1px);
+  }
+  .rounded-lg {
+    border-radius: var(--radius-lg);
+  }
+  .rounded-xl {
+    border-radius: var(--radius-xl);
+  }
+  .border {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
+  .border-x {
+    border-inline-style: var(--tw-border-style);
+    border-inline-width: 1px;
+  }
+  .border-t {
+    border-top-style: var(--tw-border-style);
+    border-top-width: 1px;
+  }
+  .border-b {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+  }
+  .border-dashed {
+    --tw-border-style: dashed;
+    border-style: dashed;
+  }
+  .border-amber-800 {
+    border-color: var(--color-amber-800);
+  }
+  .border-bordergold {
+    border-color: var(--color-bordergold);
+  }
+  .border-bordergold\/50 {
+    border-color: color-mix(in srgb, #332A18 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 50%, transparent);
+    }
+  }
+  .border-bordergold\/60 {
+    border-color: color-mix(in srgb, #332A18 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 60%, transparent);
+    }
+  }
+  .border-bordergold\/70 {
+    border-color: color-mix(in srgb, #332A18 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-bordergold) 70%, transparent);
+    }
+  }
+  .border-emerald-700 {
+    border-color: var(--color-emerald-700);
+  }
+  .border-emerald-700\/60 {
+    border-color: color-mix(in srgb, oklch(50.8% 0.118 165.612) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-700) 60%, transparent);
+    }
+  }
+  .border-emerald-700\/70 {
+    border-color: color-mix(in srgb, oklch(50.8% 0.118 165.612) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-700) 70%, transparent);
+    }
+  }
+  .border-emerald-800 {
+    border-color: var(--color-emerald-800);
+  }
+  .border-emerald-800\/50 {
+    border-color: color-mix(in srgb, oklch(43.2% 0.095 166.913) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-800) 50%, transparent);
+    }
+  }
+  .border-emerald-800\/60 {
+    border-color: color-mix(in srgb, oklch(43.2% 0.095 166.913) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-emerald-800) 60%, transparent);
+    }
+  }
+  .border-gold {
+    border-color: var(--color-gold);
+  }
+  .border-gold\/30 {
+    border-color: color-mix(in srgb, #D8B454 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-gold) 30%, transparent);
+    }
+  }
+  .border-gold\/40 {
+    border-color: color-mix(in srgb, #D8B454 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-gold) 40%, transparent);
+    }
+  }
+  .border-gold\/50 {
+    border-color: color-mix(in srgb, #D8B454 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
+    }
+  }
+  .border-gray-400 {
+    border-color: var(--color-gray-400);
+  }
+  .border-red-600 {
+    border-color: var(--color-red-600);
+  }
+  .border-red-700 {
+    border-color: var(--color-red-700);
+  }
+  .border-red-800 {
+    border-color: var(--color-red-800);
+  }
+  .border-red-800\/60 {
+    border-color: color-mix(in srgb, oklch(44.4% 0.177 26.899) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-800) 60%, transparent);
+    }
+  }
+  .border-red-800\/70 {
+    border-color: color-mix(in srgb, oklch(44.4% 0.177 26.899) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-800) 70%, transparent);
+    }
+  }
+  .border-red-900 {
+    border-color: var(--color-red-900);
+  }
+  .border-red-900\/40 {
+    border-color: color-mix(in srgb, oklch(39.6% 0.141 25.723) 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-900) 40%, transparent);
+    }
+  }
+  .border-red-900\/50 {
+    border-color: color-mix(in srgb, oklch(39.6% 0.141 25.723) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-900) 50%, transparent);
+    }
+  }
+  .border-red-900\/60 {
+    border-color: color-mix(in srgb, oklch(39.6% 0.141 25.723) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-red-900) 60%, transparent);
+    }
+  }
+  .border-sky-800 {
+    border-color: var(--color-sky-800);
+  }
+  .bg-\[\#0B0A08\] {
+    background-color: #0B0A08;
+  }
+  .bg-amber-950\/50 {
+    background-color: color-mix(in srgb, oklch(27.9% 0.077 45.635) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-amber-950) 50%, transparent);
+    }
+  }
+  .bg-black\/80 {
+    background-color: color-mix(in srgb, #000 80%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-black) 80%, transparent);
+    }
+  }
+  .bg-darkbg {
+    background-color: var(--color-darkbg);
+  }
+  .bg-emerald-600 {
+    background-color: var(--color-emerald-600);
+  }
+  .bg-emerald-700 {
+    background-color: var(--color-emerald-700);
+  }
+  .bg-emerald-950 {
+    background-color: var(--color-emerald-950);
+  }
+  .bg-emerald-950\/60 {
+    background-color: color-mix(in srgb, oklch(26.2% 0.051 172.552) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-emerald-950) 60%, transparent);
+    }
+  }
+  .bg-emerald-950\/70 {
+    background-color: color-mix(in srgb, oklch(26.2% 0.051 172.552) 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-emerald-950) 70%, transparent);
+    }
+  }
+  .bg-gold {
+    background-color: var(--color-gold);
+  }
+  .bg-golddark {
+    background-color: var(--color-golddark);
+  }
+  .bg-golddark\/40 {
+    background-color: color-mix(in srgb, #2A2212 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-golddark) 40%, transparent);
+    }
+  }
+  .bg-golddark\/70 {
+    background-color: color-mix(in srgb, #2A2212 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-golddark) 70%, transparent);
+    }
+  }
+  .bg-panelbg {
+    background-color: var(--color-panelbg);
+  }
+  .bg-red-600 {
+    background-color: var(--color-red-600);
+  }
+  .bg-red-950 {
+    background-color: var(--color-red-950);
+  }
+  .bg-red-950\/30 {
+    background-color: color-mix(in srgb, oklch(25.8% 0.092 26.042) 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-red-950) 30%, transparent);
+    }
+  }
+  .bg-red-950\/60 {
+    background-color: color-mix(in srgb, oklch(25.8% 0.092 26.042) 60%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-red-950) 60%, transparent);
+    }
+  }
+  .bg-sky-950\/50 {
+    background-color: color-mix(in srgb, oklch(29.3% 0.066 243.157) 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-sky-950) 50%, transparent);
+    }
+  }
+  .bg-white {
+    background-color: var(--color-white);
+  }
+  .p-1 {
+    padding: var(--spacing);
+  }
+  .p-2\.5 {
+    padding: calc(var(--spacing) * 2.5);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
+  }
+  .p-3\.5 {
+    padding: calc(var(--spacing) * 3.5);
+  }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
+  .p-5 {
+    padding: calc(var(--spacing) * 5);
+  }
+  .p-6 {
+    padding: calc(var(--spacing) * 6);
+  }
+  .p-7 {
+    padding: calc(var(--spacing) * 7);
+  }
+  .px-1 {
+    padding-inline: var(--spacing);
+  }
+  .px-2 {
+    padding-inline: calc(var(--spacing) * 2);
+  }
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
+  .px-3 {
+    padding-inline: calc(var(--spacing) * 3);
+  }
+  .px-3\.5 {
+    padding-inline: calc(var(--spacing) * 3.5);
+  }
+  .px-4 {
+    padding-inline: calc(var(--spacing) * 4);
+  }
+  .px-5 {
+    padding-inline: calc(var(--spacing) * 5);
+  }
+  .py-0\.5 {
+    padding-block: calc(var(--spacing) * 0.5);
+  }
+  .py-1 {
+    padding-block: var(--spacing);
+  }
+  .py-1\.5 {
+    padding-block: calc(var(--spacing) * 1.5);
+  }
+  .py-2 {
+    padding-block: calc(var(--spacing) * 2);
+  }
+  .py-2\.5 {
+    padding-block: calc(var(--spacing) * 2.5);
+  }
+  .py-3 {
+    padding-block: calc(var(--spacing) * 3);
+  }
+  .py-3\.5 {
+    padding-block: calc(var(--spacing) * 3.5);
+  }
+  .py-6 {
+    padding-block: calc(var(--spacing) * 6);
+  }
+  .pt-1 {
+    padding-top: var(--spacing);
+  }
+  .pt-2 {
+    padding-top: calc(var(--spacing) * 2);
+  }
+  .pt-2\.5 {
+    padding-top: calc(var(--spacing) * 2.5);
+  }
+  .pt-3 {
+    padding-top: calc(var(--spacing) * 3);
+  }
+  .pb-2 {
+    padding-bottom: calc(var(--spacing) * 2);
+  }
+  .pb-2\.5 {
+    padding-bottom: calc(var(--spacing) * 2.5);
+  }
+  .pb-3 {
+    padding-bottom: calc(var(--spacing) * 3);
+  }
+  .pb-16 {
+    padding-bottom: calc(var(--spacing) * 16);
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-left {
+    text-align: left;
+  }
+  .text-right {
+    text-align: right;
+  }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--tw-leading, var(--text-2xl--line-height));
+  }
+  .text-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--tw-leading, var(--text-3xl--line-height));
+  }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--tw-leading, var(--text-lg--line-height));
+  }
+  .text-sm {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
+  }
+  .text-xs {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+  }
+  .text-\[10px\] {
+    font-size: 10px;
+  }
+  .text-\[11px\] {
+    font-size: 11px;
+  }
+  .leading-none {
+    --tw-leading: 1;
+    line-height: 1;
+  }
+  .leading-relaxed {
+    --tw-leading: var(--leading-relaxed);
+    line-height: var(--leading-relaxed);
+  }
+  .leading-snug {
+    --tw-leading: var(--leading-snug);
+    line-height: var(--leading-snug);
+  }
+  .leading-tight {
+    --tw-leading: var(--leading-tight);
+    line-height: var(--leading-tight);
+  }
+  .font-black {
+    --tw-font-weight: var(--font-weight-black);
+    font-weight: var(--font-weight-black);
+  }
+  .font-bold {
+    --tw-font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold);
+  }
+  .whitespace-nowrap {
+    white-space: nowrap;
+  }
+  .text-amber-300 {
+    color: var(--color-amber-300);
+  }
+  .text-amber-400 {
+    color: var(--color-amber-400);
+  }
+  .text-black {
+    color: var(--color-black);
+  }
+  .text-emerald-300 {
+    color: var(--color-emerald-300);
+  }
+  .text-emerald-400 {
+    color: var(--color-emerald-400);
+  }
+  .text-gold {
+    color: var(--color-gold);
+  }
+  .text-gold\/80 {
+    color: color-mix(in srgb, #D8B454 80%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-gold) 80%, transparent);
+    }
+  }
+  .text-gray-200 {
+    color: var(--color-gray-200);
+  }
+  .text-gray-300 {
+    color: var(--color-gray-300);
+  }
+  .text-gray-400 {
+    color: var(--color-gray-400);
+  }
+  .text-gray-500 {
+    color: var(--color-gray-500);
+  }
+  .text-red-200 {
+    color: var(--color-red-200);
+  }
+  .text-red-300 {
+    color: var(--color-red-300);
+  }
+  .text-red-400 {
+    color: var(--color-red-400);
+  }
+  .text-sky-300 {
+    color: var(--color-sky-300);
+  }
+  .text-sky-400 {
+    color: var(--color-sky-400);
+  }
+  .text-white {
+    color: var(--color-white);
+  }
+  .placeholder-gray-500::placeholder {
+    color: var(--color-gray-500);
+  }
+  .accent-gold {
+    accent-color: var(--color-gold);
+  }
+  .shadow-2xl {
+    --tw-shadow: 0 25px 50px -12px var(--tw-shadow-color, rgb(0 0 0 / 0.25));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .shadow-lg {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 4px 6px -4px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .backdrop-blur-sm {
+    --tw-backdrop-blur: blur(var(--blur-sm));
+    -webkit-backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+    backdrop-filter: var(--tw-backdrop-blur,) var(--tw-backdrop-brightness,) var(--tw-backdrop-contrast,) var(--tw-backdrop-grayscale,) var(--tw-backdrop-hue-rotate,) var(--tw-backdrop-invert,) var(--tw-backdrop-opacity,) var(--tw-backdrop-saturate,) var(--tw-backdrop-sepia,);
+  }
+  .transition {
+    transition-property: color, background-color, border-color, outline-color, text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via, --tw-gradient-to, opacity, box-shadow, transform, translate, scale, rotate, filter, -webkit-backdrop-filter, backdrop-filter, display, content-visibility, overlay, pointer-events;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+    transition-duration: var(--tw-duration, var(--default-transition-duration));
+  }
+  .select-none {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .selection\:bg-gold ::selection {
+    background-color: var(--color-gold);
+  }
+  .selection\:bg-gold::selection {
+    background-color: var(--color-gold);
+  }
+  .selection\:text-black ::selection {
+    color: var(--color-black);
+  }
+  .selection\:text-black::selection {
+    color: var(--color-black);
+  }
+  @media (hover: hover) {
+    .hover\:border-gold:hover {
+      border-color: var(--color-gold);
+    }
+    .hover\:border-gold\/40:hover {
+      border-color: color-mix(in srgb, #D8B454 40%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:border-gold\/40:hover {
+        border-color: color-mix(in oklab, var(--color-gold) 40%, transparent);
+      }
+    }
+    .hover\:border-gold\/50:hover {
+      border-color: color-mix(in srgb, #D8B454 50%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:border-gold\/50:hover {
+        border-color: color-mix(in oklab, var(--color-gold) 50%, transparent);
+      }
+    }
+    .hover\:bg-cardbg:hover {
+      background-color: var(--color-cardbg);
+    }
+    .hover\:bg-emerald-600:hover {
+      background-color: var(--color-emerald-600);
+    }
+    .hover\:bg-emerald-950\/60:hover {
+      background-color: color-mix(in srgb, oklch(26.2% 0.051 172.552) 60%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-emerald-950\/60:hover {
+        background-color: color-mix(in oklab, var(--color-emerald-950) 60%, transparent);
+      }
+    }
+    .hover\:bg-gold:hover {
+      background-color: var(--color-gold);
+    }
+    .hover\:bg-goldhover:hover {
+      background-color: var(--color-goldhover);
+    }
+    .hover\:bg-red-500:hover {
+      background-color: var(--color-red-500);
+    }
+    .hover\:bg-red-700:hover {
+      background-color: var(--color-red-700);
+    }
+    .hover\:bg-red-900\/40:hover {
+      background-color: color-mix(in srgb, oklch(39.6% 0.141 25.723) 40%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-red-900\/40:hover {
+        background-color: color-mix(in oklab, var(--color-red-900) 40%, transparent);
+      }
+    }
+    .hover\:bg-red-900\/50:hover {
+      background-color: color-mix(in srgb, oklch(39.6% 0.141 25.723) 50%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-red-900\/50:hover {
+        background-color: color-mix(in oklab, var(--color-red-900) 50%, transparent);
+      }
+    }
+    .hover\:bg-red-950\/30:hover {
+      background-color: color-mix(in srgb, oklch(25.8% 0.092 26.042) 30%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-red-950\/30:hover {
+        background-color: color-mix(in oklab, var(--color-red-950) 30%, transparent);
+      }
+    }
+    .hover\:bg-red-950\/50:hover {
+      background-color: color-mix(in srgb, oklch(25.8% 0.092 26.042) 50%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-red-950\/50:hover {
+        background-color: color-mix(in oklab, var(--color-red-950) 50%, transparent);
+      }
+    }
+    .hover\:bg-red-950\/60:hover {
+      background-color: color-mix(in srgb, oklch(25.8% 0.092 26.042) 60%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-red-950\/60:hover {
+        background-color: color-mix(in oklab, var(--color-red-950) 60%, transparent);
+      }
+    }
+    .hover\:bg-white\/\[0\.02\]:hover {
+      background-color: color-mix(in srgb, #fff 2%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:bg-white\/\[0\.02\]:hover {
+        background-color: color-mix(in oklab, var(--color-white) 2%, transparent);
+      }
+    }
+    .hover\:text-black:hover {
+      color: var(--color-black);
+    }
+    .hover\:text-gold:hover {
+      color: var(--color-gold);
+    }
+    .hover\:text-red-300:hover {
+      color: var(--color-red-300);
+    }
+    .hover\:text-red-400:hover {
+      color: var(--color-red-400);
+    }
+    .hover\:text-white:hover {
+      color: var(--color-white);
+    }
+  }
+  .focus\:border-gold:focus {
+    border-color: var(--color-gold);
+  }
+  .focus\:outline-none:focus {
+    --tw-outline-style: none;
+    outline-style: none;
+  }
+  @media (width >= 40rem) {
+    .sm\:inline {
+      display: inline;
+    }
+    .sm\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .sm\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .sm\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .sm\:gap-2 {
+      gap: calc(var(--spacing) * 2);
+    }
+    .sm\:p-5 {
+      padding: calc(var(--spacing) * 5);
+    }
+    .sm\:px-3 {
+      padding-inline: calc(var(--spacing) * 3);
+    }
+    .sm\:px-6 {
+      padding-inline: calc(var(--spacing) * 6);
+    }
+    .sm\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--tw-leading, var(--text-xl--line-height));
+    }
+  }
+  @media (width >= 48rem) {
+    .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .md\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .md\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .md\:grid-cols-5 {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .md\:grid-cols-6 {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+  @media (width >= 64rem) {
+    .lg\:order-2 {
+      order: 2;
+    }
+    .lg\:order-3 {
+      order: 3;
+    }
+    .lg\:col-span-4 {
+      grid-column: span 4 / span 4;
+    }
+    .lg\:col-span-8 {
+      grid-column: span 8 / span 8;
+    }
+    .lg\:hidden {
+      display: none;
+    }
+    .lg\:w-auto {
+      width: auto;
+    }
+    .lg\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .lg\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .lg\:grid-cols-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .lg\:grid-cols-12 {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+    .lg\:flex-nowrap {
+      flex-wrap: nowrap;
+    }
+    .lg\:border-t-0 {
+      border-top-style: var(--tw-border-style);
+      border-top-width: 0px;
+    }
+    .lg\:py-2\.5 {
+      padding-block: calc(var(--spacing) * 2.5);
+    }
+    .lg\:pt-0 {
+      padding-top: 0px;
+    }
+    .lg\:pb-0 {
+      padding-bottom: 0px;
+    }
+  }
+}
+@layer base {
+  *,::after,::before,::backdrop {
+    border-color: #e5e7eb;
+  }
+}
+@property --tw-rotate-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-rotate-z {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-x {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-skew-y {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-space-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-space-x-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-divide-y-reverse {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0;
+}
+@property --tw-border-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-leading {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-font-weight {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-inset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-shadow-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-shadow-alpha {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+@property --tw-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-inset-ring-color {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-inset-ring-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-ring-inset {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-ring-offset-width {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --tw-ring-offset-color {
+  syntax: "*";
+  inherits: false;
+  initial-value: #fff;
+}
+@property --tw-ring-offset-shadow {
+  syntax: "*";
+  inherits: false;
+  initial-value: 0 0 #0000;
+}
+@property --tw-backdrop-blur {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-brightness {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-contrast {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-grayscale {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-hue-rotate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-invert {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-opacity {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-saturate {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-backdrop-sepia {
+  syntax: "*";
+  inherits: false;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-rotate-x: initial;
+      --tw-rotate-y: initial;
+      --tw-rotate-z: initial;
+      --tw-skew-x: initial;
+      --tw-skew-y: initial;
+      --tw-space-y-reverse: 0;
+      --tw-space-x-reverse: 0;
+      --tw-divide-y-reverse: 0;
+      --tw-border-style: solid;
+      --tw-leading: initial;
+      --tw-font-weight: initial;
+      --tw-shadow: 0 0 #0000;
+      --tw-shadow-color: initial;
+      --tw-shadow-alpha: 100%;
+      --tw-inset-shadow: 0 0 #0000;
+      --tw-inset-shadow-color: initial;
+      --tw-inset-shadow-alpha: 100%;
+      --tw-ring-color: initial;
+      --tw-ring-shadow: 0 0 #0000;
+      --tw-inset-ring-color: initial;
+      --tw-inset-ring-shadow: 0 0 #0000;
+      --tw-ring-inset: initial;
+      --tw-ring-offset-width: 0px;
+      --tw-ring-offset-color: #fff;
+      --tw-ring-offset-shadow: 0 0 #0000;
+      --tw-backdrop-blur: initial;
+      --tw-backdrop-brightness: initial;
+      --tw-backdrop-contrast: initial;
+      --tw-backdrop-grayscale: initial;
+      --tw-backdrop-hue-rotate: initial;
+      --tw-backdrop-invert: initial;
+      --tw-backdrop-opacity: initial;
+      --tw-backdrop-saturate: initial;
+      --tw-backdrop-sepia: initial;
+    }
+  }
+}
+</style>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    
     <style>
         body {
-            font-family: 'Cairo', sans-serif;
+            font-family: 'Cairo', Tahoma, 'Segoe UI', sans-serif;
             background-color: #0B0A08;
             color: #F5F1E8;
         }
@@ -61,9 +1610,15 @@
                 border-radius: 0 !important;
             }
         }
+    .no-fa .fa-check::before,.no-fa .fa-user-check::before,.no-fa .fa-circle-check::before,.no-fa .fa-shield-check::before{content:"✓"}.no-fa .fa-xmark::before{content:"✕"}.no-fa .fa-trash::before{content:"🗑"}.no-fa .fa-print::before{content:"🖨"}.no-fa .fa-user::before{content:"👤"}.no-fa .fa-scissors::before{content:"✂"}.no-fa .fa-phone::before{content:"📞"}.no-fa .fa-file-csv::before{content:"CSV"}.no-fa .fa-circle-exclamation::before{content:"!"}.no-fa .fa-triangle-exclamation::before{content:"⚠"}.no-fa .fa-rotate-left::before{content:"↺"}
+    .ic{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        #header-salon-name,#rec-salon-name{text-transform:uppercase;letter-spacing:.04em}
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%82%EF%B8%8F%3C/text%3E%3C/svg%3E">
 </head>
 <body class="min-h-screen flex flex-col selection:bg-gold selection:text-black overflow-x-hidden pb-16 lg:pb-0">
+<svg width="0" height="0" style="position:absolute"><symbol id="logo" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="none" stroke="currentColor" stroke-width="3"/><path d="M38 50c-3-17 9-27 24-27s27 9 22 27c-3-10-12-14-23-14s-20 4-23 14z" fill="currentColor"/><path d="M41 50c0 15 8 26 19 26s19-11 19-26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="53" cy="54" r="2.2" fill="currentColor"/><circle cx="67" cy="54" r="2.2" fill="currentColor"/><path d="M49 64c4-4 8-3 11 0 3-3 7-4 11 0-4 6-8 4-11 1-3 3-7 5-11-1z" fill="currentColor"/><path d="M26 112c2-19 15-28 34-28s32 9 34 28" fill="none" stroke="currentColor" stroke-width="3"/><path d="M60 90l-9-5v10zM60 90l9-5v10z" fill="currentColor"/><path d="M94 100c4-12 3-22-2-30" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><g transform="translate(78 28) scale(1.25)" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="3"/><circle cx="14" cy="21" r="3"/><path d="M8 15.5 20 2M12 17 4 3"/></g></symbol></svg>
+
 
     <!-- Toast Container -->
     <div id="toast-container" class="fixed top-4 left-4 z-[100] flex flex-col gap-2 max-w-xs w-full pointer-events-none"></div>
@@ -74,9 +1629,7 @@
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-[#0B0A08]">
         <div class="max-w-sm w-full bg-panelbg border border-bordergold rounded-3xl p-7 shadow-2xl space-y-6">
             <div class="text-center space-y-1">
-                <div class="w-16 h-16 mx-auto rounded-2xl border border-gold/40 bg-golddark text-gold flex items-center justify-center text-2xl mb-2">
-                    <i class="fa-solid fa-scissors"></i>
-                </div>
+                <svg class="w-24 h-24 mx-auto text-gold"><use href="#logo"/></svg>
                 <h1 class="text-2xl font-black text-gold">TOMMY BARBER</h1>
                 <p class="text-xs text-gray-400">صالون رجالي • تسجيل الدخول</p>
             </div>
@@ -137,9 +1690,9 @@
         <header class="bg-panelbg border-b border-bordergold px-3 sm:px-6 pt-2.5 pb-2 lg:py-2.5 sticky top-0 z-40">
             <div class="max-w-[1600px] mx-auto flex flex-wrap lg:flex-nowrap items-center justify-between gap-y-2.5 gap-x-2">
 
-                <div class="text-right shrink-0 order-1">
+                <div class="text-right shrink-0 order-1 flex items-center gap-2"><svg class="w-10 h-10 text-gold shrink-0"><use href="#logo"/></svg><div>
                     <h1 id="header-salon-name" class="text-base sm:text-xl font-black text-gold leading-tight">TOMMY BARBER</h1>
-                    <p id="header-salon-sub" class="text-[11px] text-gray-400 leading-none">صالون رجالي</p>
+                    <p id="header-salon-sub" class="text-[11px] text-gray-400 leading-none">صالون رجالي</p></div>
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0 order-2 lg:order-3">
@@ -226,7 +1779,7 @@
 
                         <div class="grid grid-cols-3 gap-2 pt-2 border-t border-bordergold">
                             <button type="button" onclick="setPaymentMethod('cash')" id="pay-btn-cash" class="pay-btn py-2.5 rounded-xl border text-xs font-bold transition">كاش</button>
-                            <button type="button" onclick="setPaymentMethod('visa')" id="pay-btn-visa" class="pay-btn py-2.5 rounded-xl border text-xs font-bold transition">فيزا</button>
+                            <button type="button" onclick="setPaymentMethod('visa')" id="pay-btn-visa" class="pay-btn py-2.5 rounded-xl border text-xs font-bold transition">إنستا باي</button>
                             <button type="button" onclick="setPaymentMethod('wallet')" id="pay-btn-wallet" class="pay-btn py-2.5 rounded-xl border text-xs font-bold transition">محفظة</button>
                         </div>
 
@@ -505,13 +2058,14 @@
                             <h2 class="text-base font-black text-white">تسجيل الحضور والانصراف اليومي</h2>
                             <p class="text-xs text-gray-400">اضغط علامة الحضور الخضراء أو الغياب الحمراء، وسجل الانصراف عند المغادرة</p>
                         </div>
-                        <span id="att-page-date" class="px-3.5 py-1.5 rounded-xl bg-darkbg border border-gold/40 text-gold font-mono text-xs font-black"></span>
+                        <div class="flex flex-wrap gap-2"><button type="button" onclick="bulkAttendance('present')" class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-black">حضور الكل</button><button type="button" onclick="bulkAttendance('checkout')" class="px-3 py-1.5 rounded-xl border border-gold/50 text-gold hover:bg-gold hover:text-black text-xs font-black transition">انصراف الكل</button></div><span id="att-page-date" class="px-3.5 py-1.5 rounded-xl bg-darkbg border border-gold/40 text-gold font-mono text-xs font-black"></span>
                     </div>
+                    <div id="att-summary" class="flex flex-wrap gap-2 text-xs font-bold"></div>
                     <div id="attendance-daily-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
                 </div>
 
                 <div class="bg-panelbg border border-bordergold rounded-2xl p-4 sm:p-5 space-y-3">
-                    <h3 class="text-sm font-black text-gold">تقرير الحضور والغياب والتأخيرات (الشهر الحالي)</h3>
+                    <div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-black text-gold">تقرير الحضور والغياب والتأخيرات</h3><label class="text-xs text-gray-400 flex items-center gap-2">شهر الحساب <input type="month" class="pm-input bg-panelbg border border-bordergold rounded-xl px-3 py-1.5 text-xs text-white" onchange="setPayrollMonth(this.value)"></label></div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-right border-collapse text-xs">
                             <thead>
@@ -537,15 +2091,7 @@
             <!-- ========================================================= -->
             <section id="view-barbers" class="view-section hidden space-y-4">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div class="flex flex-wrap items-center gap-1.5">
-                        <button onclick="setStaffFilter('all')" id="sf-all" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-black bg-gold text-black">الكل</button>
-                        <button onclick="setStaffFilter('barber')" id="sf-barber" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">حلاقين</button>
-                        <button onclick="setStaffFilter('skincare')" id="sf-skincare" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">بشرة / بيديكير</button>
-                        <button onclick="setStaffFilter('assistant')" id="sf-assistant" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">مساعدين</button>
-                        <button onclick="setStaffFilter('cashier')" id="sf-cashier" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">كاشير</button>
-                        <button onclick="setStaffFilter('manager')" id="sf-manager" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">مدير</button>
-                        <button onclick="setStaffFilter('cleaner')" id="sf-cleaner" class="sf-btn px-3.5 py-1.5 rounded-full text-xs font-bold bg-panelbg border border-bordergold text-gray-300">أرضية</button>
-                    </div>
+                    <div id="sf-bar" class="flex flex-wrap items-center gap-1.5"></div>
                     <div class="flex items-center gap-2">
                         <button onclick="openAdvanceModal()" class="px-3.5 py-2 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 text-xs font-bold">+ تسجيل سُلفة / خصم</button>
                         <button onclick="openBarberModal()" class="bg-gold hover:bg-goldhover text-black font-black px-4 py-2 rounded-xl text-xs">+ إضافة موظف / صنايعي</button>
@@ -571,6 +2117,7 @@
                     </div>
                 </div>
 
+                <label class="text-xs text-gray-300 flex items-center gap-2">شهر الحساب (الرواتب والعمولات) <input type="month" class="pm-input bg-panelbg border border-bordergold rounded-xl px-3 py-1.5 text-xs text-white" onchange="setPayrollMonth(this.value)"></label>
                 <div id="barbers-manage-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
                 <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2">
@@ -617,6 +2164,13 @@
                             <label class="block text-gray-400 mb-1">أرقام الدفع الإلكتروني / المحفظة (تُطبع في الإيصال)</label>
                             <input type="text" id="set-payment-numbers" placeholder="مثلاً: محفظة / انستاباي: 01000746687" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
                         </div>
+                        <div>
+                            <label class="block text-gray-400 mb-1">نظام خصم التأخير (بعد السماح)</label>
+                            <select id="set-late-mode" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
+                                <option value="full">لو عدّى السماح: يتخصم التأخير كله</option>
+                                <option value="excess">يتخصم اللي بعد السماح بس</option>
+                            </select>
+                        </div>
                         <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ الإعدادات</button>
                     </form>
 
@@ -646,6 +2200,16 @@
                             </div>
                         </div>
 
+                        <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
+                            <h3 class="text-sm font-black text-gold">الوظائف</h3>
+                            <div id="roles-list" class="space-y-1.5"></div>
+                            <div class="flex flex-wrap gap-2 items-center">
+                                <input id="new-role-name" placeholder="اسم وظيفة جديدة" class="flex-1 bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
+                                <label class="flex items-center gap-1 text-gray-300"><input type="checkbox" id="new-role-perf" class="accent-gold"> بتعمل خدمات للعملاء</label>
+                                <button type="button" onclick="addRole()" class="bg-gold text-black font-black px-4 py-2 rounded-xl">إضافة</button>
+                            </div>
+                        </div>
+                        
                         <!-- تصفير بيانات التشغيل والبدء على نظيف -->
                         <div class="bg-panelbg border border-red-900/60 rounded-2xl p-4 space-y-3 text-xs">
                             <div class="flex items-center gap-2 text-red-400">
@@ -696,8 +2260,8 @@
             </div>
             <div id="printable-receipt" class="bg-white text-black rounded-xl p-4 text-xs space-y-2 leading-relaxed">
                 <div class="text-center border-b border-dashed border-gray-400 pb-2">
-                    <h2 id="rec-salon-name" class="text-lg font-black">TOMMY BARBER</h2>
-                    <p id="rec-salon-address" class="text-[11px]">شارع البحر - أمام بنك ناصر الاجتماعي</p>
+                    <svg class="w-14 h-14 mx-auto text-black"><use href="#logo"/></svg><h2 id="rec-salon-name" class="text-lg font-black">TOMMY BARBER</h2>
+                    <p id="rec-salon-address" class="text-[11px]">المحلة الكبرى - شارع البحر - أمام بنك ناصر الاجتماعي</p>
                     <p id="rec-salon-phone" class="text-[11px] font-mono">01000746687</p>
                 </div>
                 <div class="flex justify-between text-[11px]">
@@ -715,7 +2279,7 @@
                     <div class="flex justify-between"><span>طريقة الدفع:</span><span id="rec-payment">كاش</span></div>
                     <div class="flex justify-between text-sm font-black border-t border-gray-400 pt-1"><span>الإجمالي:</span><span id="rec-total">0 ج.م</span></div>
                 </div>
-                <p class="text-center text-[11px] font-bold pt-2 border-t border-dashed border-gray-400">شكراً لزيارتكم مع تحيات TOMMY BARBER</p>
+                <p class="text-center text-[11px] font-bold pt-2 border-t border-dashed border-gray-400">شكراً لزيارتكم<br>مع تحيات TOMMY BARBER</p>
             </div>
             <div class="grid grid-cols-2 gap-2">
                 <button onclick="window.print()" class="bg-gold text-black font-black py-2.5 rounded-xl text-xs"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
@@ -750,6 +2314,7 @@
                         <option value="fa-jar">اسكرابات</option>
                         <option value="fa-crown">باكدجات العريس</option>
                         <option value="fa-mug-hot">كافيه ومشروبات</option>
+                        <option value="fa-hand-sparkles">مانيكير وبديكير</option>
                     </select>
                 </div>
                 <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ القسم</button>
@@ -796,14 +2361,7 @@
                     </div>
                     <div>
                         <label class="block text-gray-400 mb-1">الوظيفة / التخصص</label>
-                        <select id="edit-barber-role" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
-                            <option value="barber">حلاق (صنايعي)</option>
-                            <option value="skincare">أخصائي بشرة وعناية / بيديكير</option>
-                            <option value="assistant">مساعد حلاق</option>
-                            <option value="cashier">كاشير</option>
-                            <option value="manager">مدير</option>
-                            <option value="cleaner">عامل أرضية</option>
-                        </select>
+                        <select id="edit-barber-role" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold"></select>
                     </div>
                 </div>
 
@@ -854,6 +2412,17 @@
                     </div>
                 </div>
 
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-gray-400 mb-1">ميعاد الانصراف الرسمي</label>
+                        <input type="time" id="edit-barber-shift-end" value="22:00" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 mb-1">سماح التأخير (دقيقة)</label>
+                        <input type="number" id="edit-barber-grace" min="0" value="15" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
+                    </div>
+                </div>
+                <p class="text-[11px] text-gray-400">لو جه بعد ميعاد الحضور بأقل من أو بقدر السماح، مفيش خصم. لو عدّى السماح، التأخير بيتخصم بقيمة ساعة التأخير.</p>
                 <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ بيانات الموظف</button>
             </form>
         </div>
@@ -913,7 +2482,7 @@
                     </div>
                     <div>
                         <label class="block text-gray-400 mb-1">كلمة المرور</label>
-                        <input type="text" id="edit-user-password" required dir="ltr" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
+                        <input type="password" id="edit-user-password" required dir="ltr" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
                     </div>
                     <div>
                         <label class="block text-gray-400 mb-1">PIN (4 أرقام)</label>
@@ -996,17 +2565,30 @@
         };
 
         let db = null, cloudRef = null, isApplyingRemote = false;
-        try {
-            if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            cloudRef = db.ref('tommy_barber_exact_clone_v7');
-        } catch (e) {}
+        
 
         // =========================================================================
         // STATE & SEED DATA
         // =========================================================================
         const STORAGE_KEY = 'tommy_barber_exact_clone_v7_local';
-        const getTodayISO = () => new Date().toISOString().split('T')[0];
+        const localISO = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        const BIZ_SHIFT = 5 * 3600000; // يوم العمل بيبدأ 5 الفجر، فالفواتير بعد نص الليل تتسجل في نفس اليوم
+        const getTodayISO = () => localISO(new Date(Date.now() - BIZ_SHIFT));
+        let payrollMonth = getTodayISO().slice(0, 7);
+        const toMin = t => { const [h, m] = String(t || '').split(':').map(Number); return isNaN(h) ? null : h * 60 + (m || 0); };
+        const diffFromShift = (shift, t24) => { const a = toMin(shift), b = toMin(t24); return a == null || b == null ? 0 : b - a; };
+        const graceOf = st => (st && st.graceMinutes != null ? Number(st.graceMinutes) : 15);
+        const chargeMin = (late, st) => { const g = graceOf(st); if (late <= g) return 0; return appState.salonInfo.lateMode === 'excess' ? late - g : late; };
+        function stampOut(rec, st, t24) { rec.checkOut24 = t24; const e = st && st.shiftEnd ? toMin(st.shiftEnd) - toMin(t24) : 0; rec.earlyMinutes = e > 0 ? e : 0; }
+        function lateBadge(rec, st) {
+            const d = rec.diffMin != null ? rec.diffMin : (rec.lateMinutes || 0), late = Math.max(0, d), g = graceOf(st);
+            const B = (c, t) => `<span class="block mt-1 px-2 py-0.5 rounded-lg border text-[11px] font-black ${c}">${t}</span>`;
+            if (d < 0) return B('bg-sky-950/50 border-sky-800 text-sky-300', 'جه بدري ' + (-d) + ' د');
+            if (late === 0) return B('bg-emerald-950/60 border-emerald-800 text-emerald-300', 'في الميعاد');
+            if (late <= g) return B('bg-amber-950/50 border-amber-800 text-amber-300', 'متأخر ' + late + ' د (جوه السماح - بدون خصم)');
+            return B('bg-red-950/60 border-red-800 text-red-300', 'متأخر ' + late + ' د - هيتخصم');
+        }
+        const invFactor = inv => (inv.subtotal > 0 && inv.total != null ? inv.total / inv.subtotal : 1);
         const get24TimeStr = () => {
             const d = new Date();
             return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
@@ -1023,6 +2605,12 @@
         };
         const getTimeStr = () => formatTime12(get24TimeStr());
         const fmt = (n) => Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 });
+        const DEFAULT_ROLES = [{id:'barber',label:'حلاق (صنايعي)',perf:true},{id:'assistant',label:'مساعد حلاق'},{id:'skincare',label:'أخصائي بشرة وتنظيف بشرة',perf:true},{id:'nails',label:'أخصائي مانيكير وبديكير',perf:true},{id:'cleaner',label:'عامل أرضية'},{id:'cafe',label:'عامل كافيه'},{id:'cashier',label:'كاشير'},{id:'manager',label:'مدير'}];
+        const roles = () => (appState.roles && appState.roles.length ? appState.roles : DEFAULT_ROLES);
+        const roleLabel = r => (roles().find(x => x.id === r) || { label: 'حلاق (صنايعي)' }).label;
+        const isPerf = b => !!(roles().find(x => x.id === (b.role || 'barber')) || {}).perf;
+        const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const isCareCat = id => CARE_CATEGORIES.includes(id) || /بشرة|عناية|بديكير|مانيكير|صبغ|اسكراب|تنعيم|دقن/.test((appState.categories.find(c => c.id === id) || {}).name || '');
 
         // Categories that count as "خدمات البشرة والعناية والصبغات" for extra commission
         const CARE_CATEGORIES = ['cat_skin', 'cat_haircare', 'cat_beard', 'cat_dyes', 'cat_scrub', 'cat_smooth'];
@@ -1031,7 +2619,7 @@
             salonInfo: {
                 name: 'TOMMY BARBER',
                 sub: 'صالون رجالي',
-                address: 'شارع البحر - أمام بنك ناصر الاجتماعي',
+                address: 'المحلة الكبرى - شارع البحر - أمام بنك ناصر الاجتماعي',
                 phone: '01000746687',
                 paymentNumbers: 'محفظة / انستاباي: 01000746687'
             },
@@ -1091,7 +2679,8 @@
                 { id: 'cat_dyes', name: 'خدمات الصبغات', icon: 'fa-mortar-pestle' },
                 { id: 'cat_skin', name: 'خدمات العناية بالبشرة', icon: 'fa-face-laugh-beam' },
                 { id: 'cat_scrub', name: 'الاسكرابات', icon: 'fa-jar' },
-                { id: 'cat_groom', name: 'باكدجات خاصة بالعريس', icon: 'fa-crown' }
+                { id: 'cat_groom', name: 'باكدجات خاصة بالعريس', icon: 'fa-crown' },
+                { id: 'cat_nails', name: 'مانيكير وبديكير', icon: 'fa-hand-sparkles' }
             ],
             catalog: [
                 { id: 's1', category: 'cat_cut', name: 'قص شعر', price: 150, icon: 'fa-scissors' },
@@ -1118,7 +2707,9 @@
                 { id: 's19', category: 'cat_dyes', name: 'صبغة شعر سيلفر (خصل)', price: 500, icon: 'fa-mortar-pestle' },
                 { id: 's20', category: 'cat_skin', name: 'تنظيف بشره هيدروفيشل 7 مراحل', price: 600, icon: 'fa-face-laugh-beam' },
                 { id: 's21', category: 'cat_scrub', name: 'اسكراب وجه بالقهوة والذهب', price: 100, icon: 'fa-jar' },
-                { id: 's22', category: 'cat_groom', name: 'باكدج العريس الملكي', price: 1500, icon: 'fa-crown' }
+                { id: 's22', category: 'cat_groom', name: 'باكدج العريس الملكي', price: 1500, icon: 'fa-crown' },
+                { id: 's23', category: 'cat_nails', name: 'مانيكير', price: 150, icon: 'fa-hand-sparkles' },
+                { id: 's24', category: 'cat_nails', name: 'بديكير', price: 200, icon: 'fa-hand-sparkles' }
             ],
             invoices: [
                 {
@@ -1183,7 +2774,7 @@
 
         let appState = loadState();
         let currentUser = null;
-        let selectedBarberId = appState.barbers.find(b => (b.role || 'barber') === 'barber')?.id || 'b1';
+        let selectedBarberId = appState.barbers.find(isPerf)?.id || 'b1';
         let selectedCategoryId = appState.categories[0]?.id || 'cat_cut';
         let servicesBoxVisible = true;
         let editingInvoiceId = null;
@@ -1204,6 +2795,7 @@
         }
 
         function saveState() {
+            if (!isApplyingRemote) appState._ts = Date.now();
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
                 if (cloudRef && !isApplyingRemote) {
@@ -1222,10 +2814,14 @@
         }
 
         function initCloudSync() {
+            try { if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } catch (e) {}
             if (!cloudRef) return;
             cloudRef.on('value', (snap) => {
                 const remote = snap.val();
                 if (remote) {
+                    const rt = remote._ts || 0, lt = appState._ts || 0;
+                    if (rt && rt === lt) return;
+                    if (rt < lt) { cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {}); return; }
                     isApplyingRemote = true;
                     appState = {
                         ...JSON.parse(JSON.stringify(defaultState)),
@@ -1342,6 +2938,7 @@
 
             renderAll();
             if (firstTab) switchTab(firstTab);
+            if (user.username === 'admin' && user.password === '1234') setTimeout(() => { switchTab('users'); openUserModal(user.id); showToast('غيّر كلمة المرور والـ PIN الافتراضية دلوقتي', 'error'); }, 400);
         }
 
         function logoutUser() {
@@ -1381,23 +2978,23 @@
         }
 
         function getStaffMonthlyAttendance(staffId) {
-            const monthPrefix = getTodayISO().slice(0, 7); // YYYY-MM
+            const monthPrefix = payrollMonth;
             const records = appState.attendanceRecords || {};
             let present = 0;
             let absent = 0;
-            let lateMinutes = 0;
+            let lateMinutes = 0, chargeMinutes = 0, lateDays = 0; const st0 = appState.barbers.find(b => b.id === staffId);
             Object.entries(records).forEach(([dateKey, dayMap]) => {
                 if (dateKey.startsWith(monthPrefix) && dayMap && dayMap[staffId]) {
                     const r = dayMap[staffId];
                     if (r.status === 'present') {
                         present++;
-                        lateMinutes += Number(r.lateMinutes || 0);
+                        lateMinutes += Number(r.lateMinutes || 0); chargeMinutes += chargeMin(Number(r.lateMinutes || 0), st0); if (r.lateMinutes > 0) lateDays++;
                     } else if (r.status === 'absent') {
                         absent++;
                     }
                 }
             });
-            return { present, absent, lateMinutes };
+            return { present, absent, lateMinutes, chargeMinutes, lateDays };
         }
 
         function calculateStaffPayroll(staff, filteredInvoices) {
@@ -1408,7 +3005,7 @@
             const lateHourRate = Number(staff.lateHourRate || 20);
             const att = getStaffMonthlyAttendance(staff.id);
             const absentDays = att.absent;
-            const lateHours = Number((att.lateMinutes / 60).toFixed(2));
+            const lateHours = Number((att.chargeMinutes / 60).toFixed(2));
 
             const staffInvs = filteredInvoices.filter(i => i.barberId === staff.id);
             let regularSales = 0;
@@ -1416,8 +3013,8 @@
 
             staffInvs.forEach(inv => {
                 inv.items.forEach(it => {
-                    const lineTotal = it.price * it.qty;
-                    if (CARE_CATEGORIES.includes(it.category)) {
+                    const lineTotal = it.price * it.qty * invFactor(inv);
+                    if (isCareCat(it.category)) {
                         careSales += lineTotal;
                     } else {
                         regularSales += lineTotal;
@@ -1427,7 +3024,7 @@
 
             const totalSales = regularSales + careSales;
             const regularComm = payType === 'salary' ? 0 : (regularSales * pct) / 100;
-            const careComm = (careSales * (skinPct > 0 ? skinPct : (payType === 'salary' ? 0 : pct))) / 100;
+            const careComm = payType === 'salary' ? 0 : (careSales * (skinPct > 0 ? skinPct : pct)) / 100;
             const totalComm = Number((regularComm + careComm).toFixed(2));
 
             const dailyRate = baseSalary > 0 ? (baseSalary / 30) : 0;
@@ -1437,7 +3034,7 @@
             const netBaseSalary = Math.max(0, baseSalary - totalTimeDeduction);
 
             const advancesTotal = (appState.advances || [])
-                .filter(a => a.staffId === staff.id)
+                .filter(a => a.staffId === staff.id && (a.date || '').startsWith(payrollMonth))
                 .reduce((s, a) => s + Number(a.amount || 0), 0);
 
             const netPayable = Math.max(0, Number((netBaseSalary + totalComm - advancesTotal).toFixed(2)));
@@ -1453,7 +3050,7 @@
                 baseSalary,
                 presentDays: att.present,
                 absentDays,
-                lateMinutes: att.lateMinutes,
+                lateMinutes: att.lateMinutes, chargeMinutes: att.chargeMinutes, lateDays: att.lateDays,
                 lateHours,
                 absenceDeduction,
                 lateDeduction,
@@ -1496,17 +3093,14 @@
 
         function renderPOS() {
             // Show barbers and skincare/pedicure specialists in POS selection
-            const activeBarbers = appState.barbers.filter(b => {
-                const r = b.role || 'barber';
-                return r === 'barber' || r === 'skincare';
-            });
+            const activeBarbers = appState.barbers.filter(isPerf);
             if (!activeBarbers.some(b => b.id === selectedBarberId) && activeBarbers.length > 0) {
                 selectedBarberId = activeBarbers[0].id;
             }
 
             document.getElementById('pos-barbers-grid').innerHTML = activeBarbers.map(b => {
                 const isSel = selectedBarberId === b.id;
-                const isSkin = (b.role || 'barber') === 'skincare';
+                const isSkin = (b.role || 'barber') !== 'barber';
                 return `
                     <button type="button" onclick="selectBarber('${b.id}')" class="relative bg-panelbg border ${isSel ? 'border-gold bg-golddark/40' : 'border-bordergold hover:border-gold/40'} rounded-2xl p-3.5 text-center transition flex flex-col items-center gap-1.5">
                         ${isSel ? `<span class="absolute top-2 right-2 w-4 h-4 rounded-full bg-gold text-black text-[10px] font-black flex items-center justify-center">✓</span>` : ''}
@@ -1780,8 +3374,10 @@
         }
 
         function openThermalReceipt(inv, autoPrint = false) {
-            const payLabels = { cash: 'كاش', visa: 'فيزا', wallet: 'محفظة', instapay: 'محفظة' };
-            document.getElementById('rec-salon-name').textContent = appState.salonInfo.name;
+            if (typeof inv !== 'object') inv = appState.invoices.find(i => i.id === inv);
+            if (!inv) return;
+            const payLabels = { cash: 'كاش', visa: 'إنستا باي', wallet: 'محفظة', instapay: 'محفظة' };
+            document.getElementById('rec-salon-name').textContent = (appState.salonInfo.name || 'TOMMY BARBER').toUpperCase();
             document.getElementById('rec-salon-address').textContent = appState.salonInfo.address;
             document.getElementById('rec-salon-phone').textContent = appState.salonInfo.phone;
             document.getElementById('rec-id').textContent = inv.id;
@@ -1805,8 +3401,8 @@
         // 2. INVOICES TABLE
         // =========================================================================
         function setInvPeriod(period) {
-            const today = new Date();
-            const toISO = (d) => d.toISOString().split('T')[0];
+            const today = new Date(Date.now() - BIZ_SHIFT);
+            const toISO = (d) => localISO(d);
             let from = toISO(today), to = toISO(today);
 
             if (period === 'yesterday') {
@@ -1830,7 +3426,7 @@
             const q = (document.getElementById('inv-search-query')?.value || '').trim().toLowerCase();
             const deletedOnly = document.getElementById('show-deleted-only')?.checked;
             const canEditInv = currentUser?.permissions?.editInvoices;
-            const payLabels = { cash: 'كاش', visa: 'فيزا', wallet: 'محفظة', instapay: 'محفظة' };
+            const payLabels = { cash: 'كاش', visa: 'إنستا باي', wallet: 'محفظة', instapay: 'محفظة' };
 
             const filtered = appState.invoices.filter(inv => {
                 if (deletedOnly ? !inv.deleted : inv.deleted) return false;
@@ -1866,7 +3462,7 @@
                     <td class="p-3 font-black text-gold">${fmt(inv.total)}</td>
                     <td class="p-3 text-gray-400">${inv.cashierName || '-'}</td>
                     <td class="p-3 text-left whitespace-nowrap space-x-1 space-x-reverse">
-                        <button onclick='openThermalReceipt(${JSON.stringify(inv)})' class="px-2.5 py-1 rounded-lg border border-bordergold text-gold hover:bg-gold hover:text-black font-bold">طباعة</button>
+                        <button onclick="openThermalReceipt(${inv.id})" class="px-2.5 py-1 rounded-lg border border-bordergold text-gold hover:bg-gold hover:text-black font-bold">طباعة</button>
                         ${canEditInv ? (!inv.deleted ? `
                             <button onclick="editExistingInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-bordergold text-gray-300 hover:border-gold font-bold">تعديل</button>
                             <button onclick="deleteInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-red-900/50 bg-red-950/30 text-red-400 hover:bg-red-900/50 font-bold">حذف</button>
@@ -2043,7 +3639,7 @@
                         <td class="p-3 text-center font-black text-white">${fmt(c.spent)} ج.م</td>
                         <td class="p-3 text-center font-mono text-gray-400">${c.lastVisit}</td>
                         <td class="p-3 text-left whitespace-nowrap space-x-1 space-x-reverse">
-                            <button onclick="startInvoiceForClient('${c.name}', '${c.phone}')" class="px-2.5 py-1 rounded-lg bg-gold text-black font-black hover:bg-goldhover transition">فاتورة</button>
+                            <button data-n="${esc(c.name)}" data-p="${esc(c.phone)}" onclick="startInvoiceForClient(this.dataset.n, this.dataset.p)" class="px-2.5 py-1 rounded-lg bg-gold text-black font-black hover:bg-goldhover transition">فاتورة</button>
                             <button onclick="openClientModal('${c.phone}')" class="px-2.5 py-1 rounded-lg border border-bordergold text-gray-300 hover:border-gold font-bold">تعديل</button>
                             <button onclick="deleteClient('${c.phone}')" class="px-2.5 py-1 rounded-lg border border-red-900/50 bg-red-950/30 text-red-400 hover:bg-red-900/50 font-bold">حذف</button>
                         </td>
@@ -2061,8 +3657,8 @@
             const active = document.getElementById(`rep-btn-${period}`);
             if (active) active.className = 'rep-period-btn px-3 py-1.5 rounded-xl bg-gold text-black text-xs font-black';
 
-            const today = new Date();
-            const toISO = (d) => d.toISOString().split('T')[0];
+            const today = new Date(Date.now() - BIZ_SHIFT);
+            const toISO = (d) => localISO(d);
             let from = '', to = toISO(today);
 
             if (period === 'today') {
@@ -2112,10 +3708,7 @@
             document.getElementById('rep-kpi-sales').textContent = fmt(totalSales);
             document.getElementById('rep-kpi-count').textContent = fmt(invs.length);
             // 1. Sales by Barber & Skincare Specialists
-            const barbersOnly = appState.barbers.filter(b => {
-                const r = b.role || 'barber';
-                return r === 'barber' || r === 'skincare';
-            });
+            const barbersOnly = appState.barbers.filter(isPerf);
             const barberRows = barbersOnly.map(b => {
                 const calc = calculateStaffPayroll(b, invs);
                 return { name: b.name, count: calc.invCount, sales: calc.totalSales, comm: calc.totalComm, pct: b.commissionPct, payType: b.payType };
@@ -2148,7 +3741,7 @@
             invs.forEach(inv => inv.items.forEach(it => {
                 if (!catMap[it.category]) catMap[it.category] = { qty: 0, sales: 0 };
                 catMap[it.category].qty += it.qty;
-                catMap[it.category].sales += it.price * it.qty;
+                catMap[it.category].sales += it.price * it.qty * invFactor(inv);
             }));
             const catRows = appState.categories.map(c => ({
                 name: c.name,
@@ -2177,7 +3770,7 @@
             invs.forEach(inv => inv.items.forEach(it => {
                 if (!srvMap[it.name]) srvMap[it.name] = { qty: 0, sales: 0 };
                 srvMap[it.name].qty += it.qty;
-                srvMap[it.name].sales += it.price * it.qty;
+                srvMap[it.name].sales += it.price * it.qty * invFactor(inv);
             }));
             const srvRows = Object.entries(srvMap).map(([name, d]) => ({ name, ...d })).sort((a, b) => b.sales - a.sales).slice(0, 7);
             const maxSrvSales = Math.max(1, ...srvRows.map(r => r.sales));
@@ -2198,7 +3791,7 @@
                 `).join('');
 
             // 4. Payment Methods
-            const payLabels = { cash: 'كاش', visa: 'فيزا', wallet: 'محفظة' };
+            const payLabels = { cash: 'كاش', visa: 'إنستا باي', wallet: 'محفظة' };
             const payRows = ['cash', 'visa', 'wallet'].map(m => {
                 const sub = invs.filter(i => i.paymentMethod === m || (m === 'wallet' && i.paymentMethod === 'instapay'));
                 return { name: payLabels[m], count: sub.length, sales: sub.reduce((s, i) => s + i.total, 0) };
@@ -2400,6 +3993,7 @@
             if (!appState.attendanceRecords) appState.attendanceRecords = {};
             if (!appState.attendanceRecords[today]) appState.attendanceRecords[today] = {};
             const staff = appState.barbers.find(b => b.id === staffId);
+            const ex0 = appState.attendanceRecords[today][staffId]; if (status === 'present' && ex0 && ex0.status === 'present') { showToast('الحضور مسجل بالفعل (للتعديل اضغط ✎)', 'error'); return; }
             const now24 = get24TimeStr();
             const now12 = formatTime12(now24);
             const lateMins = status === 'present' ? calcLateMinutes(staff?.shiftStart || '12:00', now24) : 0;
@@ -2408,7 +4002,7 @@
                 status,
                 checkIn: status === 'present' ? now12 : null,
                 checkOut: null,
-                lateMinutes: lateMins,
+                lateMinutes: lateMins, checkIn24: status === 'present' ? now24 : null, diffMin: status === 'present' ? diffFromShift(staff?.shiftStart || '12:00', now24) : 0,
                 by: currentUser.displayName
             };
             logAudit(`تسجيل ${status === 'present' ? `حضور (${now12})` : 'غياب'} للموظف: ${staff?.name}`);
@@ -2417,6 +4011,25 @@
             showToast(`تم تسجيل ${status === 'present' ? 'حضور' : 'غياب'} ${staff?.name}`);
         }
 
+        function bulkAttendance(kind) {
+            if (!currentUser?.permissions?.attendance) { showToast('غير مصرح لك بتسجيل الحضور', 'error'); return; }
+            const today = getTodayISO(); const A = appState.attendanceRecords = appState.attendanceRecords || {}; const day = A[today] = A[today] || {};
+            const n24 = get24TimeStr(), n12 = formatTime12(n24); let n = 0;
+            appState.barbers.forEach(b => { const r = day[b.id];
+                if (kind === 'present' && !r) { day[b.id] = { status: 'present', checkIn: n12, checkOut: null, lateMinutes: calcLateMinutes(b.shiftStart || '12:00', n24), checkIn24: n24, diffMin: diffFromShift(b.shiftStart || '12:00', n24), by: currentUser.displayName }; n++; }
+                if (kind === 'checkout' && r && r.status === 'present' && !r.checkOut) { r.checkOut = n12; stampOut(r, b, n24); n++; } });
+            logAudit((kind === 'present' ? 'حضور' : 'انصراف') + ' جماعي (' + n + ')'); saveState(); renderAll();
+            showToast(n ? 'تم تسجيل ' + n + ' موظف' : 'مفيش حد محتاج تسجيل', n ? 'success' : 'error');
+        }
+        function editCheckIn(staffId) {
+            if (!currentUser?.permissions?.attendance) return;
+            const rec = appState.attendanceRecords?.[getTodayISO()]?.[staffId]; if (!rec) return;
+            const v = prompt('وقت الحضور الصحيح (بنظام 24 ساعة، مثال 13:30)'); if (!v) return;
+            if (!/^\d{1,2}:\d{2}$/.test(v.trim())) { showToast('اكتب الوقت بالشكل ده 13:30', 'error'); return; }
+            const t = v.trim().padStart(5, '0'), st = appState.barbers.find(b => b.id === staffId);
+            rec.checkIn = formatTime12(t); rec.lateMinutes = calcLateMinutes(st?.shiftStart || '12:00', t); rec.checkIn24 = t; rec.diffMin = diffFromShift(st?.shiftStart || '12:00', t);
+            logAudit('تعديل وقت حضور ' + (st?.name || '')); saveState(); renderAll();
+        }
         function markTodayCheckout(staffId) {
             if (!currentUser?.permissions?.attendance) {
                 showToast('غير مصرح لك بتسجيل الانصراف', 'error');
@@ -2430,7 +4043,7 @@
             }
             const staff = appState.barbers.find(b => b.id === staffId);
             const now12 = getTimeStr();
-            rec.checkOut = now12;
+            rec.checkOut = now12; stampOut(rec, staff, get24TimeStr());
             logAudit(`تسجيل انصراف (${now12}) للموظف: ${staff?.name}`);
             saveState();
             renderAll();
@@ -2438,17 +4051,12 @@
         }
 
         function renderAttendanceSection() {
-            const roleLabels = {
-                barber: 'حلاق (صنايعي)',
-                skincare: 'أخصائي بشرة / بيديكير',
-                assistant: 'مساعد حلاق',
-                cashier: 'كاشير',
-                manager: 'مدير',
-                cleaner: 'عامل أرضية'
-            };
+            const roleLabels = new Proxy({}, { get: (_, k) => roleLabel(k) });
             const today = getTodayISO();
             document.getElementById('att-page-date').textContent = today;
             const todayMap = (appState.attendanceRecords && appState.attendanceRecords[today]) || {};
+            const vals = appState.barbers.map(b => todayMap[b.id]), nP = vals.filter(r => r?.status === 'present').length, nA = vals.filter(r => r?.status === 'absent').length, nL = vals.filter(r => r?.status === 'present' && r.lateMinutes > 0).length, nW = vals.length - nP - nA;
+            document.getElementById('att-summary').innerHTML = `<span class="px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800 text-emerald-300">حاضر ${nP}</span><span class="px-3 py-1 rounded-full bg-red-950/60 border border-red-900 text-red-300">غايب ${nA}</span><span class="px-3 py-1 rounded-full bg-amber-950/50 border border-amber-800 text-amber-300">متأخر ${nL}</span><span class="px-3 py-1 rounded-full bg-darkbg border border-bordergold text-gray-300">لسه ${nW}</span>`;
 
             document.getElementById('attendance-daily-cards').innerHTML = appState.barbers.map(b => {
                 const rec = todayMap[b.id];
@@ -2459,7 +4067,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h4 class="font-black text-white text-sm">${b.name}</h4>
-                                <span class="text-[11px] text-gray-400">${roleLabels[b.role || 'barber']} • ميعاده: <b class="text-gold">${formatTime12(b.shiftStart || '12:00')}</b></span>
+                                <span class="text-[11px] text-gray-400">${roleLabels[b.role || 'barber']} • ميعاده: <b class="text-gold">${formatTime12(b.shiftStart || '12:00')}${b.shiftEnd ? ' - ' + formatTime12(b.shiftEnd) : ''}</b> • سماح ${graceOf(b)} د</span>
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <button type="button" onclick="markTodayAttendance('${b.id}', 'present')" title="تسجيل حضور" class="w-9 h-9 rounded-xl flex items-center justify-center font-black transition ${isPresent ? 'bg-emerald-600 text-white shadow-lg' : 'bg-panelbg border border-emerald-800/60 text-emerald-400 hover:bg-emerald-950/60'}">
@@ -2474,9 +4082,9 @@
                         <div class="flex items-center justify-between pt-2 border-t border-bordergold/50 text-[11px]">
                             <div>
                                 ${isPresent ? `
-                                    <span class="text-emerald-400 font-bold">حضر: <b>${formatTime12(rec.checkIn)}</b></span>
-                                    ${rec.lateMinutes > 0 ? `<span class="text-amber-400 mr-1.5">(تأخير ${rec.lateMinutes} د)</span>` : ''}
-                                    ${rec.checkOut ? `<span class="text-sky-400 block">انصرف: <b>${formatTime12(rec.checkOut)}</b></span>` : ''}
+                                    <span class="text-emerald-400 font-bold">حضر: <b>${formatTime12(rec.checkIn)}</b></span><button type="button" onclick="editCheckIn('${b.id}')" class="mr-1 text-gray-400 hover:text-gold" title="تعديل وقت الحضور">✎</button>
+                                    ${lateBadge(rec, b)}
+                                    ${rec.checkOut ? `<span class="text-sky-400 block">انصرف: <b>${formatTime12(rec.checkOut)}</b>${rec.earlyMinutes > 0 ? ` <span class="text-amber-400">(انصرف بدري ${rec.earlyMinutes} د)</span>` : ''}</span>` : ''}
                                 ` : (isAbsent ? `<span class="text-red-400 font-bold">✕ مسجل غياب اليوم</span>` : `<span class="text-gray-500">في انتظار تسجيل الحضور...</span>`)}
                             </div>
                             ${isPresent && !rec.checkOut ? `
@@ -2489,7 +4097,7 @@
                 `;
             }).join('');
 
-            const activeInvs = appState.invoices.filter(i => !i.deleted);
+            const activeInvs = appState.invoices.filter(i => !i.deleted && (i.date || '').startsWith(payrollMonth));
             document.getElementById('attendance-report-tbody').innerHTML = appState.barbers.map(b => {
                 const c = calculateStaffPayroll(b, activeInvs);
                 return `
@@ -2499,7 +4107,7 @@
                         <td class="p-3 text-center text-gray-300">${formatTime12(b.shiftStart || '12:00')}</td>
                         <td class="p-3 text-center font-black text-emerald-400">${c.presentDays} يوم</td>
                         <td class="p-3 text-center font-black text-red-400">${c.absentDays} يوم</td>
-                        <td class="p-3 text-center font-bold text-amber-400">${c.lateHours} ساعة (${c.lateMinutes} د)</td>
+                        <td class="p-3 text-center font-bold text-amber-400">${c.lateDays} يوم • ${c.lateMinutes} د <span class="text-red-400">(المحسوب ${c.chargeMinutes} د)</span></td>
                         <td class="p-3 text-center font-bold text-red-400">- ${fmt(c.totalTimeDeduction)} ج.م</td>
                         <td class="p-3 text-left font-black text-gold text-sm">${fmt(c.netPayable)} ج.م</td>
                     </tr>
@@ -2507,22 +4115,20 @@
             }).join('');
         }
 
+        function renderStaffFilters() {
+            const el = document.getElementById('sf-bar'); if (!el) return;
+            el.innerHTML = [{ id: 'all', label: 'الكل' }, ...roles()].map(r => `<button onclick="setStaffFilter('${r.id}')" id="sf-${r.id}" class="sf-btn px-3.5 py-1.5 rounded-full text-xs ${staffRoleFilter === r.id ? 'font-black bg-gold text-black' : 'font-bold bg-panelbg border border-bordergold text-gray-300'}">${esc(r.label)}</button>`).join('');
+        }
         function renderBarbersManage() {
-            const roleLabels = {
-                barber: 'حلاق (صنايعي)',
-                skincare: 'أخصائي بشرة / بيديكير',
-                assistant: 'مساعد حلاق',
-                cashier: 'كاشير',
-                manager: 'مدير',
-                cleaner: 'عامل أرضية'
-            };
+            renderStaffFilters();
+            const roleLabels = new Proxy({}, { get: (_, k) => roleLabel(k) });
             const typeNames = {
                 commission: 'نسبة فقط',
                 salary: 'راتب ثابت فقط',
                 both: 'راتب ثابت + نسبة'
             };
 
-            const activeInvs = appState.invoices.filter(i => !i.deleted);
+            const activeInvs = appState.invoices.filter(i => !i.deleted && (i.date || '').startsWith(payrollMonth));
             let sumBase = 0, sumComms = 0, sumNet = 0;
 
             appState.barbers.forEach(s => {
@@ -2579,7 +4185,7 @@
                             </div>
                             <div>
                                 <span class="text-gray-400 block text-[10px]">تأخير</span>
-                                <b class="text-amber-400">${calc.lateHours} س</b>
+                                <b class="text-amber-400">${calc.lateMinutes} د</b>
                             </div>
                         </div>
 
@@ -2626,6 +4232,7 @@
         }
 
         function openBarberModal(id = null) {
+            document.getElementById('edit-barber-role').innerHTML = roles().map(r => `<option value="${r.id}">${esc(r.label)}</option>`).join('');
             if (id) {
                 const b = appState.barbers.find(x => x.id === id);
                 document.getElementById('edit-barber-id').value = b.id;
@@ -2652,6 +4259,9 @@
                 document.getElementById('edit-barber-shift').value = '12:00';
                 document.getElementById('edit-barber-late-rate').value = 25;
             }
+            const bb = id ? appState.barbers.find(x => x.id === id) : null;
+            document.getElementById('edit-barber-shift-end').value = bb?.shiftEnd || '22:00';
+            document.getElementById('edit-barber-grace').value = bb?.graceMinutes ?? 15;
             toggleBarberPayFields();
             document.getElementById('barber-modal').classList.remove('hidden');
         }
@@ -2681,7 +4291,7 @@
                 return;
             }
 
-            const payload = { name, phone1, phone2, role, payType, baseSalary, commissionPct, skinPct, shiftStart, lateHourRate };
+            const payload = { name, phone1, phone2, role, payType, baseSalary, commissionPct, skinPct, shiftStart, lateHourRate, shiftEnd: document.getElementById('edit-barber-shift-end').value || '22:00', graceMinutes: Math.max(0, Number(document.getElementById('edit-barber-grace').value) || 0) };
             if (id) {
                 Object.assign(appState.barbers.find(x => x.id === id), payload);
                 logAudit(`تعديل بيانات الموظف: ${name}`);
@@ -2736,7 +4346,7 @@
                         <h4 class="font-black text-white text-sm">${u.displayName}</h4>
                         <span class="px-2.5 py-0.5 rounded-full bg-golddark border border-gold/40 text-gold font-bold">${u.roleTitle}</span>
                     </div>
-                    <p class="text-gray-400 font-mono">Username: ${u.username} | PIN: <b class="text-gold">${u.pin}</b></p>
+                    <p class="text-gray-400 font-mono">Username: ${u.username} | PIN: <b class="text-gold">••••</b></p>
                     <button onclick="openUserModal('${u.id}')" class="w-full py-2 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل الصلاحيات</button>
                 </div>
             `).join('');
@@ -2794,8 +4404,26 @@
             saveState(); closeModal('user-modal'); renderUsersManage();
         }
 
+        function renderRoles() {
+            const el = document.getElementById('roles-list'); if (!el) return;
+            el.innerHTML = roles().map(r => `<div class="flex items-center justify-between bg-darkbg border border-bordergold/60 rounded-xl px-3 py-2"><span class="text-white font-bold">${esc(r.label)} ${r.perf ? '<span class="text-[10px] text-gold">• بتعمل خدمات</span>' : ''}</span><button type="button" onclick="delRole('${r.id}')" class="text-gray-500 hover:text-red-400">حذف</button></div>`).join('');
+        }
+        function addRole() {
+            const n = document.getElementById('new-role-name').value.trim(); if (!n) return;
+            if (!appState.roles) appState.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+            appState.roles.push({ id: 'r' + Date.now(), label: n, perf: document.getElementById('new-role-perf').checked });
+            document.getElementById('new-role-name').value = ''; logAudit('إضافة وظيفة: ' + n); saveState(); renderAll(); showToast('تمت إضافة الوظيفة');
+        }
+        function delRole(id) {
+            if (appState.barbers.some(b => (b.role || 'barber') === id)) return showToast('في موظفين على الوظيفة دي، غيّر وظيفتهم الأول', 'error');
+            if (!appState.roles) appState.roles = JSON.parse(JSON.stringify(DEFAULT_ROLES));
+            appState.roles = appState.roles.filter(r => r.id !== id); saveState(); renderAll();
+        }
         function renderSettings() {
-            document.getElementById('header-salon-name').textContent = appState.salonInfo.name;
+            renderRoles();
+            if (/tommy|تومي|بربر|باربر/i.test(appState.salonInfo.name || '')) appState.salonInfo.name = 'TOMMY BARBER';
+            { const lm = document.getElementById('set-late-mode'); if (lm) lm.value = appState.salonInfo.lateMode || 'full'; }
+            document.getElementById('header-salon-name').textContent = (appState.salonInfo.name || 'TOMMY BARBER').toUpperCase();
             document.getElementById('header-salon-sub').textContent = appState.salonInfo.sub || 'صالون رجالي';
             document.getElementById('set-name').value = appState.salonInfo.name;
             document.getElementById('set-sub').value = appState.salonInfo.sub || 'صالون رجالي';
@@ -2813,7 +4441,8 @@
 
         function saveSalonSettings(e) {
             e.preventDefault();
-            appState.salonInfo.name = document.getElementById('set-name').value.trim();
+            appState.salonInfo.name = document.getElementById('set-name').value.trim().toUpperCase();
+            appState.salonInfo.lateMode = document.getElementById('set-late-mode').value;
             appState.salonInfo.sub = document.getElementById('set-sub').value.trim();
             appState.salonInfo.address = document.getElementById('set-address').value.trim();
             appState.salonInfo.phone = document.getElementById('set-phone').value.trim();
@@ -2885,7 +4514,9 @@
             e.target.value = '';
         }
 
+        function setPayrollMonth(v) { if (!v) return; payrollMonth = v; renderAll(); }
         function renderAll() {
+            document.querySelectorAll('.pm-input').forEach(i => i.value = payrollMonth);
             renderPOS();
             renderInvoicesTable();
             renderClientsTable();
@@ -2906,7 +4537,17 @@
             setRepPeriod('month');
             renderAll();
             initCloudSync();
+            window.addEventListener('online', () => { if (!cloudRef) showToast('رجع الإنترنت - حدّث الصفحة (F5) عشان تتزامن الفواتير مع الموبايل', 'error'); });
         };
     </script>
+<script>
+(function(){
+const P={scissors:'<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',x:'<path d="M18 6 6 18M6 6l12 12"/>',check:'<path d="M20 6 9 17l-5-5"/>',trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/>',print:'<path d="M6 9V3h12v6M6 18H4v-7h16v7h-2M6 14h12v7H6z"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',phone:'<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',drop:'<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',smile:'<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 3 4 3 4-3 4-3M9 9h.01M15 9h.01"/>',sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>',wind:'<path d="M3 8h10a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>',crown:'<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',cup:'<path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 10h2a2 2 0 0 1 0 4h-2M7 3v2M11 3v2M14 3v2"/>',flame:'<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z"/>',leaf:'<path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15zM5 19l8-8"/>',dl:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',alert:'<path d="M12 3l10 18H2zM12 10v5M12 18h.01"/>',undo:'<path d="M3 8h11a6 6 0 0 1 0 12H8M3 8l4-4M3 8l4 4"/>',shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>'};
+const M={xmark:'x',check:'check','user-check':'check','circle-check':'check','shield-check':'shield',trash:'trash',print:'print',user:'user',phone:'phone','file-csv':'dl','circle-exclamation':'alert','triangle-exclamation':'alert','rotate-left':'undo',droplet:'drop','face-smile':'smile','face-laugh-beam':'smile',child:'smile',crown:'crown','mug-hot':'cup',fire:'flame',leaf:'leaf',wind:'wind',hurricane:'wind',water:'wind',scissors:'scissors','pen-nib':'scissors','ruler-horizontal':'scissors'};
+function rep(){document.querySelectorAll('i[class*="fa-"]').forEach(i=>{const c=[...i.classList],n=c.find(x=>x.startsWith('fa-')&&!/^fa-(solid|regular|brands)$/.test(x))||'',s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('viewBox','0 0 24 24');s.setAttribute('class','ic '+c.filter(x=>!x.startsWith('fa-')).join(' '));s.innerHTML=P[M[n.slice(3)]||'sparkle'];i.replaceWith(s)})}
+let q=0;new MutationObserver(()=>{if(!q){q=1;requestAnimationFrame(()=>{q=0;rep()})}}).observe(document.body,{childList:true,subtree:true});rep();
+document.addEventListener('input',e=>{const t=e.target;if(t.tagName==='INPUT'&&/[<>]/.test(t.value)&&!/number|date|time|month|file|checkbox/.test(t.type))t.value=t.value.replace(/[<>]/g,'')});
+})();
+</script>
 </body>
 </html>
