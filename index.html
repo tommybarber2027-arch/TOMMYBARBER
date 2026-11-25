@@ -2180,13 +2180,6 @@
                             <label class="block text-gray-400 mb-1">أرقام الدفع الإلكتروني / المحفظة (تُطبع في الإيصال)</label>
                             <input type="text" id="set-payment-numbers" placeholder="مثلاً: محفظة / انستاباي: 01000746687" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
                         </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1">نظام خصم التأخير (بعد السماح)</label>
-                            <select id="set-late-mode" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
-                                <option value="full">لو عدّى السماح: يتخصم التأخير كله</option>
-                                <option value="excess">يتخصم اللي بعد السماح بس</option>
-                            </select>
-                        </div>
                         <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ الإعدادات</button>
                     </form>
 
@@ -2556,13 +2549,9 @@
                 <button onclick="closeModal('reset-ops-modal')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <p class="text-gray-300 leading-relaxed">
-                هل أنت متأكد من مسح جميع <b>الفواتير والحسابات وسجل الحضور والانصراف والسُلف</b> للبدء من جديد؟
-                <br><span class="text-gold font-bold">سيتم الاحتفاظ بالخدمات والأسعار والحلاقين والمستخدمين كما هم.</span>
+                هل أنت متأكد من مسح جميع <b>الفواتير والحركات وسجل الزيارات والحضور والانصراف والسُلف</b> للبدء من جديد؟
+                <br><span class="text-gold font-bold">سيتم الاحتفاظ بأسماء وأرقام العملاء في قائمة العملاء، وكذلك الحلاقين والعمال والخدمات والأسعار والمستخدمين كما هم.</span>
             </p>
-            <label class="flex items-center gap-2 bg-darkbg border border-bordergold rounded-xl p-2.5 text-gray-200 cursor-pointer">
-                <input type="checkbox" id="reset-include-clients" checked class="accent-gold">
-                <span>حذف قائمة العملاء التجريبيين أيضاً</span>
-            </label>
             <div class="grid grid-cols-2 gap-2 pt-1">
                 <button type="button" onclick="executeOperationalReset()" class="bg-red-600 hover:bg-red-500 text-white font-black py-2.5 rounded-xl">نعم، ابدأ على نظيف</button>
                 <button type="button" onclick="closeModal('reset-ops-modal')" class="bg-darkbg border border-bordergold text-gray-300 font-bold py-2.5 rounded-xl">إلغاء</button>
@@ -2572,7 +2561,7 @@
 
     <script>
         // =========================================================================
-        // FIREBASE CLOUD SYNC
+        // FIREBASE CLOUD SYNC & DATE/TIME HELPERS
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD3NFgHKlVKJbZ4_tBaYQbreDOTdK6QI3I",
@@ -2586,10 +2575,6 @@
         };
 
         let db = null, cloudRef = null, isApplyingRemote = false;
-
-        // =========================================================================
-        // STATE & SEED DATA
-        // =========================================================================
         const STORAGE_KEY = 'tommy_barber_exact_clone_v7_local';
         const localISO = d => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
         const BIZ_SHIFT = 5 * 3600000;
@@ -2630,8 +2615,8 @@
         const roleLabel = r => (roles().find(x => x.id === r) || { label: 'حلاق (صنايعي)' }).label;
         const isPerf = b => !!(roles().find(x => x.id === (b.role || 'barber')) || {}).perf;
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-        const CARE_CATEGORIES = ['cat_skin', 'cat_haircare', 'cat_beard', 'cat_dyes', 'cat_scrub', 'cat_smooth'];
         const isCareCat = id => CARE_CATEGORIES.includes(id) || /بشرة|عناية|بديكير|مانيكير|صبغ|اسكراب|تنعيم|دقن/.test((appState.categories.find(c => c.id === id) || {}).name || '');
+        const CARE_CATEGORIES = ['cat_skin', 'cat_haircare', 'cat_beard', 'cat_dyes', 'cat_scrub', 'cat_smooth'];
 
         const defaultState = {
             salonInfo: {
@@ -2816,43 +2801,61 @@
                 if (cloudRef && !isApplyingRemote) {
                     cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
                 }
-                if (usbFolderHandle && !isApplyingRemote) {
-                    writeAutoBackupToUsb();
-                }
+                writeAutoBackupToUsb();
             } catch (e) {}
         }
 
         // =========================================================================
-        // AUTO-BACKUP DIRECTLY TO USB FLASH DRIVE (File System Access API)
+        // AUTO-BACKUP DIRECTLY TO USB FLASH DRIVE (File System Access API + Fallback)
         // =========================================================================
         let usbFolderHandle = null;
+        let usbFileHandle = null;
 
         async function linkUsbBackupFolder() {
+            const st = document.getElementById('usb-backup-status');
+            if (!window.isSecureContext) {
+                showToast('لفتح نافذة اختيار الفلاشة مباشرة، افتح البرنامج من رابط الموقع الرسمي (HTTPS) أو على Chrome/Edge', 'error');
+                if (st) {
+                    st.innerHTML = `<span class="text-amber-400 font-bold">⚠ يجب فتح البرنامج من رابط الموقع (HTTPS) لفتح نافذة اختيار الفلاشة مباشرة</span>`;
+                }
+                return;
+            }
             try {
-                if (!window.showDirectoryPicker) {
-                    showToast('متصفحك لا يدعم الربط المباشر للفلاشة، استخدم زر تحميل نسخة احتياطية', 'error');
+                if (window.showSaveFilePicker) {
+                    usbFileHandle = await window.showSaveFilePicker({
+                        suggestedName: 'TOMMY_BARBER_AUTO_BACKUP.json',
+                        types: [{ description: 'TOMMY BARBER Backup File', accept: { 'application/json': ['.json'] } }]
+                    });
+                    usbFolderHandle = null;
+                    await writeAutoBackupToUsb();
+                    if (st) {
+                        st.innerHTML = `<span class="text-emerald-400 font-black">✓ مربوط بنجاح (${esc(usbFileHandle.name)}) — يتم الحفظ على الفلاشة تلقائياً مع كل فاتورة</span>`;
+                    }
+                    showToast('تم ربط الفلاشة وحفظ النسخة الاحتياطية عليها بنجاح!');
                     return;
                 }
-                usbFolderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-                await writeAutoBackupToUsb();
-                const st = document.getElementById('usb-backup-status');
-                if (st) {
-                    st.innerHTML = `<span class="text-emerald-400 font-black">✓ مربوط بالفلاشة / المجلد (${esc(usbFolderHandle.name)}) — يتم الحفظ تلقائياً</span>`;
+                if (window.showDirectoryPicker) {
+                    usbFolderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                    usbFileHandle = null;
+                    await writeAutoBackupToUsb();
+                    if (st) {
+                        st.innerHTML = `<span class="text-emerald-400 font-black">✓ مربوط بالفلاشة (${esc(usbFolderHandle.name)}) — يتم الحفظ تلقائياً</span>`;
+                    }
+                    showToast('تم ربط الفلاشة وحفظ أول نسخة احتياطية عليها بنجاح!');
+                    return;
                 }
-                showToast('تم ربط الفلاشة وحفظ أول نسخة احتياطية عليها بنجاح!');
+                showToast('متصفحك الحالي لا يدعم ربط الفلاشة المباشر، استخدم متصفح Chrome أو Edge على الكمبيوتر', 'error');
             } catch (err) {
-                if (err.name !== 'AbortError') {
-                    showToast('تعذر الوصول للفلاشة، تأكد من السماح بالكتابة عليها', 'error');
-                }
+                if (err.name === 'AbortError') return;
+                showToast('تعذر فتح نافذة الفلاشة هنا — افتح البرنامج من رابط موقعك الرسمي في Chrome/Edge', 'error');
             }
         }
 
         async function writeAutoBackupToUsb() {
-            if (!usbFolderHandle) return;
+            if (!usbFolderHandle && !usbFileHandle) return;
             try {
-                const fileName = `TOMMY_BARBER_AUTO_BACKUP.json`;
-                const fileHandle = await usbFolderHandle.getFileHandle(fileName, { create: true });
-                const writable = await fileHandle.createWritable();
+                const targetHandle = usbFileHandle || await usbFolderHandle.getFileHandle('TOMMY_BARBER_AUTO_BACKUP.json', { create: true });
+                const writable = await targetHandle.createWritable();
                 await writable.write(JSON.stringify(appState, null, 2));
                 await writable.close();
             } catch (e) {
@@ -2997,7 +3000,6 @@
 
             renderAll();
             if (firstTab) switchTab(firstTab);
-            if (user.username === 'admin' && user.password === '1234') setTimeout(() => { switchTab('users'); openUserModal(user.id); showToast('غيّر كلمة المرور والـ PIN الافتراضية دلوقتي', 'error'); }, 400);
         }
 
         function logoutUser() {
@@ -4581,8 +4583,6 @@
         function renderSettings() {
             renderRoles();
             if (/tommy|تومي|بربر|باربر/i.test(appState.salonInfo.name || '')) appState.salonInfo.name = 'TOMMY BARBER';
-            const lm = document.getElementById('set-late-mode');
-            if (lm) lm.value = appState.salonInfo.lateMode || 'full';
             document.getElementById('header-salon-name').textContent = (appState.salonInfo.name || 'TOMMY BARBER').toUpperCase();
             document.getElementById('header-salon-sub').textContent = appState.salonInfo.sub || 'صالون رجالي';
             document.getElementById('set-name').value = appState.salonInfo.name;
@@ -4602,7 +4602,6 @@
         function saveSalonSettings(e) {
             e.preventDefault();
             appState.salonInfo.name = document.getElementById('set-name').value.trim().toUpperCase();
-            appState.salonInfo.lateMode = document.getElementById('set-late-mode').value;
             appState.salonInfo.sub = document.getElementById('set-sub').value.trim();
             appState.salonInfo.address = document.getElementById('set-address').value.trim();
             appState.salonInfo.phone = document.getElementById('set-phone').value.trim();
@@ -4619,20 +4618,25 @@
         }
 
         function executeOperationalReset() {
-            const includeClients = document.getElementById('reset-include-clients')?.checked;
             appState.invoices = [];
             appState.attendanceRecords = {};
             appState.advances = [];
             appState.auditLogs = [];
-            if (includeClients) {
-                appState.clients = [];
+            // الاحتفاظ بأسماء وأرقام العملاء وتصفير زياراتهم السابقة فقط
+            if (Array.isArray(appState.clients)) {
+                appState.clients = appState.clients.map(c => ({
+                    id: c.id || ('c-' + Date.now() + Math.random()),
+                    name: c.name,
+                    phone: c.phone,
+                    createdAt: '-'
+                }));
             }
-            logAudit('تم تصفير بيانات التشغيل والبدء على نظيف');
+            logAudit('تم تصفير الفواتير والحركات والزيارات والبدء على نظيف (مع الاحتفاظ بقائمة العملاء والخدمات والطاقم)');
             saveState();
             resetCurrentInvoice();
             renderAll();
             closeModal('reset-ops-modal');
-            showToast('تم تصفير الفواتير والحسابات بنجاح! يمكنك البدء الآن من فاتورة رقم 1');
+            showToast('تم مسح الفواتير والزيارات بنجاح مع الاحتفاظ بأسماء وأرقام العملاء والخدمات!');
         }
 
         function downloadFullBackup() {
