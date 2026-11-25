@@ -2214,15 +2214,11 @@
                                     <input type="file" accept=".json" onchange="restoreFullBackup(event)" class="hidden">
                                 </label>
                             </div>
-                        </div>
-
-                        <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
-                            <h3 class="text-sm font-black text-gold">الوظائف</h3>
-                            <div id="roles-list" class="space-y-1.5"></div>
-                            <div class="flex flex-wrap gap-2 items-center">
-                                <input id="new-role-name" placeholder="اسم وظيفة جديدة" class="flex-1 bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
-                                <label class="flex items-center gap-1 text-gray-300"><input type="checkbox" id="new-role-perf" class="accent-gold"> بتعمل خدمات للعملاء</label>
-                                <button type="button" onclick="addRole()" class="bg-gold text-black font-black px-4 py-2 rounded-xl">إضافة</button>
+                            <div class="pt-2 border-t border-bordergold/50 space-y-2">
+                                <button type="button" onclick="linkUsbBackupFolder()" class="w-full bg-darkbg hover:bg-cardbg border border-emerald-700/70 text-emerald-300 font-black py-2.5 rounded-xl transition">
+                                    <i class="fa-solid fa-usb ml-1"></i> ربط مجلد / فلاشة USB للنسخ التلقائي المباشر
+                                </button>
+                                <p id="usb-backup-status" class="text-[11px] text-gray-400 text-center">غير مربوط بفلاشة حالياً (اضغط لاختيار الفلاشة وسيتم الحفظ عليها تلقائياً مع كل عملية)</p>
                             </div>
                         </div>
                         
@@ -2820,7 +2816,51 @@
                 if (cloudRef && !isApplyingRemote) {
                     cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
                 }
+                if (usbFolderHandle && !isApplyingRemote) {
+                    writeAutoBackupToUsb();
+                }
             } catch (e) {}
+        }
+
+        // =========================================================================
+        // AUTO-BACKUP DIRECTLY TO USB FLASH DRIVE (File System Access API)
+        // =========================================================================
+        let usbFolderHandle = null;
+
+        async function linkUsbBackupFolder() {
+            try {
+                if (!window.showDirectoryPicker) {
+                    showToast('متصفحك لا يدعم الربط المباشر للفلاشة، استخدم زر تحميل نسخة احتياطية', 'error');
+                    return;
+                }
+                usbFolderHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+                await writeAutoBackupToUsb();
+                const st = document.getElementById('usb-backup-status');
+                if (st) {
+                    st.innerHTML = `<span class="text-emerald-400 font-black">✓ مربوط بالفلاشة / المجلد (${esc(usbFolderHandle.name)}) — يتم الحفظ تلقائياً</span>`;
+                }
+                showToast('تم ربط الفلاشة وحفظ أول نسخة احتياطية عليها بنجاح!');
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showToast('تعذر الوصول للفلاشة، تأكد من السماح بالكتابة عليها', 'error');
+                }
+            }
+        }
+
+        async function writeAutoBackupToUsb() {
+            if (!usbFolderHandle) return;
+            try {
+                const fileName = `TOMMY_BARBER_AUTO_BACKUP.json`;
+                const fileHandle = await usbFolderHandle.getFileHandle(fileName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(JSON.stringify(appState, null, 2));
+                await writable.close();
+            } catch (e) {
+                const st = document.getElementById('usb-backup-status');
+                if (st) {
+                    st.innerHTML = `<span class="text-amber-400 font-bold">⚠ تم فصل الفلاشة — أعد ربطها للاستمرار في النسخ التلقائي</span>`;
+                }
+            }
         }
 
         function logAudit(text) {
