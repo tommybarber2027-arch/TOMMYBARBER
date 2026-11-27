@@ -213,7 +213,7 @@
                 savedInv = {
                     id: nextId, date: getTodayISO(), time: getTimeStr(), barberId: selectedBarberId, barberName,
                     clientName, clientPhone, notes, paymentMethod: currentDraft.paymentMethod, subtotal, discount, total,
-                    cashierName: currentUser ? currentUser.displayName : 'omar', deleted: false, items: JSON.parse(JSON.stringify(currentDraft.items))
+                    cashierName: currentUser ? currentUser.displayName : 'omar', shiftId: ensureShift().id, deleted: false, items: JSON.parse(JSON.stringify(currentDraft.items))
                 };
                 appState.invoices.unshift(savedInv);
                 logAudit(`حفظ فاتورة رقم ${savedInv.id} بقيمة ${savedInv.total} ج.م`);

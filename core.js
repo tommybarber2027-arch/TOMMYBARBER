@@ -244,7 +244,66 @@
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 
         // AUTH
-        let pinBuffer = '', failedAttempts = 0, lockedUntil = 0, loginUserId = null;
+        const MGR_MIN = 10, CASH_MIN = 6, PIN_MAX = 12;
+        const _K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+        function sha256b(msg) {
+            let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a, h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
+            const l = msg.length, nb = (l + 9 + 63) >> 6, buf = new Uint8Array(nb * 64); buf.set(msg); buf[l] = 0x80;
+            const dv = new DataView(buf.buffer); dv.setUint32(nb * 64 - 4, (l * 8) >>> 0); dv.setUint32(nb * 64 - 8, Math.floor(l * 8 / 4294967296));
+            const w = new Uint32Array(64);
+            for (let o = 0; o < nb * 64; o += 64) {
+                for (let i = 0; i < 16; i++) w[i] = dv.getUint32(o + i * 4);
+                for (let i = 16; i < 64; i++) { const a = w[i - 15], b = w[i - 2]; w[i] = (w[i - 16] + (((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3)) + w[i - 7] + (((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10))) | 0; }
+                let a = h0, b = h1, c = h2, d = h3, e = h4, f = h5, g = h6, h = h7;
+                for (let i = 0; i < 64; i++) {
+                    const t1 = (h + (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) + ((e & f) ^ (~e & g)) + _K[i] + w[i]) | 0;
+                    const t2 = ((((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+                    h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+                }
+                h0 = (h0 + a) | 0; h1 = (h1 + b) | 0; h2 = (h2 + c) | 0; h3 = (h3 + d) | 0; h4 = (h4 + e) | 0; h5 = (h5 + f) | 0; h6 = (h6 + g) | 0; h7 = (h7 + h) | 0;
+            }
+            const out = new Uint8Array(32), ov = new DataView(out.buffer); [h0, h1, h2, h3, h4, h5, h6, h7].forEach((x, i) => ov.setUint32(i * 4, x >>> 0)); return out;
+        }
+        const _hex = a => [...a].map(x => x.toString(16).padStart(2, '0')).join('');
+        function hashPass(pass, salt) {
+            const enc = new TextEncoder(), s = enc.encode(salt); let h = sha256b(enc.encode(salt + ':' + pass));
+            for (let i = 0; i < 20000; i++) { const m = new Uint8Array(32 + s.length); m.set(h); m.set(s, 32); h = sha256b(m); }
+            return _hex(h);
+        }
+        function randBytes(n) { const a = new Uint8Array(n); if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for (let i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256); return a; }
+        const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); delete u.password; delete u.pin; };
+        const checkUserPass = (u, p) => !!(u && u.passHash && u.salt) && hashPass(p, u.salt) === u.passHash;
+        const isMgrUser = u => !!u && u.roleTitle === 'مدير';
+        const minPassLen = u => isMgrUser(u) ? MGR_MIN : CASH_MIN;
+        function passProblem(p, u) {
+            if (!/^\d+$/.test(p)) return 'الباسورد أرقام فقط';
+            if (p.length < minPassLen(u)) return `الباسورد لازم يكون ${minPassLen(u)} أرقام على الأقل`;
+            if (p.length > PIN_MAX) return `الباسورد أقصى حد ${PIN_MAX} رقم`;
+            if (/^(\d)\1+$/.test(p) || '01234567890123456789'.includes(p) || '98765432109876543210'.includes(p)) return 'الباسورد سهل التخمين، اختار أرقام مش متتالية ولا متكررة';
+            return '';
+        }
+        const REC_AL = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        const normRec = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        function makeRecovery(u) {
+            const r = randBytes(16); let c = ''; r.forEach(x => { c += REC_AL[x % 32]; });
+            u.recSalt = _hex(randBytes(16)); u.recHash = hashPass(c, u.recSalt);
+            return c.match(/.{4}/g).join('-');
+        }
+        const checkRecovery = (u, code) => !!(u && u.recHash) && hashPass(normRec(code), u.recSalt) === u.recHash;
+
+        let pinBuffer = '', failedAttempts = 0, loginUserId = null;
+        let lockedUntil = Number((() => { try { return localStorage.getItem('tommy_lku'); } catch (e) { return 0; } })()) || 0;
+        function registerFail() {
+            failedAttempts++;
+            if (failedAttempts < 5) { showToast('كلمة المرور غير صحيحة', 'error'); return; }
+            let lv = 0; try { lv = Number(localStorage.getItem('tommy_lk')) || 0; } catch (e) {}
+            lv++; const secs = 30 * Math.pow(2, Math.min(lv - 1, 7));
+            lockedUntil = Date.now() + secs * 1000; failedAttempts = 0;
+            try { localStorage.setItem('tommy_lk', lv); localStorage.setItem('tommy_lku', lockedUntil); } catch (e) {}
+            const msg = document.getElementById('pin-lock-msg'); msg.textContent = `محاولات خاطئة متكررة! تم القفل لمدة ${secs >= 60 ? Math.round(secs / 60) + ' دقيقة' : secs + ' ثانية'}.`; msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), secs * 1000);
+        }
+        const clearFails = () => { failedAttempts = 0; try { localStorage.removeItem('tommy_lk'); localStorage.removeItem('tommy_lku'); } catch (e) {} };
         function renderLoginUsers() {
             const el = document.getElementById('login-users'); if (!el) return;
             if (!loginUserId || !appState.users.some(u => u.id === loginUserId)) loginUserId = appState.users[0] && appState.users[0].id;
@@ -256,51 +315,92 @@
         function updatePinDots() {
             const d = document.getElementById('pin-dots'); if (!d) return;
             const n = Math.max(4, pinBuffer.length);
+            { const f = document.getElementById('forgot-link'); if (f) { const u = appState.users.find(x => x.id === loginUserId); f.classList.toggle('hidden', !(u && isMgrUser(u) && u.recHash)); } }
             d.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-gold' : 'w-3 h-3 rounded-full border border-gold/50'}"></span>`).join('');
         }
         function pressPin(d) {
             if (Date.now() < lockedUntil) return;
-            if (pinBuffer.length >= 8) return;
+            if (pinBuffer.length >= PIN_MAX) return;
             pinBuffer += d; updatePinDots();
-            const u = appState.users.find(x => x.id === loginUserId);
-            if (u && String(u.password).length === pinBuffer.length) setTimeout(submitLogin, 150);
         }
         function backPin() { pinBuffer = pinBuffer.slice(0, -1); updatePinDots(); }
         function clearPin() { pinBuffer = ''; updatePinDots(); }
         function submitLogin() {
-            if (Date.now() < lockedUntil) return;
+            if (Date.now() < lockedUntil) { showToast('الدخول مقفول مؤقتاً، استنى شوية', 'error'); return; }
             const user = appState.users.find(u => u.id === loginUserId); if (!user) return;
             if (!pinBuffer) { showToast('اكتب كلمة المرور', 'error'); return; }
-            if (String(user.password) !== pinBuffer) {
-                failedAttempts++; clearPin();
-                if (failedAttempts >= 5) {
-                    lockedUntil = Date.now() + 30000; failedAttempts = 0;
-                    const msg = document.getElementById('pin-lock-msg'); msg.textContent = 'محاولات خاطئة متكررة! تم القفل لمدة 30 ثانية.'; msg.classList.remove('hidden');
-                    setTimeout(() => msg.classList.add('hidden'), 30000);
-                } else showToast('كلمة المرور غير صحيحة', 'error');
-                return;
-            }
-            failedAttempts = 0; document.getElementById('pin-lock-msg').classList.add('hidden'); clearPin(); completeLogin(user);
+            const ok = checkUserPass(user, pinBuffer); clearPin();
+            if (!ok) { registerFail(); return; }
+            clearFails(); document.getElementById('pin-lock-msg').classList.add('hidden');
+            if (user.mustChange) forcePassChange(user, () => completeLogin(user)); else completeLogin(user);
         }
         document.addEventListener('keydown', e => {
-            const a = document.getElementById('auth-screen'); if (!a || a.classList.contains('hidden')) return;
+            const a = document.getElementById('auth-screen'); if (!a || a.classList.contains('hidden') || document.getElementById('sec-box')) return;
             if (/^\d$/.test(e.key)) pressPin(e.key); else if (e.key === 'Backspace') backPin(); else if (e.key === 'Enter') submitLogin();
         });
+
+        // ---- password change / recovery screens ----
+        function secModal(title, html, okText, onOk, onCancel) {
+            document.getElementById('sec-box')?.remove();
+            const d = document.createElement('div'); d.id = 'sec-box'; d.className = 'fixed inset-0 z-[300] bg-black/85 flex items-center justify-center p-4';
+            d.innerHTML = `<div class="bg-panelbg border border-bordergold rounded-2xl max-w-sm w-full p-5 space-y-3 text-sm"><h3 class="font-black text-gold">${title}</h3>${html}<div class="grid ${onCancel ? 'grid-cols-2' : 'grid-cols-1'} gap-2"><button type="button" id="sec-ok" class="bg-gold text-black font-black py-2.5 rounded-xl">${okText}</button>${onCancel ? '<button type="button" id="sec-no" class="bg-darkbg border border-bordergold text-gray-300 font-bold py-2.5 rounded-xl">رجوع</button>' : ''}</div></div>`;
+            document.body.appendChild(d);
+            d.querySelector('#sec-ok').onclick = () => { if (onOk(d) !== false) d.remove(); };
+            if (onCancel) d.querySelector('#sec-no').onclick = () => { d.remove(); onCancel(); };
+            const i = d.querySelector('input'); if (i) i.focus();
+        }
+        const _pi = (id, ph) => `<input id="${id}" type="password" inputmode="numeric" maxlength="${PIN_MAX}" autocomplete="off" dir="ltr" placeholder="${ph}" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-gold font-black tracking-widest text-center">`;
+        function showRecoveryCode(code, then) {
+            secModal('كود الاسترجاع', `<p class="text-gray-300 leading-relaxed text-xs">ده الكود اللي يفتح لك البرنامج لو نسيت الباسورد. اكتبه على ورقة واحفظها في مكان آمن بره الصالون. <b class="text-red-400">مش هيظهر تاني</b>، وأي كود قديم بيبطل.</p><div dir="ltr" class="bg-darkbg border border-gold rounded-xl py-3 text-center font-mono font-black text-lg tracking-widest text-gold select-all">${code}</div><button type="button" onclick="navigator.clipboard&&navigator.clipboard.writeText('${code}').then(()=>showToast('تم النسخ'))" class="w-full bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl text-xs">نسخ الكود</button>`, 'كتبته وحفظته', () => { if (then) then(); });
+        }
+        function forcePassChange(user, done) {
+            const mg = isMgrUser(user);
+            secModal('لازم تغيّر كلمة المرور', `<p class="text-gray-300 text-xs leading-relaxed">كلمة المرور الحالية قديمة أو ضعيفة. اختار كلمة جديدة ${minPassLen(user)} أرقام على الأقل، من غير تكرار أو تسلسل.</p>${_pi('sp1', 'كلمة المرور الجديدة')}${_pi('sp2', 'اكتبها تاني للتأكيد')}`, 'حفظ ودخول', d => {
+                const a = d.querySelector('#sp1').value, b = d.querySelector('#sp2').value, pr = passProblem(a, user);
+                if (pr) { showToast(pr, 'error'); return false; }
+                if (a !== b) { showToast('الكلمتين مش متطابقتين', 'error'); return false; }
+                setUserPass(user, a); user.mustChange = false; const code = mg ? makeRecovery(user) : null;
+                currentUser = user; logAudit(`تغيير كلمة مرور ${user.displayName}`); currentUser = null; saveState();
+                if (code) setTimeout(() => showRecoveryCode(code, done), 50); else setTimeout(done, 50);
+            }, () => {});
+        }
+        function forgotPassword() {
+            const user = appState.users.find(u => u.id === loginUserId);
+            if (!user || !isMgrUser(user) || !user.recHash) { showToast('مفيش كود استرجاع متسجل', 'error'); return; }
+            secModal('استرجاع كلمة المرور', `<p class="text-gray-300 text-xs leading-relaxed">اكتب كود الاسترجاع اللي كتبته على الورقة، وبعدها اختار كلمة جديدة.</p><input id="sr0" dir="ltr" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-gold font-mono font-black tracking-widest text-center uppercase">${_pi('sr1', 'كلمة المرور الجديدة')}${_pi('sr2', 'اكتبها تاني للتأكيد')}`, 'تأكيد', d => {
+                if (Date.now() < lockedUntil) { showToast('الدخول مقفول مؤقتاً، استنى شوية', 'error'); return false; }
+                if (!checkRecovery(user, d.querySelector('#sr0').value)) { registerFail(); return false; }
+                const a = d.querySelector('#sr1').value, b = d.querySelector('#sr2').value, pr = passProblem(a, user);
+                if (pr) { showToast(pr, 'error'); return false; }
+                if (a !== b) { showToast('الكلمتين مش متطابقتين', 'error'); return false; }
+                clearFails(); setUserPass(user, a); user.mustChange = false; const code = makeRecovery(user);
+                logAudit('استرجاع كلمة مرور المدير بكود الاسترجاع'); saveState(); setTimeout(() => showRecoveryCode(code, () => showToast('تم تغيير كلمة المرور، سجّل الدخول')), 50);
+            }, () => {});
+        }
+
         function migrateAuth() {
-            if (appState.authVersion === 2) return false;
-            const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, users: false, settings: false, expenses: false }, p || {});
-            const isMgr = u => u.id === 'u-admin' || u.roleTitle === 'مدير' || u.username === 'admin';
-            const mOld = old.find(isMgr) || {};
-            const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', pin: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, users: true, settings: true, expenses: true } });
-            const c1 = { id: 'u-cashier1', displayName: 'كاشير 1', roleTitle: 'كاشير', username: 'cashier1', password: '1111', pin: '1111', permissions: A() };
-            const c2 = { id: 'u-cashier2', displayName: 'كاشير 2', roleTitle: 'كاشير', username: 'cashier2', password: '2222', pin: '2222', permissions: A() };
-            const others = old.filter(u => !isMgr(u) && !['u-omar', 'u-sara', 'u-cashier1', 'u-cashier2'].includes(u.id));
-            appState.users = [mgr, c1, c2].concat(others); appState.authVersion = 2; return true;
+            let ch = false;
+            if (appState.authVersion !== 2 && appState.authVersion !== 3) {
+                const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, finance: false, drawer: true, users: false, settings: false }, p || {});
+                const isMgr = u => u.id === 'u-admin' || u.roleTitle === 'مدير' || u.username === 'admin';
+                const mOld = old.find(isMgr) || {};
+                const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, finance: true, drawer: true, users: true, settings: true } });
+                const c1 = { id: 'u-cashier1', displayName: 'كاشير 1', roleTitle: 'كاشير', username: 'cashier1', password: '1111', permissions: A() };
+                const c2 = { id: 'u-cashier2', displayName: 'كاشير 2', roleTitle: 'كاشير', username: 'cashier2', password: '2222', permissions: A() };
+                const others = old.filter(u => !isMgr(u) && !['u-omar', 'u-sara', 'u-cashier1', 'u-cashier2'].includes(u.id));
+                appState.users = [mgr, c1, c2].concat(others); ch = true;
+            }
+            (appState.users || []).forEach(u => {
+                if (u.password !== undefined && !u.passHash) { const p = String(u.password); setUserPass(u, p); u.mustChange = !!passProblem(p, u); ch = true; }
+                else if (u.password !== undefined || u.pin !== undefined) { delete u.password; delete u.pin; ch = true; }
+            });
+            if (appState.authVersion !== 3) { appState.authVersion = 3; ch = true; }
+            return ch;
         }
         if (migrateAuth()) saveState();
 
         function completeLogin(user) {
-            if (user.permissions && user.permissions.expenses === undefined) user.permissions.expenses = (user.roleTitle === 'مدير');
+            if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = !!user.permissions.pos; }
             currentUser = user;
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');

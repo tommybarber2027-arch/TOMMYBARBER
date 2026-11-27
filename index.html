@@ -13,12 +13,12 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="tailwind.css?v=8">
+    <link rel="stylesheet" href="tailwind.css?v=9">
     <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="base.css?v=8">
-    <link rel="stylesheet" href="theme.css?v=8">
+    <link rel="stylesheet" href="base.css?v=9">
+    <link rel="stylesheet" href="theme.css?v=9">
 </head>
 <body class="min-h-screen flex flex-col selection:bg-gold selection:text-black overflow-x-hidden pb-16 lg:pb-0">
 <svg width="0" height="0" style="position:absolute"><symbol id="logo" viewBox="0 0 360 468"><image href="logo-gold.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-g,1)"/><image href="logo-ink.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-i,0)"/></symbol></svg>
@@ -47,6 +47,7 @@
             <div class="bg-darkbg border border-bordergold rounded-2xl py-3.5 text-center">
                 <div id="pin-dots" class="flex justify-center gap-3.5 h-5 items-center"></div>
                 <p id="pin-lock-msg" class="text-[11px] text-red-400 mt-1.5 hidden"></p>
+                <button type="button" id="forgot-link" onclick="forgotPassword()" class="hidden text-[11px] text-gray-400 underline mt-1.5">نسيت كلمة المرور؟</button>
             </div>
             <div class="grid grid-cols-3 gap-2.5" dir="ltr">
                 <button type="button" onclick="pressPin('1')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">1</button><button type="button" onclick="pressPin('2')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">2</button><button type="button" onclick="pressPin('3')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">3</button><button type="button" onclick="pressPin('4')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">4</button><button type="button" onclick="pressPin('5')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">5</button><button type="button" onclick="pressPin('6')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">6</button><button type="button" onclick="pressPin('7')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">7</button><button type="button" onclick="pressPin('8')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">8</button><button type="button" onclick="pressPin('9')" class="bg-darkbg hover:bg-cardbg border border-bordergold rounded-xl py-3 text-lg font-black text-white">9</button>
@@ -87,15 +88,16 @@
                 </div>
 
                 <nav id="main-nav-scroll" class="w-full lg:w-auto order-3 lg:order-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pt-2 lg:pt-0 border-t border-bordergold/50 lg:border-t-0 no-scrollbar">
-                    <button onclick="switchTab('pos')" id="tab-pos" data-perm="pos" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0">فاتورة جديدة</button>
+                    <button onclick="switchTab('pos')" id="tab-pos" data-perm="pos" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0">المبيعات</button>
                     <button onclick="switchTab('invoices')" id="tab-invoices" data-perm="invoices" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الفواتير</button>
                     <button onclick="switchTab('clients')" id="tab-clients" data-perm="clients" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">العملاء</button>
-                    <button onclick="switchTab('reports')" id="tab-reports" data-perm="reports" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">التقارير</button>
-                    <button onclick="switchTab('catalog')" id="tab-catalog" data-perm="catalog" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الخدمات والأسعار</button>
-                    <button onclick="switchTab('barbers')" id="tab-barbers" data-perm="barbers" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحلاقين والعمالة</button>
-                    <button onclick="switchTab('attendance')" id="tab-attendance" data-perm="attendance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحضور والانصراف</button>
+                    <button onclick="switchTab('catalog')" id="tab-catalog" data-perm="catalog" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الخدمات</button>
+                    <button onclick="switchTab('barbers')" id="tab-barbers" data-perm="barbers" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الفريق</button>
+                    <button onclick="switchTab('attendance')" id="tab-attendance" data-perm="attendance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحضور</button>
+                    <button onclick="switchTab('drawer')" id="tab-drawer" data-perm="drawer" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الدرج والخزنة</button>
                     <button onclick="switchTab('finance')" id="tab-finance" data-perm="finance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المالية</button>
-                    <button onclick="switchTab('users')" id="tab-users" data-perm="users" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المستخدمين</button>
+                    <button onclick="switchTab('reports')" id="tab-reports" data-perm="reports" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">التقارير</button>
+                    <button onclick="switchTab('users')" id="tab-users" data-perm="users" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المستخدمون</button>
                     <button onclick="switchTab('settings')" id="tab-settings" data-perm="settings" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الإعدادات</button>
                 </nav>
 
@@ -680,6 +682,7 @@
             </section>
 
             <section id="view-attendance" class="view-section hidden space-y-3"></section>
+            <section id="view-drawer" class="view-section hidden space-y-3"></section>
             <section id="view-finance" class="view-section hidden space-y-3"></section>
         </main>
 
@@ -893,8 +896,8 @@
                 </div>
                 <input type="hidden" id="edit-user-display-en">
                 <div>
-                    <label class="block text-gray-400 mb-1">كلمة المرور (أرقام فقط، من 4 إلى 8)</label>
-                    <input type="text" id="edit-user-password" required inputmode="numeric" pattern="\d{4,8}" maxlength="8" autocomplete="off" dir="ltr" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-gold font-black tracking-widest">
+                    <label class="block text-gray-400 mb-1">كلمة المرور (أرقام فقط: المدير 10 أرقام، الكاشير 6). سيبها فاضية لو مش هتغيّرها</label>
+                    <input type="password" id="edit-user-password" inputmode="numeric" maxlength="12" autocomplete="off" dir="ltr" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-gold font-black tracking-widest">
                     <input type="hidden" id="edit-user-username"><input type="hidden" id="edit-user-pin">
                 </div>
 
@@ -909,6 +912,7 @@
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-catalog" class="accent-gold"> تعديل الخدمات والأسعار</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-barbers" class="accent-gold"> الحلاقين والرواتب</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-attendance" class="accent-gold"> الحضور والانصراف</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-drawer" class="accent-gold"> الدرج والخزنة</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-finance" class="accent-gold"> المالية</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-users" class="accent-gold"> إدارة المستخدمين</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-settings" class="accent-gold"> الإعدادات وسجل المراجعة</label>
@@ -961,23 +965,24 @@
         </div>
     </div>
 
-<script defer src="core.js?v=8"></script>
-<script defer src="payroll.js?v=8"></script>
-<script defer src="pos.js?v=8"></script>
-<script defer src="invoices.js?v=8"></script>
-<script defer src="clients.js?v=8"></script>
-<script defer src="reports.js?v=8"></script>
-<script defer src="catalog.js?v=8"></script>
-<script defer src="staff.js?v=8"></script>
-<script defer src="users-settings.js?v=8"></script>
-<script defer src="names.js?v=8"></script>
-<script defer src="invoice-settings.js?v=8"></script>
-<script defer src="data-tools.js?v=8"></script>
-<script defer src="attendance.js?v=8"></script>
-<script defer src="finance.js?v=8"></script>
-<script defer src="app.js?v=8"></script>
-<script defer src="icons.js?v=8"></script>
-<script defer src="theme.js?v=8"></script>
-<script defer src="ui.js?v=8"></script>
+<script defer src="core.js?v=9"></script>
+<script defer src="payroll.js?v=9"></script>
+<script defer src="pos.js?v=9"></script>
+<script defer src="invoices.js?v=9"></script>
+<script defer src="clients.js?v=9"></script>
+<script defer src="reports.js?v=9"></script>
+<script defer src="catalog.js?v=9"></script>
+<script defer src="staff.js?v=9"></script>
+<script defer src="users-settings.js?v=9"></script>
+<script defer src="names.js?v=9"></script>
+<script defer src="invoice-settings.js?v=9"></script>
+<script defer src="data-tools.js?v=9"></script>
+<script defer src="attendance.js?v=9"></script>
+<script defer src="finance.js?v=9"></script>
+<script defer src="drawer.js?v=9"></script>
+<script defer src="app.js?v=9"></script>
+<script defer src="icons.js?v=9"></script>
+<script defer src="theme.js?v=9"></script>
+<script defer src="ui.js?v=9"></script>
 </body>
 </html>

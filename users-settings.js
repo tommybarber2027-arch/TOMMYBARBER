@@ -6,14 +6,14 @@
                         <h4 class="font-black text-white text-sm">${u.displayName}</h4>
                         <span class="px-2.5 py-0.5 rounded-full bg-golddark border border-gold/40 text-gold font-bold">${u.roleTitle}</span>
                     </div>
-                    <p class="text-gray-400 font-mono">Username: ${u.username} | PIN: <b class="text-gold">${u.pin}</b></p>
-                    <div class="grid grid-cols-2 gap-2"><button onclick="openUserModal('${u.id}')" class="py-2 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل الصلاحيات</button><button onclick="deleteUser('${u.id}')" class="py-2 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 font-bold">حذف المستخدم</button></div>
+                    <p class="text-gray-400 font-mono">${u.mustChange ? '<b class="text-red-400">لازم يغيّر كلمة المرور</b>' : 'كلمة المرور محفوظة مشفّرة'}</p>
+                    <div class="grid grid-cols-2 gap-2"><button onclick="openUserModal('${u.id}')" class="py-2 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل الصلاحيات</button>${isMgrUser(u) ? '' : `<button onclick="deleteUser('${u.id}')" class="py-2 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 font-bold">حذف المستخدم</button>`}</div>
                 </div>
             `).join('');
         }
 
         function openUserModal(id = null) {
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'finance', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'finance', 'users', 'settings'];
             if (id) {
                 const u = appState.users.find(x => x.id === id);
                 if (!u) return;
@@ -22,8 +22,8 @@
                 { const e = document.getElementById('edit-user-display-en'); e.value = u.displayNameEn || ''; e.dataset.manual = u.displayNameEn ? '1' : ''; }
                 document.getElementById('edit-user-role').value = u.roleTitle || 'كاشير';
                 document.getElementById('edit-user-username').value = u.username || '';
-                document.getElementById('edit-user-password').value = u.password || '';
-                document.getElementById('edit-user-pin').value = u.pin || '';
+                document.getElementById('edit-user-password').value = '';
+                document.getElementById('edit-user-pin').value = '';
                 permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); if (cb) cb.checked = !!(u.permissions && u.permissions[p]); });
             } else {
                 if (appState.users.length >= 7) { showToast('الحد الأقصى 1 مدير + 6 كاشير', 'error'); return; }
@@ -42,23 +42,28 @@
         function saveUser(e) {
             e.preventDefault();
             const id = document.getElementById('edit-user-id').value;
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'finance', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'finance', 'users', 'settings'];
             const perms = {};
             permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); perms[p] = cb ? cb.checked : false; });
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
-            const pwd = document.getElementById('edit-user-password').value.trim(), pin = pwd;
-            if (!/^\d{4,8}$/.test(pwd)) { showToast('يجب أن تكون كلمة المرور من 4 إلى 8 أرقام', 'error'); return; }
+            const pwd = document.getElementById('edit-user-password').value.trim();
+            const roleSel = document.getElementById('edit-user-role').value, tgt = id ? appState.users.find(x => x.id === id) : null;
+            if (tgt && isMgrUser(tgt) && roleSel !== 'مدير') { showToast('مينفعش تغيّر وظيفة المدير', 'error'); return; }
+            if (!id && roleSel === 'مدير' && appState.users.some(isMgrUser)) { showToast('فيه مدير واحد بس', 'error'); return; }
+            if (!id || pwd) { const pr = passProblem(pwd, { roleTitle: roleSel }); if (pr) { showToast(pr, 'error'); return; } }
 
             if (appState.users.some(u => u.id !== id && (u.username.toLowerCase() === username.toLowerCase()))) {
                 showToast('اسم المستخدم مستخدم بالفعل', 'error');
                 return;
             }
 
-            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, password: document.getElementById('edit-user-password').value.trim(), pin, permissions: perms };
+            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, permissions: perms };
+            let newRec = null;
             if (id) {
                 const targetUser = appState.users.find(x => x.id === id);
                 if (targetUser) {
                     Object.assign(targetUser, data);
+                    if (pwd) { setUserPass(targetUser, pwd); targetUser.mustChange = false; if (isMgrUser(targetUser)) newRec = makeRecovery(targetUser); }
                     logAudit(`تعديل صلاحيات المستخدم: ${data.displayName}`);
                     if (currentUser && currentUser.id === id) {
                         currentUser = targetUser;
@@ -70,10 +75,10 @@
                     }
                 }
             } else {
-                appState.users.push({ id: 'u-' + Date.now(), ...data });
+                const nu = { id: 'u-' + Date.now(), ...data }; setUserPass(nu, pwd); appState.users.push(nu);
                 logAudit(`إضافة مستخدم جديد: ${data.displayName}`);
             }
-            saveState(); closeModal('user-modal'); renderAll(); showToast('تم حفظ بيانات وصلاحيات المستخدم بنجاح');
+            saveState(); closeModal('user-modal'); renderAll(); showToast('تم حفظ بيانات وصلاحيات المستخدم بنجاح'); if (newRec) showRecoveryCode(newRec);
         }
 
         function renderRoles() {
@@ -155,7 +160,7 @@
                 try {
                     const parsed = JSON.parse(ev.target.result);
                     if (!parsed || !parsed.catalog || !parsed.barbers) { showToast('ملف النسخة الاحتياطية غير صالح', 'error'); return; }
-                    appState = { ...JSON.parse(JSON.stringify(defaultState)), ...parsed };
+                    appState = { ...JSON.parse(JSON.stringify(defaultState)), ...parsed }; migrateAuth();
                     logAudit('تم استرجاع نسخة احتياطية لقاعدة البيانات'); saveState(); renderAll();
                     showToast('تم استرجاع جميع البيانات بنجاح!');
                 } catch (err) { showToast('حدث خطأ أثناء قراءة الملف', 'error'); }
@@ -324,5 +329,5 @@
             document.querySelectorAll('.pm-input').forEach(i => i.value = payrollMonth);
             renderPOS(); renderInvoicesTable(); renderClientsTable(); renderReports();
             renderCatalogManagement(); renderBarbersManage(); renderUsersManage(); renderSettings();
-            try { ensureNewPerms(); renderAttendance(); finRefresh(); } catch (e) { console.error(e); }
+            try { ensureNewPerms(); renderAttendance(); finRefresh(); renderDrawer(); renderPL(); } catch (e) { console.error(e); }
         }

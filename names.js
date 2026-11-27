@@ -66,7 +66,7 @@
             if (!currentUser?.permissions?.users) { showToast('غير مصرح لك', 'error'); return; }
             const u = appState.users.find(x => x.id === id); if (!u) return;
             if (currentUser && currentUser.id === id) { showToast('مينفعش تحذف المستخدم اللي داخل بيه دلوقتي', 'error'); return; }
-            if (u.roleTitle === 'مدير' && appState.users.filter(x => x.roleTitle === 'مدير').length <= 1) { showToast('لازم يفضل مدير واحد على الأقل', 'error'); return; }
+            if (isMgrUser(u)) { showToast('المدير مينفعش يتحذف', 'error'); return; }
             askConfirm(`حذف المستخدم: ${esc(u.displayName)}. الفواتير اللي عملها هتفضل محفوظة.`, () => {
                 appState.users = appState.users.filter(x => x.id !== id);
                 logAudit(`حذف المستخدم: ${u.displayName}`);

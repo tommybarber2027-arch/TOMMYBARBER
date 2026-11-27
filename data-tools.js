@@ -32,10 +32,11 @@
         }
         function factoryReset() {
             if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك بتنفيذ هذه العملية', 'error'); return; }
-            confirmDanger('هيتم مسح كل شيء وإرجاع البرنامج لحالته الأولى. كلمات المرور هترجع للافتراضي (المدير 8800).', () => {
+            confirmDanger('هيتم مسح كل شيء وإرجاع البرنامج لحالته الأولى. حساب المدير وكلمة مروره وكود الاسترجاع بيفضلوا زي ما هم.', () => {
                 const fresh = JSON.parse(JSON.stringify(defaultState));
                 fresh.invoices = []; fresh.clients = []; fresh.advances = []; fresh.auditLogs = []; fresh.barbers = []; fresh.attendanceRecords = {};
-                fresh.expenses = []; fresh.users = []; fresh._ts = Date.now();
+                fresh.expenses = []; fresh.finExpenses = []; fresh.finAdv = []; fresh.attendanceLog = {}; fresh.shifts = []; fresh.vaultAdj = [];
+                fresh.users = appState.users.filter(isMgrUser); fresh.authVersion = 3; fresh._ts = Date.now();
                 appState = fresh; migrateAuth();
                 selectedBarberId = null; selectedCategoryId = appState.categories[0]?.id || 'cat_cut';
                 currentUser = null; currentDraft = { items: [], paymentMethod: 'cash', discount: 0 };
