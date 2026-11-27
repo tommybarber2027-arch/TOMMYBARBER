@@ -1835,7 +1835,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
     <!-- PIN / PASSWORD LOGIN SCREEN                               -->
     <!-- ========================================================= -->
     <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4 bg-[#0B0A08]">
-        <div class="ui-ctl flex items-center gap-1.5"><button type="button" class="js-lang ctl-btn" aria-label="Language"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg><span class="lang-lbl">EN</span></button><button type="button" class="js-theme ctl-btn" aria-label="Theme"><svg class="ic theme-ic" viewBox="0 0 24 24"></svg></button></div>
+        <div class="ui-ctl flex items-center gap-1.5"><button type="button" class="js-theme ctl-btn" aria-label="Theme"><svg class="ic theme-ic" viewBox="0 0 24 24"></svg></button></div>
         
         <div class="max-w-sm w-full bg-panelbg border border-bordergold rounded-3xl p-7 shadow-2xl space-y-5">
             <div class="text-center space-y-1">
@@ -1882,7 +1882,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                         <i class="fa-regular fa-user text-gold"></i>
                         <span id="header-user-badge" class="font-bold hidden sm:inline">المدير • مدير</span>
                     </div>
-                    <div class="ui-ctl flex items-center gap-1.5"><button type="button" class="js-lang ctl-btn" aria-label="Language"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18"/></svg><span class="lang-lbl">EN</span></button><button type="button" class="js-theme ctl-btn" aria-label="Theme"><svg class="ic theme-ic" viewBox="0 0 24 24"></svg></button></div>
+                    <div class="ui-ctl flex items-center gap-1.5"><button type="button" class="js-theme ctl-btn" aria-label="Theme"><svg class="ic theme-ic" viewBox="0 0 24 24"></svg></button></div>
                     <button id="install-btn" onclick="installApp()" class="hidden bg-gold text-black px-3 py-1.5 rounded-xl text-xs font-black">تثبيت التطبيق</button>
                     <button onclick="logoutUser()" class="bg-darkbg hover:bg-red-950/50 border border-bordergold text-gray-300 hover:text-red-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">
                         خروج
@@ -1895,9 +1895,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                     <button onclick="switchTab('clients')" id="tab-clients" data-perm="clients" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">العملاء</button>
                     <button onclick="switchTab('reports')" id="tab-reports" data-perm="reports" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">التقارير</button>
                     <button onclick="switchTab('catalog')" id="tab-catalog" data-perm="catalog" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الخدمات والأسعار</button>
-                    <button onclick="switchTab('attendance')" id="tab-attendance" data-perm="attendance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحضور والانصراف</button>
                     <button onclick="switchTab('barbers')" id="tab-barbers" data-perm="barbers" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحلاقين والعمالة</button>
-                    <button onclick="switchTab('expenses')" id="tab-expenses" data-perm="expenses" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المصاريف والسلف</button>
                     <button onclick="switchTab('users')" id="tab-users" data-perm="users" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المستخدمين</button>
                     <button onclick="switchTab('settings')" id="tab-settings" data-perm="settings" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الإعدادات</button>
                 </nav>
@@ -2206,44 +2204,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
             </section>
 
             <!-- 5. الحضور والانصراف -->
-            <section id="view-attendance" class="view-section hidden space-y-5">
-                <div class="bg-panelbg border border-bordergold rounded-2xl p-4 sm:p-5 space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-bordergold pb-3">
-                        <div>
-                            <h2 class="text-base font-black text-white">تسجيل الحضور والانصراف اليومي</h2>
-                            <p class="text-xs text-gray-400">كل موظف ليه كارت: اضغط «تسجيل حضور» أول ما يوصل، و«تسجيل انصراف» لما يمشي. لو مجاش اضغط «غياب»، ولو في إجازة اضغط «إجازة» (من غير خصم). لو غلطت اضغط «تراجع».</p>
-                        </div>
-                        
-                        <span id="att-page-date" class="px-3.5 py-1.5 rounded-xl bg-darkbg border border-gold/40 text-gold font-mono text-xs font-black"></span>
-                    </div>
-                    <div id="att-summary" class="flex flex-wrap gap-2 text-xs font-bold"></div>
-                    <div id="attendance-daily-cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
-                </div>
-
-                <div class="bg-panelbg border border-bordergold rounded-2xl p-4 sm:p-5 space-y-3">
-                    <div class="flex flex-wrap items-center justify-between gap-2">
-                        <h3 class="text-sm font-black text-gold">تقرير الحضور والغياب والتأخيرات</h3>
-                        <label class="text-xs text-gray-400 flex items-center gap-2">شهر الحساب <input type="month" class="pm-input bg-panelbg border border-bordergold rounded-xl px-3 py-1.5 text-xs text-white" onchange="setPayrollMonth(this.value)"></label>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-right border-collapse text-xs">
-                            <thead>
-                                <tr class="border-b border-bordergold text-gray-400">
-                                    <th class="p-3">الاسم</th>
-                                    <th class="p-3">الوظيفة</th>
-                                    <th class="p-3 text-center">ميعاد الحضور</th>
-                                    <th class="p-3 text-center">أيام الحضور</th>
-                                    <th class="p-3 text-center">أيام الغياب</th>
-                                    <th class="p-3 text-center">إجمالي التأخير</th>
-                                    <th class="p-3 text-center">خصم التأخير والغياب</th>
-                                    <th class="p-3 text-left">صافي الباقي له</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-report-tbody" class="divide-y divide-bordergold/40"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+            
 
             <!-- 6. الحلاقين والعمالة -->
             <section id="view-barbers" class="view-section hidden space-y-4">
@@ -2277,42 +2238,10 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                 <label class="text-xs text-gray-300 flex items-center gap-2">شهر الحساب (الرواتب والعمولات) <input type="month" class="pm-input bg-panelbg border border-bordergold rounded-xl px-3 py-1.5 text-xs text-white" onchange="setPayrollMonth(this.value)"></label>
                 <div id="barbers-manage-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-                <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2">
-                    <h3 class="text-sm font-black text-white">سجل السُلف والخصومات</h3>
-                    <div id="advances-list-box" class="divide-y divide-bordergold/40 text-xs"></div>
-                </div>
             </section>
 
             <!-- 7. المستخدمين -->
-            <section id="view-expenses" class="view-section hidden space-y-4">
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div><h2 class="text-base font-black text-white">المصاريف والسلف وشجرة الحسابات</h2><p class="text-xs text-gray-400">سجّل أي مبلغ صرفته على الصالون على الحساب المناسب. السلف بتتسجل على الموظف وبتتخصم من مرتبه تلقائي.</p></div>
-                    <label class="text-xs text-gray-300 flex items-center gap-2">الشهر <input type="month" id="exp-month" onchange="expMonth=this.value;renderExpenses()" class="bg-panelbg border border-bordergold rounded-xl px-3 py-2 text-white"></label>
-                </div>
-                <div id="exp-summary" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
-                    <form onsubmit="addExpense(event)" class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
-                        <h3 class="text-sm font-black text-gold">تسجيل مصروف / سلفة</h3>
-                        <div><label class="block text-gray-400 mb-1">التاريخ</label><input type="date" id="exp-date" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"></div>
-                        <div><label class="block text-gray-400 mb-1">الحساب</label><select id="exp-acc" onchange="onExpAccChange()" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"></select></div>
-                        <div id="exp-new-wrap" class="hidden space-y-2 bg-darkbg border border-gold/30 rounded-xl p-2.5"><select id="exp-new-group" class="w-full bg-panelbg border border-bordergold rounded-xl px-3 py-2 text-white"></select><input id="exp-new-name" placeholder="اسم البند الجديد (مثال: صيانة تكييف)" class="w-full bg-panelbg border border-bordergold rounded-xl px-3 py-2 text-white"></div>
-                        <div id="exp-emp-wrap" class="hidden"><label class="block text-gray-400 mb-1">الموظف اللي أخد السلفة</label><select id="exp-emp" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"></select></div>
-                        <div><label class="block text-gray-400 mb-1">المبلغ (ج.م)</label><input type="number" id="exp-amount" min="1" step="any" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold"></div>
-                        <div><label class="block text-gray-400 mb-1">طريقة الدفع</label><select id="exp-pay" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"><option value="cash">نقدي</option><option value="visa">إنستا باي</option><option value="wallet">محفظة</option></select></div>
-                        <div><label class="block text-gray-400 mb-1">ملاحظة (اختياري)</label><input type="text" id="exp-note" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"></div>
-                        <button type="submit" id="exp-submit" class="w-full bg-gold hover:bg-goldhover text-black font-black py-2.5 rounded-xl">تسجيل</button>
-                        <button type="button" id="exp-cancel" onclick="cancelExpEdit()" class="hidden w-full bg-darkbg border border-bordergold text-gray-300 font-bold py-2.5 rounded-xl">إلغاء التعديل</button>
-                    </form>
-                    <div class="lg:col-span-2 space-y-4">
-                        <div class="bg-panelbg border border-bordergold rounded-2xl p-4"><h3 class="text-sm font-black text-white mb-3">المصاريف حسب الحساب</h3><div id="exp-breakdown" class="space-y-3 text-xs"></div></div>
-                        <div class="bg-panelbg border border-bordergold rounded-2xl p-4"><h3 class="text-sm font-black text-white mb-3">سجل الشهر</h3><div class="overflow-x-auto"><table class="w-full text-right text-xs"><tbody id="exp-list" class="divide-y divide-bordergold/40"></tbody></table></div></div>
-                    </div>
-                </div>
-                <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3">
-                    <div class="flex items-center justify-between"><h3 class="text-sm font-black text-gold">شجرة الحسابات</h3><button type="button" onclick="addAccount(null)" class="px-3 py-1.5 rounded-xl bg-gold text-black text-xs font-black">+ مجموعة جديدة</button></div>
-                    <div id="accounts-tree" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
-                </div>
-            </section>
+            
             <section id="view-users" class="view-section hidden space-y-4">
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-black text-white">المستخدمين والصلاحيات (1 مدير + حتى 6 كاشير)</h2>
@@ -2326,7 +2255,6 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                 <div id="set-pills" class="flex flex-wrap gap-2">
                     <button type="button" data-sp="general" onclick="showSettingsPanel('general')" class="set-pill">بيانات الصالون</button>
                     <button type="button" data-sp="invoice" onclick="showSettingsPanel('invoice')" class="set-pill">الفاتورة والإيصال</button>
-                    <button type="button" data-sp="attendance" onclick="showSettingsPanel('attendance')" class="set-pill">الحضور والرواتب</button>
                     <button type="button" data-sp="roles" onclick="showSettingsPanel('roles')" class="set-pill">الوظائف</button>
                     <button type="button" data-sp="backup" onclick="showSettingsPanel('backup')" class="set-pill">النسخ الاحتياطي والاسترجاع</button>
                     <button type="button" data-sp="data" onclick="showSettingsPanel('data')" class="set-pill">المسح والحذف وضبط المصنع</button>
@@ -2450,28 +2378,6 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                     </form>
                 </div>
 
-                <!-- الحضور والرواتب -->
-                <div id="set-p-attendance" class="set-panel hidden max-w-2xl">
-                    <form onsubmit="saveSalonSettings(event)" class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
-                        <h3 class="text-sm font-black text-gold">إعدادات الحضور والتأخير</h3>
-                        <div>
-                            <label class="block text-gray-400 mb-1">لو عدّى السماح، التأخير اللي يتحسب</label>
-                            <select id="set-late-mode" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
-                                <option value="full">التأخير كله (من ميعاد الحضور)</option>
-                                <option value="excess">اللي بعد السماح بس</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-400 mb-1">خصم التأخير من المرتب</label>
-                            <select id="set-late-deduct" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">
-                                <option value="track">لا، سجّل التأخير بس وأنا أظبطه في الآخر</option>
-                                <option value="auto">نعم، اخصمه تلقائي من المرتب</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">حفظ الإعدادات</button>
-                    </form>
-                </div>
-
                 <!-- الوظائف -->
                 <div id="set-p-roles" class="set-panel hidden max-w-2xl">
                     <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
@@ -2514,6 +2420,11 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
 
                 <!-- المسح والحذف وضبط المصنع -->
                 <div id="set-p-data" class="set-panel hidden max-w-2xl space-y-3">
+                    <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
+                        <h3 class="text-sm font-black text-gold">أرشفة الفواتير القديمة</h3>
+                        <p class="text-gray-300 leading-relaxed">بتنزّل كل فواتير الشهور السابقة في ملف على جهازك وبتشيلها من البرنامج، عشان البرنامج يفضل سريع. تقارير الشهور القديمة مش هتظهر بعدها في البرنامج، فاحتفظ بالملف.</p>
+                        <button type="button" onclick="archiveOldInvoices()" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">أرشفة فواتير الشهور السابقة</button>
+                    </div>
                     <div class="bg-panelbg border border-red-900/60 rounded-2xl p-4 space-y-3 text-xs">
                         <div class="flex items-center gap-2 text-red-400">
                             <i class="fa-solid fa-triangle-exclamation text-base"></i>
@@ -2521,9 +2432,6 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                         </div>
                         <p class="text-gray-400 leading-relaxed">كل عملية بتطلب منك تكتب كلمة حذف للتأكيد، ومفيش رجوع بعدها، فخد نسخة احتياطية الأول.</p>
                         <div class="dz-row"><div><b class="text-white block">الفواتير</b><span class="text-gray-400">يمسح كل الفواتير ويبدأ الترقيم من 1</span></div><button type="button" class="dz-btn" onclick="wipeData('invoices')">مسح الفواتير</button></div>
-                        <div class="dz-row"><div><b class="text-white block">الحضور والانصراف</b><span class="text-gray-400">يمسح سجل الحضور والغياب لكل الموظفين</span></div><button type="button" class="dz-btn" onclick="wipeData('attendance')">مسح الحضور</button></div>
-                        <div class="dz-row"><div><b class="text-white block">السُلف والخصومات</b><span class="text-gray-400">يمسح السُلف وخصومات الموظفين</span></div><button type="button" class="dz-btn" onclick="wipeData('advances')">مسح السُلف</button></div>
-                        <div class="dz-row"><div><b class="text-white block">المصاريف</b><span class="text-gray-400">يمسح كل حركات المصاريف</span></div><button type="button" class="dz-btn" onclick="wipeData('expenses')">مسح المصاريف</button></div>
                         <div class="dz-row"><div><b class="text-white block">العملاء</b><span class="text-gray-400">يمسح قاعدة بيانات العملاء (الأسماء والأرقام)</span></div><button type="button" class="dz-btn" onclick="wipeData('clients')">مسح العملاء</button></div>
                         <div class="dz-row"><div><b class="text-white block">الموظفين والحلاقين</b><span class="text-gray-400">يحذف كل الموظفين (لحذف موظف واحد افتح قسم الحلاقين والعمالة)</span></div><button type="button" class="dz-btn" onclick="wipeData('staff')">حذف كل الموظفين</button></div>
                         <div class="dz-row"><div><b class="text-white block">سجل المراجعة</b><span class="text-gray-400">يمسح سجل العمليات والأمان</span></div><button type="button" class="dz-btn" onclick="wipeData('audit')">مسح السجل</button></div>
@@ -2653,7 +2561,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                 <input type="hidden" id="edit-barber-id">
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-gray-400 mb-1">الاسم بالعربي</label>
+                        <label class="block text-gray-400 mb-1">اسم العامل / الصنايعي</label>
                         <input type="text" id="edit-barber-name" oninput="autoEnName()" placeholder="اكتب الاسم هنا..." class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
                     </div>
                     <div>
@@ -2662,10 +2570,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-gray-400 mb-1">الاسم بالإنجليزي</label>
-                    <input type="text" id="edit-barber-name-en" dir="ltr" oninput="this.dataset.manual='1'" placeholder="بيتكتب تلقائي لو سبته فاضي" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
-                </div>
+                <input type="hidden" id="edit-barber-name-en">
                 <div class="grid grid-cols-2 gap-2.5">
                     <div>
                         <label class="block text-gray-400 mb-1">رقم التليفون الأساسي</label>
@@ -2774,10 +2679,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-gray-400 mb-1">الاسم بالإنجليزي (اختياري)</label>
-                    <input type="text" id="edit-user-display-en" dir="ltr" oninput="this.dataset.manual='1'" placeholder="بيتكتب تلقائي لو سبته فاضي" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white font-bold">
-                </div>
+                <input type="hidden" id="edit-user-display-en">
                 <div>
                     <label class="block text-gray-400 mb-1">كلمة المرور (أرقام فقط، من 4 إلى 8)</label>
                     <input type="text" id="edit-user-password" required inputmode="numeric" pattern="\d{4,8}" maxlength="8" autocomplete="off" dir="ltr" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-gold font-black tracking-widest">
@@ -2794,9 +2696,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-reports" class="accent-gold"> التقارير المالية</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-catalog" class="accent-gold"> تعديل الخدمات والأسعار</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-barbers" class="accent-gold"> الحلاقين والرواتب</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-attendance" class="accent-gold"> قسم الحضور والانصراف</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-users" class="accent-gold"> إدارة المستخدمين</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-expenses" class="accent-gold"> المصاريف والسلف والحسابات</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-settings" class="accent-gold"> الإعدادات وسجل المراجعة</label>
                     </div>
                 </div>
@@ -3231,7 +3131,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
             const pct = Number(staff.commissionPct || 0);
             const skinPct = Number(staff.skinPct || 0);
             const lateHourRate = Number(staff.lateHourRate || 20);
-            const att = getStaffMonthlyAttendance(staff.id);
+            const att = { present: 0, absent: 0, lateMinutes: 0, chargeMinutes: 0, workMinutes: 0, lateDays: 0 };
             const absentDays = att.absent;
             const lateHours = Number((att.chargeMinutes / 60).toFixed(2));
 
@@ -3240,6 +3140,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
 
             staffInvs.forEach(inv => {
                 inv.items.forEach(it => {
+                    if (it.category === 'cat_cafe') return;
                     const lineTotal = it.price * it.qty * invFactor(inv);
                     if (isCareCat(it.category)) careSales += lineTotal;
                     else regularSales += lineTotal;
@@ -3257,9 +3158,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
             const totalTimeDeduction = absenceDeduction + lateDeduction;
             const netBaseSalary = Math.max(0, baseSalary - totalTimeDeduction);
 
-            const advancesTotal = (appState.advances || [])
-                .filter(a => a.staffId === staff.id && (a.date || '').startsWith(payrollMonth))
-                .reduce((s, a) => s + Number(a.amount || 0), 0);
+            const advancesTotal = 0;
 
             const netPayable = Math.max(0, Number((netBaseSalary + totalComm - advancesTotal).toFixed(2)));
 
@@ -3289,7 +3188,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
         function scrollToInvoiceDrawer() { document.getElementById('pos-invoice-drawer')?.scrollIntoView({ behavior: 'smooth' }); }
 
         function renderPOS() {
-            const activeBarbers = appState.barbers.filter(isPerf);
+            const activeBarbers = appState.barbers.filter(b => isPerf(b) && !b.hidden);
             if (!activeBarbers.some(b => b.id === selectedBarberId) && activeBarbers.length > 0) selectedBarberId = activeBarbers[0].id;
 
             document.getElementById('pos-barbers-grid').innerHTML = activeBarbers.map(b => {
@@ -4036,7 +3935,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 rounded-full border border-gold/50 text-gold flex items-center justify-center text-lg shrink-0"><i class="fa-regular fa-user"></i></div>
                                 <div>
-                                    <h3 class="text-sm font-black text-white">${b.name}</h3>
+                                    <h3 class="text-sm font-black text-white">${b.name}${b.hidden ? ' <span class="text-[10px] px-2 py-0.5 rounded-full bg-darkbg border border-bordergold text-gray-400 font-bold">مخفي</span>' : ''}</h3>
                                     <span class="inline-block mt-0.5 px-2.5 py-0.5 rounded-full bg-golddark border border-gold/30 text-[10px] text-gold font-bold">${roleLabel(role)} • ${typeNames[pt]}</span>
                                     <div class="text-[11px] text-gray-400 font-mono mt-1" dir="ltr">
                                         ${b.phone1 ? `<span><i class="fa-solid fa-phone text-gold text-[10px] mr-1"></i>${b.phone1}</span>` : ''}
@@ -4044,18 +3943,12 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex flex-col gap-1.5"><button onclick="openBarberModal('${b.id}')" class="px-3 py-1.5 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-xs font-bold text-gray-300">تعديل</button><button onclick="printStatement('${b.id}')" class="px-3 py-1.5 rounded-xl border border-gold/40 bg-golddark text-gold hover:bg-gold hover:text-black text-xs font-bold transition">كشف حساب</button><button onclick="deleteBarber('${b.id}')" class="px-3 py-1.5 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 text-xs font-bold">حذف</button></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-1.5 bg-darkbg border border-bordergold/70 rounded-xl p-2.5 text-xs text-center">
-                            <div><span class="text-gray-400 block text-[10px]">حضور</span><b class="text-emerald-400">${calc.presentDays} يوم</b></div>
-                            <div class="border-x border-bordergold/60"><span class="text-gray-400 block text-[10px]">غياب</span><b class="text-red-400">${calc.absentDays} يوم</b></div>
-                            <div><span class="text-gray-400 block text-[10px]">تأخير</span><b class="text-amber-400">${fmtDur(calc.lateMinutes)}</b></div>
+                            <div class="flex flex-col gap-1.5"><button onclick="openBarberModal('${b.id}')" class="px-3 py-1.5 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-xs font-bold text-gray-300">تعديل</button><button onclick="printStatement('${b.id}')" class="px-3 py-1.5 rounded-xl border border-gold/40 bg-golddark text-gold hover:bg-gold hover:text-black text-xs font-bold transition">كشف حساب</button><button onclick="toggleBarberHidden('${b.id}')" class="px-3 py-1.5 rounded-xl border border-bordergold bg-darkbg text-gray-300 hover:border-gold text-xs font-bold">${b.hidden ? 'إظهار' : 'إخفاء'}</button><button onclick="deleteBarber('${b.id}')" class="px-3 py-1.5 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 text-xs font-bold">حذف</button></div>
                         </div>
                         <div class="space-y-1.5 text-xs border-t border-bordergold/50 pt-2.5">
                             ${pt !== 'commission' ? `<div class="flex justify-between"><span class="text-gray-400">الراتب الثابت (بعد الغياب والتأخير):</span><span class="font-bold text-white">${fmt(calc.netBaseSalary)} ج.م</span></div>` : ''}
                             ${pt !== 'salary' ? `<div class="flex justify-between"><span class="text-gray-400">عمولة الشغل (${b.commissionPct || 0}%):</span><span class="font-bold text-gold">${fmt(calc.regularComm)} ج.م</span></div>` : ''}
                             <div class="flex justify-between"><span class="text-gray-400">عمولة البشرة والعناية (${b.skinPct || 0}%):</span><span class="font-bold text-gold">${fmt(calc.careComm)} ج.م</span></div>
-                            <div class="flex justify-between"><span class="text-gray-400">السُلف والخصومات:</span><span class="font-bold text-red-400">- ${fmt(calc.advancesTotal)} ج.م</span></div>
                             <div class="flex justify-between border-t border-bordergold pt-2 text-sm">
                                 <span class="font-black text-white">صافي الباقي له:</span>
                                 <span class="font-black text-gold">${fmt(calc.netPayable)} ج.م</span>
@@ -4065,15 +3958,6 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
                 `;
             }).join('');
 
-            const advBox = document.getElementById('advances-list-box');
-            advBox.innerHTML = (!appState.advances || appState.advances.length === 0)
-                ? `<p class="text-gray-500 py-3 text-center">لا توجد سُلف مسجلة حالياً</p>`
-                : appState.advances.map(a => `
-                    <div class="py-2.5 flex items-center justify-between">
-                        <div><b class="text-white">${a.staffName}</b><span class="text-gray-400 mr-2">• ${a.reason}</span><span class="text-[11px] text-gray-500 font-mono mr-2">(${a.date})</span></div>
-                        <div class="flex items-center gap-3"><span class="font-black text-red-400">${fmt(a.amount)} ج.م</span><button onclick="deleteAdvance('${a.id}')" class="text-gray-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button></div>
-                    </div>
-                `).join('');
         }
 
         function toggleBarberPayFields() {
@@ -4169,7 +4053,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
         }
 
         function openUserModal(id = null) {
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'users', 'settings', 'expenses'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'users', 'settings'];
             if (id) {
                 const u = appState.users.find(x => x.id === id);
                 if (!u) return;
@@ -4198,7 +4082,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
         function saveUser(e) {
             e.preventDefault();
             const id = document.getElementById('edit-user-id').value;
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'users', 'settings', 'expenses'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'users', 'settings'];
             const perms = {};
             permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); perms[p] = cb ? cb.checked : false; });
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
@@ -4475,11 +4359,11 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
         }
         function setPayrollMonth(v) { if (!v) return; payrollMonth = v; renderAll(); }
         function renderAll() {
+            try { ensureCafe(); } catch (e) { console.error(e); }
             try { renderLoginUsers(); } catch (e) {}
-            try { renderExpenses(); } catch (e) { console.error(e); }
             document.querySelectorAll('.pm-input').forEach(i => i.value = payrollMonth);
             renderPOS(); renderInvoicesTable(); renderClientsTable(); renderReports();
-            renderCatalogManagement(); renderAttendanceSection(); renderBarbersManage(); renderUsersManage(); renderSettings();
+            renderCatalogManagement(); renderBarbersManage(); renderUsersManage(); renderSettings();
         }
 
         // ===================== AR/EN NAMES (staff & users) =====================
@@ -4523,7 +4407,7 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
             (appState.users || []).forEach(u => add(u.displayName, u.displayNameAr, u.displayNameEn));
             return out;
         }
-        window.nameEntries = nameEntries;
+        window.nameEntries = () => [];
         function autoEnName() {
             const en = document.getElementById('edit-barber-name-en'); if (!en || en.dataset.manual === '1') return;
             en.value = trAr2En(document.getElementById('edit-barber-name').value);
@@ -4699,6 +4583,31 @@ html.light #toast-container>div{box-shadow:0 12px 30px -10px rgba(16,24,40,.35)}
             }, 'ضبط المصنع');
         }
 
+        function toggleBarberHidden(id) {
+            const b = appState.barbers.find(x => x.id === id); if (!b) return;
+            b.hidden = !b.hidden; logAudit((b.hidden ? 'إخفاء الموظف: ' : 'إظهار الموظف: ') + b.name);
+            saveState(); renderAll(); showToast(b.hidden ? 'تم إخفاء الموظف من الكاشير' : 'تم إظهار الموظف');
+        }
+        function archiveOldInvoices() {
+            if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك', 'error'); return; }
+            const cut = getTodayISO().slice(0, 7) + '-01', old = appState.invoices.filter(i => (i.date || '') < cut);
+            if (!old.length) { showToast('مفيش فواتير قديمة للأرشفة', 'error'); return; }
+            askConfirm(`هننزّل ${old.length} فاتورة قبل الشهر الحالي في ملف على جهازك، وبعدها نشيلها من البرنامج.`, () => {
+                const blob = new Blob([JSON.stringify({ archivedAt: new Date().toISOString(), invoices: old }, null, 1)], { type: 'application/json' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tommy-invoices-archive-' + getTodayISO().slice(0, 7) + '.json';
+                document.body.appendChild(a); a.click(); a.remove();
+                appState.invoices = appState.invoices.filter(i => (i.date || '') >= cut);
+                logAudit(`أرشفة ${old.length} فاتورة قديمة`); saveState(); renderAll(); showToast('تمت الأرشفة');
+            }, 'أرشف');
+        }
+        function ensureCafe() {
+            if (appState.cafeAdded) return; appState.cafeAdded = true;
+            if (appState.categories.some(c => c.id === 'cat_cafe')) return;
+            appState.categories.push({ id: 'cat_cafe', name: 'الكافيه والمشروبات', icon: 'fa-mug-hot' });
+            [['شاي', 15, 'fa-mug-hot'], ['قهوة', 30, 'fa-mug-hot'], ['نسكافيه', 30, 'fa-mug-hot'], ['ينسون', 15, 'fa-mug-hot'], ['مياه معدنية', 10, 'fa-bottle-water'], ['مشروب غازي', 20, 'fa-bottle-water'], ['عصير', 25, 'fa-glass-water']]
+                .forEach((d, i) => appState.catalog.push({ id: 'cafe' + (i + 1), category: 'cat_cafe', name: d[0], price: d[1], icon: d[2] }));
+            saveState();
+        }
         window.onload = function () {
             const today = getTodayISO();
             const fromEl = document.getElementById('inv-date-from'), toEl = document.getElementById('inv-date-to');
@@ -4734,13 +4643,12 @@ if(h&&window.ResizeObserver)new ResizeObserver(hh).observe(h);addEventListener('
 </script>
 <script>
 (function(){
-const D={"كل موظف ليه كارت: اضغط «تسجيل حضور» أول ما يوصل، و«تسجيل انصراف» لما يمشي. لو مجاش اضغط «غياب»، ولو في إجازة اضغط «إجازة» (من غير خصم). لو غلطت اضغط «تراجع»": "Each employee has a card: tap \"Check in\" when they arrive and \"Check out\" when they leave. If they did not come tap \"Absent\", for leave tap \"Leave\" (no deduction). Tap \"Undo\" if you made a mistake", "جميع بياناتك محفوظة تلقائياً على قاعدة البيانات السحابية وتعمل من أي جهاز. يمكنك تحميل نسخة احتياطية كاملة على جهازك أو ربط فلاشة": "All your data is saved automatically to the cloud database and works from any device. You can download a full backup to your device or link a USB drive", "سجّل أي مبلغ صرفته على الصالون على الحساب المناسب. السلف بتتسجل على الموظف وبتتخصم من مرتبه تلقائي": "Record any amount you spent on the salon under the right account. Advances are recorded against the employee and deducted from their salary automatically", "سيتم الاحتفاظ بأسماء وأرقام العملاء المسجلين والحلاقين والخدمات والمستخدمين كما هم": "The names and numbers of registered customers, barbers, services and users will be kept as they are", "تم تصفير الفواتير والحركات والزيارات مع الاحتفاظ بأسماء وأرقام العملاء": "Invoices, transactions and visits were reset while keeping customer names and numbers", "يتم ربط العميل برقم الموبايل لمنع التكرار ومعرفة عدد زياراته السابقة": "Customers are linked by mobile number to prevent duplicates and track previous visits", "تم مسح الفواتير والحركات بنجاح مع الاحتفاظ بأسماء وأرقام العملاء!": "Invoices and transactions cleared successfully, customer names and numbers kept!", "تم ربط الفلاشة بنجاح! سيتم الحفظ عليها تلقائياً مع كل عملية": "USB drive linked successfully! Data will be saved to it automatically after every operation", "عند تسجيل بيانات عميل يجب إدخال الاسم ورقم التليفون معاً": "When saving a customer, both name and phone number are required", "مع الاحتفاظ بأسماء وأرقام العملاء والحلاقين والخدمات": "while keeping customer, barber and service names and numbers", "المحلة الكبرى - شارع البحر - أمام بنك ناصر الاجتماعي": "El-Mahalla El-Kubra - El-Bahr St. - opposite Nasser Social Bank", "لربط الفلاشة مباشرة افتح البرنامج من رابطك الرسمي في": "To link a USB drive directly, open the app from your official link in", "الفواتير والحسابات وسجل الحضور والانصراف والسُلف": "Invoices, accounts, attendance records and advances", "مسح الفواتير والحسابات التجريبية والبدء من جديد": "Clear test invoices and accounts and start fresh", "ملاحظات (مثلاً: ترشيح تنظيف بشرة من مساعد...)": "Notes (e.g. skin cleaning recommended by an assistant...)", "المستخدمين والصلاحيات (1 مدير + حتى 6 كاشير)": "Users & permissions (1 manager + up to 6 cashiers)", "محاولات خاطئة متكررة! تم القفل لمدة 30 ثانية": "Too many wrong attempts! Locked for 30 seconds", "في موظفين على الوظيفة دي، غيّر وظيفتهم الأول": "Some employees have this job, change their job first", "تم استرجاع نسخة احتياطية لقاعدة البيانات": "Database backup restored", "لا، سجّل التأخير بس وأنا أظبطه في الآخر": "No, just record lateness and I will settle it later", "نسبة عمولة البشرة والعناية والصبغات (%)": "Skin, care & dye commission (%)", "يجب إدخال اسم العميل ورقم التليفون معاً": "Customer name and phone number are both required", "الموظف حاضر بالفعل. سجّل انصرافه الأول": "Employee is already checked in. Check them out first", "تحذف السلفة دي؟ هترجع للموظف في الحساب": "Delete this advance? It will return to the employee's account", "اسمح بالنوافذ المنبثقة عشان تطبع الكشف": "Allow pop-ups to print the statement", "بيانات الموظف / الصنايعي ونظام الراتب": "Employee / barber details & pay system", "يجب إدخال الاسم ورقم التليفون الأساسي": "Name and primary phone number are required", "تم حفظ بيانات وصلاحيات المستخدم بنجاح": "User data and permissions saved successfully", "اسم البند الجديد (مثال: صيانة تكييف)": "New item name (e.g. AC maintenance)", "مثلاً: محفظة / انستاباي: 01000746687": "e.g. Wallet / InstaPay: 01000746687", "تصفير بيانات التشغيل والبدء على نظيف": "Reset operating data and start clean", "خدمة بروتين (البروتين الخاص بالعميل)": "Protein treatment (customer's own protein)", "يجب تسجيل الحضور أولاً قبل الانصراف": "Check-in is required before check-out", "الراتب الثابت (بعد الغياب والتأخير)": "Fixed salary (after absence & lateness)", "بيانات العميل والملاحظات (اختياري)": "Customer details & notes (optional)", "قاعدة بيانات العملاء وسجل الزيارات": "Customer database & visit history", "لو عدّى السماح، التأخير اللي يتحسب": "If grace is exceeded, the lateness counted", "رقم التليفون (إجباري ومميز للعميل)": "Phone number (required & unique per customer)", "لا يوجد عملاء مسجلين مطابقين للبحث": "No registered customers match the search", "تم تسجيل السُلفة وخصمها من المستحق": "Advance recorded and deducted from dues", "خصم التأخير اتسجل قبل كده للشهر ده": "Lateness deduction was already recorded for this month", "رقم موبايل العميل (يبحث تلقائياً)": "Customer mobile (auto-search)", "صلاحيات الشاشات والعمليات الحساسة": "Screen & sensitive operation permissions", "هذا الرقم مسجل مسبقاً باسم العميل": "This number is already registered to customer", "غير مصرح لك بتسجيل الحضور والغياب": "You are not allowed to record attendance", "بحث (رقم / عميل / موبايل / حلاق)": "Search (number / customer / mobile / barber)", "أرقام الدفع الإلكتروني / المحفظة": "E-payment / wallet numbers", "، وإعادة ترقيم الفواتير ليبدأ من": ", and renumber invoices to start from", "تم تحميل النسخة الاحتياطية بنجاح": "Backup downloaded successfully", "خامات ومنتجات (صبغات، كريمات...)": "Materials & products (dyes, creams...)", "بحث باسم العميل أو رقم الموبايل": "Search by customer name or mobile", "تقرير الحضور والغياب والتأخيرات": "Attendance, absence & lateness report", "قاعدة البيانات والنسخ الاحتياطي": "Database & backup", "غير مصرح لك بالدخول لهذه الشاشة": "You are not allowed to open this screen", "رقم التليفون مسجل مسبقاً للموظف": "Phone number already registered to employee", "تم استرجاع جميع البيانات بنجاح!": "All data restored successfully!", "الصافي (إيرادات - مصاريف - سلف)": "Net (revenue - expenses - advances)", "شهر الحساب (الرواتب والعمولات)": "Payroll month (salaries & commissions)", "المصاريف والسلف وشجرة الحسابات": "Expenses, advances & chart of accounts", "حمام زيت بالعسل والاعشاب للدقن": "Honey & herbal oil beard bath", "ليس لديك صلاحية تعديل الفواتير": "You do not have permission to edit invoices", "غير مصرح لك بتنفيذ هذه العملية": "You are not allowed to perform this action", "ملف النسخة الاحتياطية غير صالح": "Invalid backup file", "السلفة هترجع للموظف في المرتب)": "the advance will return to the employee's salary)", "حساب السلف أساسي ومينفعش يتحذف": "The advances account is essential and cannot be deleted", "عليه حركات مسجلة، مينفعش يتحذف": "It has recorded transactions and cannot be deleted", "اختر القسم ثم اضغط على الخدمة": "Choose a category then tap the service", "تسجيل الحضور والانصراف اليومي": "Daily check-in & check-out", "التأخير كله (من ميعاد الحضور)": "The whole lateness (from shift start)", "محفظة / انستاباي: 01000746687": "Wallet / InstaPay: 01000746687", "احذف الحسابات اللي جواه الأول": "Delete the accounts inside it first", "تنظيف بشره هيدروفيشل 7 مراحل": "Hydrafacial skin cleaning (7 steps)", "ليس لديك صلاحية حذف الفواتير": "You do not have permission to delete invoices", "الحد الأقصى 1 مدير + 6 كاشير": "Maximum 1 manager + 6 cashiers", "بند جديد مش موجود في القايمة": "New item not in the list", "اختر الحلاق / أخصائي البشرة": "Choose barber / skin specialist", "نعم، اخصمه تلقائي من المرتب": "Yes, deduct automatically from salary", "الفواتير القديمة والتجريبية": "old and test invoices", "تسجيل سُلفة أو خصم على موظف": "Record an advance or deduction for an employee", "غير مصرح لك بتسجيل الانصراف": "You are not allowed to record check-out", "صالون رجالي • تسجيل الدخول": "Men's Salon • Sign in", "تقوم هذه الخاصية بحذف جميع": "This feature deletes all", "معاينة الإيصال الحراري (80": "Thermal receipt preview (80", "الراتب الثابت الشهري (ج.م)": "Monthly fixed salary (EGP)", "بيانات المستخدم والصلاحيات": "User data & permissions", "قص شعر اطفال (تحت 4 سنوات)": "Kids haircut (under 4 years)", "تعذر الوصول للمسار المختار": "Unable to access the selected path", "تم حفظ بيانات العميل بنجاح": "Customer data saved successfully", "لسه ما سجّلش حضور النهاردة": "Has not checked in today yet", "غايب النهاردة (هيتخصم يوم)": "Absent today (a day will be deducted)", "تمسح تسجيل النهاردة للموظف": "Delete today's record for employee", "عرض الفواتير المحذوفة فقط": "Show deleted invoices only", "العنوان (يظهر في الإيصال)": "Address (shown on receipt)", "المصاريف والسلف والحسابات": "Expenses, advances & accounts", "حمام زيت بالكولاجين للدقن": "Collagen oil beard bath", "اسكراب وجه بالقهوة والذهب": "Coffee & gold face scrub", "اختر خدمة واحدة على الأقل": "Select at least one service", "مفيش جلسة مفتوحة للانصراف": "No open session to check out", "لا توجد سُلف مسجلة حالياً": "No advances recorded", "مستخدم بالفعل لمستخدم آخر": "already used by another user", "حدث خطأ أثناء قراءة الملف": "An error occurred while reading the file", "إعدادات الصالون والإيصال": "Salon & receipt settings", "هل أنت متأكد من مسح جميع": "Are you sure you want to delete all", "قيمة ساعة التأخير (ج.م)": "Late hour rate (EGP)", "الإعدادات وسجل المراجعة": "Settings & audit log", "أخصائي بشرة وتنظيف بشرة": "Skin care & cleaning specialist", "جلسة ازالة القشره للدقن": "Beard exfoliation session", "بيانات الدخول غير صحيحة": "Incorrect login details", "اسم المستخدم أو رقم الـ": "Username or the", "مفيش مصاريف في الشهر ده": "No expenses this month", "الموظف اللي أخد السلفة": "Employee who took the advance", "للحفظ التلقائي المباشر": "for direct auto-save", "نسبة الشغل الأساسي (%)": "Main work commission (%)", "اختر الموظف / الصنايعي": "Choose employee / barber", "تعديل الخدمات والأسعار": "Edit services & prices", "جوه السماح - بدون خصم)": "within grace - no deduction)", "بعد السماح (بيتسجل بس)": "after grace (recorded only)", "أخصائي مانيكير وبديكير": "Manicure & pedicure specialist", "لم يتم إضافة خدمات بعد": "No services added yet", "تعديل صلاحيات المستخدم": "Edit user permissions", "تراجع عن آخر حركة حضور": "Undo last attendance action", "فاتورة جديدة رقم 1304": "New invoice # 1304", "إجمالي المبيعات (ج.م)": "Total sales (EGP)", "خصم التأخير من المرتب": "Deduct lateness from salary", "اسم العامل / الصنايعي": "Worker / barber name", "ميعاد الانصراف الرسمي": "Official check-out time", "خدمات العناية بالبشرة": "Skin care services", "حذف العميل صاحب الرقم": "Delete the customer with number", "تسجيل حضور (رجع تاني)": "Check in (came back)", "عمولة البشرة والعناية": "Skin & care commission", "اكتب اسم البند الجديد": "Enter the new item name", "صافي الرواتب الثابتة": "Net fixed salaries", "سجل السُلف والخصومات": "Advances & deductions log", "سجل المراجعة والأمان": "Audit & security log", "رقم التليفون الأساسي": "Primary phone number", "نظام الراتب والعمولة": "Salary & commission system", "راتب ثابت + نسبة (%)": "Fixed salary + commission (%)", "سماح التأخير (دقيقة)": "Lateness grace (minutes)", "قسم الحضور والانصراف": "Attendance section", "تأكيد البدء على نظيف": "Confirm fresh start", "خدمات العناية بالشعر": "Hair care services", "خدمات العناية بالدقن": "Beard care services", "باكدجات خاصة بالعريس": "Groom packages", "صبغة شعر سيلفر (خصل)": "Silver hair dye (highlights)", "عدد الزيارات السابقة": "Previous visits", "استرجاع الفاتورة رقم": "Restore invoice number", "تم حفظ بيانات الموظف": "Employee data saved", "اسم المجموعة الجديدة": "New group name", "مسح تسجيل حضور اليوم": "Delete today's attendance record", "المبيعات حسب الحلاق": "Sales by barber", "أكثر الخدمات مبيعاً": "Top-selling services", "خصم التأخير والغياب": "Lateness & absence deduction", "إضافة موظف / صنايعي": "Add employee / barber", "صافي المستحق للفريق": "Net due to the team", "المصاريف حسب الحساب": "Expenses by account", "تحميل نسخة احتياطية": "Download backup", "بتعمل خدمات للعملاء": "Performs services for customers", "قطرة (عناية بالشعر)": "Droplet (hair care)", "راتب ثابت فقط (ج.م)": "Fixed salary only (EGP)", "ميعاد الحضور الرسمي": "Official check-in time", "اسم العميل (إجباري)": "Customer name (required)", "باكدج العريس الملكي": "Royal groom package", "تم حفظ الفاتورة رقم": "Invoice saved, number", "تعديل بيانات العميل": "Edit customer details", "تعديل بيانات الموظف": "Edit employee details", "كشف حساب موظف - شهر": "Employee statement - month", "فاتورة جديدة / مسح": "New invoice / Clear", "المبيعات حسب القسم": "Sales by category", "تسجيل مصروف / سلفة": "Record expense / advance", "اللي بعد السماح بس": "Only what is after the grace", "دقن (عناية بالدقن)": "Beard (beard care)", "رقم تليفون احتياطي": "Backup phone number", "رقم بديل (اختياري)": "Alternate number (optional)", "تعديل/حذف الفواتير": "Edit/delete invoices", "نعم، ابدأ على نظيف": "Yes, start fresh", "تعديل الفاتورة رقم": "Edit invoice number", "إجازة (من غير خصم)": "Leave (no deduction)", "المرافق والاتصالات": "Utilities & communications", "الحلاقين والعمالة": "Barbers & staff", "تسجيل سُلفة / خصم": "Record advance / deduction", "حفظ بيانات الموظف": "Save employee data", "سُلفة نقدية / خصم": "Cash advance / deduction", "الحلاقين والرواتب": "Barbers & payroll", "حفظ بيانات العميل": "Save customer data", "سُلفة منتصف الشهر": "Mid-month advance", "خدمات تنعيم الشعر": "Hair smoothing services", "حلاقة دقن بالشفره": "Razor beard shave", "جلسة علاج التساقط": "Hair loss treatment session", "إضافة مستخدم جديد": "Add new user", "تمت إضافة الوظيفة": "Job added", "أدوات ومواد تنظيف": "Cleaning tools & supplies", "بتتخصم من المرتب)": "deducted from salary)", "اسم الحساب الجديد": "New account name", "وقت الحضور الصحيح": "Correct check-in time", "الخدمات والأسعار": "Services & prices", "الحضور والانصراف": "Attendance", "بحث سريع عن خدمة": "Quick service search", "إجمالي المدفوعات": "Total payments", "المبيعات اليومية": "Daily sales", "ملاحظة (اختياري)": "Note (optional)", "ربط مجلد / فلاشة": "Link folder / USB drive", "الوظيفة / التخصص": "Job / specialty", "التقارير المالية": "Financial reports", "إدارة المستخدمين": "User management", "عميل مسجل سابقاً": "Previously registered customer", "تعديل فاتورة رقم": "Editing invoice number", "فاتورة جديدة رقم": "New invoice #", "حذف الفاتورة رقم": "Delete invoice number", "متأخر بعد السماح": "Late after grace", "تعديل وقت الحضور": "Edit check-in time", "راتب ثابت + نسبة": "Fixed salary + commission", "السُلف والخصومات": "Advances & deductions", "تم حفظ الإعدادات": "Settings saved", "مستلزمات الصالون": "Salon supplies", "مستلزمات الكافيه": "Cafe supplies", "المصاريف والسلف": "Expenses & advances", "الإجمالي: 0 ج.م": "Total: 0 EGP", "تسجيل عميل جديد": "Register new customer", "إجمالي الخصومات": "Total discounts", "إجمالي العمولات": "Total commissions", "اسم وظيفة جديدة": "New job name", "مانيكير وبديكير": "Manicure & pedicure", "إجمالي مدفوعاته": "Total payments", "تم حذف الفاتورة": "Invoice deleted", "تم تسجيل انصراف": "Check-out recorded", "إضافة موظف جديد": "Add new employee", "تعديل الصلاحيات": "Edit permissions", "تحذف الحركة دي؟": "Delete this entry?", "السلف والخصومات": "Advances & deductions", "مفيش مبلغ يتخصم": "No amount to deduct", "متوسط الفاتورة": "Average invoice", "إجمالي التأخير": "Total lateness", "صافي الباقي له": "Net remaining for him", "شكراً لزيارتكم": "Thank you for visiting", "باكدجات العريس": "Groom packages", "كافيه ومشروبات": "Cafe & drinks", "اكتب الاسم هنا": "Enter name here", "السبب / البيان": "Reason / description", "للبدء من جديد؟": "to start over?", "تحديد شعر ودقن": "Hair & beard outline", "بشرة / بيديكير": "Skin / pedicure", "حفظ فاتورة رقم": "Save invoice number", "لا توجد مبيعات": "No sales", "لا توجد بيانات": "No data", "إضافة قسم جديد": "Add new category", "صيانة وتجهيزات": "Maintenance & equipment", "صيانة وإصلاحات": "Maintenance & repairs", "مصاريف الصالون": "Salon expenses", "تم حفظ التعديل": "Changes saved", "الراتب الأساسي": "Base salary", "الصافي المستحق": "Net payable", "تعديل وقت حضور": "Edit check-in time of", "المدير • مدير": "Manager • Manager", "تثبيت التطبيق": "Install app", "إلغاء التعديل": "Cancel edit", "شجرة الحسابات": "Chart of accounts", "حفظ الإعدادات": "Save settings", "متصل بالسحابة": "Connected to cloud", "للحفظ المباشر": "for direct saving", "سشوار (تصفيف)": "Blow-dry (styling)", "عناية بالبشرة": "Skin care", "بيانات الخدمة": "Service details", "قاعدة العملاء": "Customers database", "حفظ الصلاحيات": "Save permissions", "الاسم بالكامل": "Full name", "حلاق (صنايعي)": "Barber", "خدمات التصفيف": "Styling services", "خدمات الصبغات": "Hair dye services", "فرد شعري مصري": "Egyptian hair straightening", "صبغة شعر اصفر": "Yellow (gold) hair dye", "متصل بالفلاشة": "Connected to USB drive", "يحفظ تلقائياً": "Saves automatically", "تم حذف العميل": "Customer deleted", "تم حفظ الخدمة": "Service saved", "تم تسجيل رجوع": "Return recorded", "تراجع / تغيير": "Undo / change", "راتب ثابت فقط": "Fixed salary only", "مصروفات ثابتة": "Fixed expenses", "مكافآت وحوافز": "Bonuses & incentives", "إيرادات الشهر": "Month revenue", "لا توجد حركات": "No entries", "عمولة الخدمات": "Services commission", "لا يوجد تسجيل": "No records", "اسم المستخدم": "Username", "فاتورة جديدة": "New invoice", "رجوع للخدمات": "Back to services", "رقم الموبايل": "Mobile number", "عدد الزيارات": "Visits", "الشهر الماضي": "Last month", "عدد الفواتير": "Invoices", "ميعاد الحضور": "Check-in time", "المبلغ (ج.م)": "Amount (EGP)", "مجموعة جديدة": "New group", "إضافة مستخدم": "Add user", "الوصف الفرعي": "Subtitle", "رقم التليفون": "Phone number", "استرجاع نسخة": "Restore backup", "سجل المراجعة": "Audit log", "نسبة فقط (%)": "Commission only (%)", "الاسم الظاهر": "Display name", "رقم الفاتورة": "Invoice no.", "تم حفظ القسم": "Category saved", "تسجيل انصراف": "Check out", "لسه ما سجّلش": "Not yet recorded", "اخصم التأخير": "Deduct lateness", "نظافة المكان": "Premises cleaning", "سلف الموظفين": "Employee advances", "مصروفات أخرى": "Other expenses", "اختار الحساب": "Choose the account", "اختار الموظف": "Choose the employee", "الاسم الجديد": "New name", "توقيع الموظف": "Employee signature", "توقيع المدير": "Manager signature", "بسبب التأخير": "due to lateness", "صالون رجالي": "Men's Salon", "كلمة المرور": "Password", "حسب الكاشير": "By cashier", "أيام الحضور": "Days present", "أيام الغياب": "Days absent", "طريقة الدفع": "Payment method", "اسم الصالون": "Salon name", "تنعيم الشعر": "Hair smoothing", "السعر (ج.م)": "Price (EGP)", "سُلفة نقدية": "Cash advance", "استشوار شعر": "Hair blow-dry", "استشوار دقن": "Beard blow-dry", "كيرلي تويست": "Curly twist", "كيرلي ستايل": "Curly style", "نتائج البحث": "Search results", "تعديل القسم": "Edit category", "ساعات الشغل": "Work hours", "عمولة الشغل": "Work commission", "تسجيل سُلفة": "Record advance", "بتعمل خدمات": "Performs services", "إضافة وظيفة": "Add job", "إيجار المحل": "Shop rent", "تليفون أرضي": "Landline phone", "أدوات حلاقة": "Barber tools", "معدات وأثاث": "Equipment & furniture", "رسوم وضرائب": "Fees & taxes", "اكتب المبلغ": "Enter the amount", "حفظ التعديل": "Save changes", "تحذف الحساب": "Delete the account", "تأخير الشهر": "Month's lateness", "لا توجد سلف": "No advances", "غير مصرح لك": "Not allowed", "ج.م من مرتب": "EGP from the salary of", "المستخدمين": "Users", "خدمات القص": "Haircut services", "اسم العميل": "Customer name", "حفظ وطباعة": "Save & print", "آخر 7 أيام": "Last 7 days", "آخر 30 يوم": "Last 30 days", "اكتب للبحث": "Type to search", "شهر الحساب": "Payroll month", "عدد الفريق": "Team size", "اسم الخدمة": "Service name", "حفظ الخدمة": "Save service", "مثلاً: 200": "e.g. 200", "تسجيل وخصم": "Record & deduct", "في الميعاد": "On time", "مساعد حلاق": "Barber assistant", "عامل أرضية": "Floor cleaner", "عامل كافيه": "Cafe worker", "عبد الرحمن": "Abdelrahman", "الاسكرابات": "Scrubs", "تعديل خدمة": "Edit service", "إضافة خدمة": "Add service", "رجوع للشغل": "Back to work", "تسجيل حضور": "Check in", "لسه موجود)": "still present)", "بعد السماح": "after grace", "حساب محذوف": "Deleted account", "تم التسجيل": "Recorded", "خصم الغياب": "Absence deduction", "سجل الحضور": "Attendance log", "تم التراجع": "Undone", "دخول برقم": "Sign in with", "الإعدادات": "Settings", "إنستا باي": "InstaPay", "خصم (ج.م)": "Discount (EGP)", "المجموع 0": "Subtotal 0", "آخر زيارة": "Last visit", "هذا الشهر": "This month", "طرق الدفع": "Payment methods", "سجل الشهر": "Month log", "اسم القسم": "Category name", "حفظ القسم": "Save category", "خالد ناصر": "Khaled Nasser", "حلاقة دقن": "Beard shave", "مكواه شعر": "Hair straightener", "راتب ثابت": "Fixed salary", "تعديل قسم": "Edit category", "في مجموعة": "In group", "حذف مصروف": "Delete expense", "خصم تأخير": "Lateness deduction", "الفواتير": "Invoices", "التقارير": "Reports", "الإجمالي": "Total", "المبيعات": "Sales", "المستخدم": "User", "قسم جديد": "New category", "خدمة • 0": "service • 0", "الفاتورة": "Invoice", "مع تحيات": "Regards from", "الأيقونة": "Icon", "مقص (قص)": "Scissors (cut)", "اسكرابات": "Scrubs", "غير صحيح": "Incorrect", "بدون اسم": "No name", "تم تسجيل": "Recorded", "نسبة فقط": "Commission only", "كشف حساب": "Statement", "تم الخصم": "Deducted", "العملاء": "Customers", "التاريخ": "Date", "الخدمات": "Services", "الكاشير": "Cashier", "إجراءات": "Actions", "العمولة": "Commission", "الطريقة": "Method", "الوظيفة": "Job", "الوظائف": "Jobs", "المجموع": "Subtotal", "جه بدري": "Came early", "مانيكير": "Manicure", "استرجاع": "Restore", "ج.م على": "EGP on", "النظافة": "Cleaning", "العمالة": "Labor", "الحلاق": "Barber", "فاتورة": "Invoice", "فواتير": "invoices", "الخدمة": "Service", "المبلغ": "Amount", "الحساب": "Account", "، وسجل": ", and log", "السُلف": "Advances", "العميل": "Customer", "أرقام)": "numbers)", "هيتخصم": "will be deducted", "بديكير": "Pedicure", "اسكراب": "Scrub", "المدير": "Manager", "قص شعر": "Haircut", "النظام": "System", "ملاحظة": "Note", "للموظف": "for employee", "الساعة": "at", "ميعاده": "Shift", "كهرباء": "Electricity", "إنترنت": "Internet", "نثريات": "Petty cash", "انصراف": "Check-out", "إخفاء": "Hide", "محفظة": "Wallet", "اليوم": "Today", "الدفع": "Payment", "تصدير": "Export", "القسم": "Category", "الاسم": "Name", "الشهر": "Month", "تسجيل": "Record", "إضافة": "Add", "رقم 1": "number 1", "الخصم": "Discount", "طباعة": "Print", "إغلاق": "Close", "صبغات": "Dyes", "مثلاً": "e.g.", "الصفة": "Title", "كاشير": "Cashier", "إلغاء": "Cancel", "متأخر": "Late", "عناية": "Care", "تنعيم": "Smoothing", "مصطفى": "Mostafa", "إظهار": "Show", "بقيمة": "worth", "تعديل": "Edit", "زيارة": "visit", "الوقت": "Time", "إجازة": "Leave", "انصرف": "Left", "تراجع": "Undo", "تأخير": "Lateness", "باربر": "BARBER", "مصروف": "Expense", "السلف": "Advances", "موافق": "OK", "تأكيد": "Confirm", "دخول": "Sign in", "خروج": "Logout", "بدون": "None", "الكل": "All", "كمية": "Qty", "موظف": "employee", "نقدي": "Cash", "مدير": "Manager", "بشرة": "Skin", "أحمد": "Ahmed", "فتحي": "Fathy", "يوسف": "Youssef", "كريم": "Karim", "سعيد": "Saeed", "ويفي": "Wavy", "حلاق": "Barber", "خدمة": "service", "قطعة": "pc", "عميل": "Customer", "حضور": "Check-in", "غياب": "Absent", "حاضر": "Present", "غايب": "Absent", "بدري": "early", "سماح": "grace", "ج.م)": "EGP)", "سلفة": "Advance", "احذف": "Delete", "تومي": "TOMMY", "بربر": "BARBER", "مياه": "Water", "حساب": "Account", "يوم)": "day)", "ساعة": "h", "امسح": "Clear", "تخصم": "Deduct", "اخصم": "Deduct", "مسح": "Clear", "كاش": "Cash", "حفظ": "Save", "أمس": "Yesterday", "إلى": "To", "رقم": "No.", "ج.م": "EGP", "صبغ": "Dye", "دقن": "Beard", "خصم": "Discount", "حذف": "Delete", "حضر": "Arrived", "رجع": "Came back", "يوم": "day", "شغل": "work", "شهر": "month", "من": "from", "أو": "or", "ص": "AM", "م": "PM", "د": "min", "؟": "?", "و": "and", "، و": ", and", "اختر المستخدم": "Select user", "كلمة المرور غير صحيحة": "Incorrect password", "اكتب كلمة المرور": "Enter the password", "كلمة المرور (أرقام فقط، من 4 إلى 8)": "Password (digits only, 4 to 8)", "يجب أن تكون كلمة المرور من 4 إلى 8 أرقام": "Password must be 4 to 8 digits", "اسم المستخدم مستخدم بالفعل": "Username already used", "تم تغيير كلمة المرور": "Password changed", "للتواصل": "Contact", "فادي سعد": "Fady Saad"};
-const X={"بيانات الصالون": "Salon details", "الفاتورة والإيصال": "Invoice & receipt", "الحضور والرواتب": "Attendance & payroll", "النسخ الاحتياطي والاسترجاع": "Backup & restore", "المسح والحذف وضبط المصنع": "Delete & factory reset", "سجل المراجعة والأمان": "Audit & security log", "إعدادات الحضور والتأخير": "Attendance & lateness settings", "تعديل شكل الفاتورة والإيصال": "Edit invoice & receipt layout", "أي تعديل هنا بيتطبق على طول على الفواتير المطبوعة وعلى المعاينة اللي جنبه بعد ما تضغط حفظ.": "Any change here is applied immediately to printed invoices and to the preview beside it after you press Save.", "الاسم اللي يظهر أعلى الفاتورة (سيبه فاضي لاستخدام اسم الصالون)": "Name shown at the top of the invoice (leave empty to use the salon name)", "العنوان على الفاتورة (سيبه فاضي لاستخدام عنوان الصالون)": "Address on the invoice (leave empty to use the salon address)", "التليفون على الفاتورة (سيبه فاضي لاستخدام رقم الصالون)": "Phone on the invoice (leave empty to use the salon phone)", "رسالة الشكر (سطر 1)": "Thank-you message (line 1)", "رسالة الشكر (سطر 2)": "Thank-you message (line 2)", "اكتب {name} في أي رسالة وهيتبدل باسم الصالون.": "Type {name} in any message and it will be replaced by the salon name.", "ملاحظة إضافية أسفل الفاتورة (اختياري)": "Extra note at the bottom of the invoice (optional)", "مثلاً: الفاتورة صالحة للاستبدال خلال 3 أيام": "e.g. Items can be exchanged within 3 days", "عرض الورق": "Paper width", "80 مم": "80 mm", "58 مم": "58 mm", "حجم الخط": "Font size", "حجم اللوجو": "Logo size", "صغير": "Small", "متوسط": "Medium", "كبير": "Large", "اختار اللي يظهر في الفاتورة:": "Choose what appears on the invoice:", "اللوجو": "Logo", "العنوان": "Address", "رقم التليفون": "Phone number", "التاريخ والوقت": "Date & time", "اسم الحلاق": "Barber name", "اسم العميل": "Customer name", "اسم الكاشير": "Cashier name", "سطر الخصم": "Discount line", "طريقة الدفع": "Payment method", "أرقام الدفع الإلكتروني": "E-payment numbers", "ملاحظات الفاتورة": "Invoice notes", "حفظ تعديلات الفاتورة": "Save invoice changes", "رجوع للشكل الأصلي": "Restore original layout", "معاينة الفاتورة (بيانات تجريبية)": "Invoice preview (sample data)", "اللوجو بيظهر أسود في الفاتورة عشان الطابعة الحرارية بتطبع أسود وأبيض بس.": "The logo appears black on the invoice because thermal printers print in black and white only.", "رفع واسترجاع نسخة": "Upload & restore a backup", "استرجاع نسخة بيستبدل البيانات الحالية بالنسخة اللي ترفعها، فخد نسخة احتياطية الأول لو محتاج.": "Restoring a backup replaces the current data with the uploaded one, so take a backup first if needed.", "مسح بيانات محددة": "Delete specific data", "كل عملية بتطلب منك تكتب كلمة حذف للتأكيد، ومفيش رجوع بعدها، فخد نسخة احتياطية الأول.": "Each action asks you to type the word delete to confirm and cannot be undone, so take a backup first.", "الفواتير": "Invoices", "يمسح كل الفواتير ويبدأ الترقيم من 1": "Deletes all invoices and restarts numbering from 1", "مسح الفواتير": "Delete invoices", "الحضور والانصراف": "Attendance", "يمسح سجل الحضور والغياب لكل الموظفين": "Deletes attendance and absence records for all staff", "مسح الحضور": "Delete attendance", "السُلف والخصومات": "Advances & deductions", "يمسح السُلف وخصومات الموظفين": "Deletes staff advances and deductions", "مسح السُلف": "Delete advances", "المصاريف": "Expenses", "يمسح كل حركات المصاريف": "Deletes all expense records", "مسح المصاريف": "Delete expenses", "العملاء": "Customers", "يمسح قاعدة بيانات العملاء (الأسماء والأرقام)": "Deletes the customer database (names and numbers)", "مسح العملاء": "Delete customers", "الموظفين والحلاقين": "Staff & barbers", "يحذف كل الموظفين (لحذف موظف واحد افتح قسم الحلاقين والعمالة)": "Deletes all staff (to delete one employee open the Barbers & Staff section)", "حذف كل الموظفين": "Delete all staff", "سجل المراجعة": "Audit log", "يمسح سجل العمليات والأمان": "Deletes the operations and security log", "مسح السجل": "Clear log", "ضبط المصنع": "Factory reset", "يرجّع البرنامج لحالته الأولى: يمسح كل الفواتير والعملاء والموظفين والمصاريف والحضور والسُلف والإعدادات المخصصة، ويرجّع الخدمات والأقسام الافتراضية وكلمات المرور الافتراضية (المدير 8800، كاشير 1 = 1111، كاشير 2 = 2222).": "Returns the app to its initial state: deletes all invoices, customers, staff, expenses, attendance, advances and custom settings, and restores the default services, categories and default passwords (Manager 8800, Cashier 1 = 1111, Cashier 2 = 2222).", "ضبط المصنع (مسح كل شيء)": "Factory reset (delete everything)", "تأكيد الحذف": "Confirm deletion", "اكتب كلمة حذف للتأكيد": "Type the word delete to confirm", "مسح كل الفواتير": "Delete all invoices", "هيتم مسح كل الفواتير، وترقيم الفواتير الجاية هيبدأ من 1. العملاء والموظفين والخدمات هيفضلوا زي ما هم.": "All invoices will be deleted and new invoices will start numbering from 1. Customers, staff and services stay as they are.", "مسح سجل الحضور والانصراف": "Delete attendance records", "هيتم مسح سجل الحضور والانصراف لكل الموظفين.": "The attendance records of all staff will be deleted.", "مسح السُلف والخصومات": "Delete advances and deductions", "هيتم مسح السُلف والخصومات وحركات المصاريف المرتبطة بيها.": "Advances and deductions, and the expense entries linked to them, will be deleted.", "هيتم مسح كل حركات المصاريف.": "All expense records will be deleted.", "مسح قاعدة العملاء": "Delete customer database", "هيتم مسح كل العملاء (الأسماء والأرقام). الفواتير القديمة مش هتتأثر.": "All customers (names and numbers) will be deleted. Old invoices are not affected.", "هيتم حذف كل الموظفين مع سجل حضورهم وسُلفهم. الفواتير القديمة هتفضل محفوظة بأسمائهم.": "All staff will be deleted along with their attendance and advance records. Old invoices stay saved under their names.", "مسح سجل المراجعة": "Delete audit log", "هيتم مسح سجل المراجعة والأمان.": "The audit and security log will be deleted.", "هيتم مسح كل شيء وإرجاع البرنامج لحالته الأولى. كلمات المرور هترجع للافتراضي (المدير 8800).": "Everything will be deleted and the app returned to its initial state. Passwords will return to the default (Manager 8800).", "تم تنفيذ العملية بنجاح": "Operation completed successfully", "تم ضبط المصنع. سجّل الدخول من جديد": "Factory reset done. Please log in again", "غير مصرح لك": "Not authorized", "غير مصرح لك بتنفيذ هذه العملية": "You are not authorized to perform this operation", "حذف الموظف": "Delete employee", "حذف المستخدم": "Delete user", "حذف": "Delete", "الفواتير القديمة هتفضل محفوظة باسمه، لكن سجل حضوره وسُلفه هيتمسحوا": "Old invoices stay saved under his name, but his attendance and advance records will be deleted", "الفواتير اللي عملها هتفضل محفوظة": "The invoices he created stay saved", "تم حذف الموظف": "Employee deleted", "تم حذف المستخدم": "User deleted", "مينفعش تحذف المستخدم اللي داخل بيه دلوقتي": "You cannot delete the user you are logged in with", "لازم يفضل مدير واحد على الأقل": "At least one manager must remain", "تم حفظ تعديلات الفاتورة وتطبيقها": "Invoice changes saved and applied", "تم الرجوع للشكل الأصلي": "Restored the original layout", "ترجّع شكل الفاتورة للإعدادات الأصلية؟": "Restore the invoice layout to the original settings?", "رجّع": "Restore", "تعديل إعدادات الفاتورة والإيصال": "Edited invoice and receipt settings", "رجوع إعدادات الفاتورة للشكل الأصلي": "Restored invoice settings to the original layout", "الاسم بالعربي": "Name in Arabic", "الاسم بالإنجليزي": "Name in English", "الاسم بالإنجليزي (اختياري)": "Name in English (optional)", "بيتكتب تلقائي لو سبته فاضي": "Filled automatically if left empty", "فاتورة": "Invoice", "الحلاق": "Barber", "العميل": "Customer", "الكاشير": "Cashier", "ملاحظات": "Notes"};for(const k in X)if(!(k in D))D[k]=X[k];
+const D={};
 const SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',MOON='<path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/>';
 const esc=k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const RE=new RegExp('(?<![\\u0600-\\u06FF])(?:'+Object.keys(D).sort((a,b)=>b.length-a.length).map(esc).join('|')+')(?![\\u0600-\\u06FF])','g');
 const AR=/[\u0600-\u06FF]/,ANY=/[\u0600-\u06FFA-Za-z]/,ATTR=['placeholder','title','aria-label'],root=document.documentElement;
-let lang='ar',theme='dark';try{lang=localStorage.getItem('tommy_lang')||'ar';theme=localStorage.getItem('tommy_theme')||'dark'}catch(e){}
+let lang='ar',theme='dark';try{lang='ar';theme=localStorage.getItem('tommy_theme')||'dark'}catch(e){}
 const orig=new WeakMap(),wrote=new WeakMap(),origTitle=document.title;
 let NRE={en:null,ar:null},NMAP={en:{},ar:{}},NSIG='';
 function ensureNames(){let es=[];try{es=window.nameEntries?window.nameEntries():[]}catch(e){}
