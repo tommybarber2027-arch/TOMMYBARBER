@@ -41,7 +41,7 @@
             let h = `<div style="font-size:${fs}px;line-height:1.55;color:#000">`;
             h += `<div style="text-align:center;${dash}">`;
             if (S.showLogo && S.logoData) h += `<img src="${S.logoData}" alt="" style="display:block;margin:0 auto 4px;width:${lw}mm;height:auto">`;
-            else if (S.showLogo) h += `<svg class="app-logo" viewBox="0 0 360 468" style="display:block;margin:0 auto 4px;overflow:hidden;width:${lw}mm;height:${(lw * 468 / 360).toFixed(1)}mm"><use href="#logo"/></svg>`;
+            else if (S.showLogo) h += `<img src="receipt-logo.webp" alt="" style="display:block;margin:0 auto 4px;width:${lw}mm;height:auto">`;
             h += `<div class="rec-salon-name" style="font-weight:900;font-size:1.5em;line-height:1.25">${esc(name)}</div>`;
             if (S.showAddress && address) h += `<div style="font-size:.92em">${esc(address)}</div>`;
             if (S.showPhone && phone) h += `<div dir="ltr" style="font-size:.92em;font-family:monospace">${esc(phone)}</div>`;
@@ -77,7 +77,7 @@
             const el = document.getElementById('inv-preview'); if (!el) return;
             const S = readInvForm(), pn = document.getElementById('set-payment-numbers');
             const sample = { id: 1, date: getTodayISO(), time: getTimeStr(), barberName: (appState.barbers.find(isPerf) || {}).name || 'أحمد', clientName: 'اسم العميل', paymentMethod: 'wallet', subtotal: 250, discount: 25, total: 225, cashierName: currentUser ? currentUser.displayName : 'المدير', notes: 'ملاحظة تجريبية', items: [{ name: 'قص شعر', price: 150, qty: 1 }, { name: 'حلاقة دقن', price: 100, qty: 1 }] };
-            const pv = document.getElementById('inv-logo-prev'); if (pv) pv.src = invLogoData || 'logo-ink.webp';
+            const pv = document.getElementById('inv-logo-prev'); if (pv) pv.src = invLogoData || 'receipt-logo.webp';
             el.style.width = (S.paper === '58' ? 58 : 80) + 'mm';
             el.style.maxWidth = '100%';
             el.innerHTML = buildReceiptHtml(sample, S, { payNumbers: pn ? pn.value.trim() : null });
