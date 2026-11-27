@@ -61,7 +61,7 @@
             const totalTimeDeduction = absenceDeduction + lateDeduction;
             const netBaseSalary = Math.max(0, baseSalary - totalTimeDeduction);
 
-            const advancesTotal = 0;
+            const advancesTotal = (typeof finAdvTotal === 'function') ? finAdvTotal(staff.id, payrollMonth) : 0;
 
             const netPayable = Math.max(0, Number((netBaseSalary + totalComm - advancesTotal).toFixed(2)));
 

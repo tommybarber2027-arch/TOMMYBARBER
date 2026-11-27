@@ -13,7 +13,7 @@
         }
 
         function openUserModal(id = null) {
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'finance', 'users', 'settings'];
             if (id) {
                 const u = appState.users.find(x => x.id === id);
                 if (!u) return;
@@ -42,7 +42,7 @@
         function saveUser(e) {
             e.preventDefault();
             const id = document.getElementById('edit-user-id').value;
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'finance', 'users', 'settings'];
             const perms = {};
             permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); perms[p] = cb ? cb.checked : false; });
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
@@ -324,4 +324,5 @@
             document.querySelectorAll('.pm-input').forEach(i => i.value = payrollMonth);
             renderPOS(); renderInvoicesTable(); renderClientsTable(); renderReports();
             renderCatalogManagement(); renderBarbersManage(); renderUsersManage(); renderSettings();
+            try { ensureNewPerms(); renderAttendance(); finRefresh(); } catch (e) { console.error(e); }
         }

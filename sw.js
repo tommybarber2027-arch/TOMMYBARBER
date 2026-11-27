@@ -1,6 +1,6 @@
 // Tommy Barber service worker — network-first so updates always show, cache only as offline fallback.
-const CACHE = 'tommy-v8';
-const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "tailwind.css", "base.css", "theme.css", "logo-gold.webp", "logo-ink.webp", "core.js", "payroll.js", "pos.js", "invoices.js", "clients.js", "reports.js", "catalog.js", "staff.js", "users-settings.js", "names.js", "invoice-settings.js", "data-tools.js", "app.js", "icons.js", "theme.js", "ui.js"];
+const CACHE = 'tommy-v9';
+const FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "tailwind.css", "base.css", "theme.css", "logo-gold.webp", "logo-ink.webp", "core.js", "payroll.js", "pos.js", "invoices.js", "clients.js", "reports.js", "catalog.js", "staff.js", "users-settings.js", "names.js", "invoice-settings.js", "data-tools.js", "attendance.js", "finance.js", "app.js", "icons.js", "theme.js", "ui.js"];
 self.addEventListener('install', e => {
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES).catch(() => {})));
