@@ -32,8 +32,15 @@
         // ---------- receive customer requests ----------
         function bpListen() {
             if (!db || bpListening) return; bpListening = true;
-            db.ref('booking_requests').on('value', snap => {
-                const all = snap.val() || {}; let added = 0;
+            db.ref('booking_requests').on('value', snap => bpImport(snap.val() || {}), () => { showToast('مش قادر أقرا طلبات الحجز من السحابة. راجع الربط الآمن أو القواعد', 'error'); });
+        }
+        function bpPull() {
+            if (!db) { showToast('مفيش اتصال بالسحابة', 'error'); return; }
+            db.ref('booking_requests').once('value').then(s => { const n = (appState.bookings || []).length; bpImport(s.val() || {}); showToast((appState.bookings || []).length > n ? 'وصلت طلبات جديدة' : 'مفيش طلبات جديدة'); }).catch(() => showToast('مش قادر أقرا طلبات الحجز. راجع الربط الآمن أو القواعد', 'error'));
+        }
+        function bpImport(all) {
+            {
+                let added = 0;
                 appState.bpSeen = appState.bpSeen || [];
                 Object.keys(all).forEach(k => {
                     if (appState.bpSeen.includes(k) || (appState.bookings || []).some(b => b.id === 'w' + k)) return;
@@ -48,7 +55,7 @@
                 if (appState.bpSeen.length > 800) appState.bpSeen = appState.bpSeen.slice(-500);
                 if (added) { saveState(); showToast(added === 1 ? 'وصلك طلب حجز جديد من صفحة الحجز' : `وصلك ${added} طلبات حجز جديدة`); try { renderBookings(); } catch (e) { } }
                 bpBadge();
-            }, () => { });
+            }
         }
         function bpBadge() {
             const n = (appState.bookings || []).filter(b => b.source === 'web' && b.status === 'انتظار').length, sp = document.querySelector('#tab-bookings span');
@@ -81,8 +88,8 @@
             const times = bkSlots().map(t => `<option value="${t}">${bkTime12(t)}</option>`).join('');
             const sel = (id, v) => { setTimeout(() => { const e = document.getElementById(id); if (e) e.value = v; }, 0); };
             root.innerHTML = `<div class="space-y-3 max-w-2xl">
-              <div class="${card}"><div class="flex items-center justify-between"><h3 class="text-sm font-black text-gold">صفحة حجز العملاء</h3><label class="flex items-center gap-2 text-white font-bold"><input type="checkbox" ${c.enabled ? 'checked' : ''} onchange="bpSet('enabled',this.checked);renderBookingSettings()" class="accent-gold w-5 h-5"> مفعّلة</label></div>
-                <p class="text-gray-300 leading-relaxed">العميل بيفتح الرابط ده من موبايله، يختار الحلاق والخدمة والميعاد، والطلب بيوصلك في تبويب الحجوزات بحالة "انتظار" وإنت تقبل أو ترفض. كل اللي تعدله هنا بينزل على الصفحة لوحده.</p>
+              <div class="${card}"><div class="flex items-center justify-between"><h3 class="text-sm font-black text-gold">إعدادات الحجز أونلاين</h3><label class="flex items-center gap-2 text-white font-bold"><input type="checkbox" ${c.enabled ? 'checked' : ''} onchange="bpSet('enabled',this.checked);renderBookingSettings()" class="accent-gold w-5 h-5"> مفعّلة</label></div>
+                <p class="text-gray-300 leading-relaxed">العميل بيفتح الرابط ده من موبايله، يختار الحلاق والخدمة والميعاد، والطلبات بتوصلك في تبويب <b class="text-gold">الحجوزات</b> (في الشريط الرئيسي) بحالة "انتظار" وإنت تقبل أو ترفض. كل اللي تعدله هنا بينزل على الصفحة لوحده.</p>
                 <div class="flex gap-2"><input dir="ltr" readonly value="${esc(bpLink())}" onclick="this.select()" class="${inp} text-gold"><button onclick="bpCopy()" class="px-4 bg-gold text-black font-black rounded-xl">نسخ</button></div>
                 <div class="flex items-center justify-between"><span id="bp-status" class="text-gray-400">${bpPubAt ? 'اتنشرت آخر تعديلات ' + bpPubAt : ''}</span><button onclick="bpPublish(true)" class="px-3 py-1.5 bg-darkbg border border-bordergold text-gold font-bold rounded-xl">انشر دلوقتي</button></div></div>
               <div class="${card}"><h3 class="text-sm font-black text-white">مواعيد الصالون</h3>

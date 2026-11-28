@@ -210,6 +210,7 @@
         function attachCloud() {
             cloudRef.on('value', (snap) => {
                 const remote = snap.val(), first = !cloudSynced; cloudSynced = true;
+                if (first) setTimeout(() => { try { bpListen(); bpPublish(); bpBadge(); } catch (e) { } }, 1500);
                 const push = () => cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
                 if (remote) {
                     const rt = remote._ts || 0, lt = appState._ts || 0;
@@ -228,7 +229,6 @@
                 } else if (!startedVirgin || first) {
                     saveState();
                 }
-                if (first) { try { bpListen(); bpPublish(); bpBadge(); } catch (e) { } }
             }, () => { cloudSynced = false; showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
         }
         function applyRemote(remote) {
