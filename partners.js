@@ -241,14 +241,14 @@
         const ptSeedGone = () => new Set(ptData().trash.map(x => x.kind + ':' + x.id));
         function ptSeedMissing() {
             const d = ptData(), gone = ptSeedGone(); let n = 0;
-            PT_SEED.forEach((r, i) => { const k = r[2] === 'z' ? 'ext' : 'exp', id = 'seed' + i; if (!d[k].some(x => x.id === id) && !gone.has(k + ':' + id)) n++; });
-            if (!d.owed.some(x => x.id === 'seed_owed') && !gone.has('owed:seed_owed')) n++;
+            PT_SEED.forEach((r, i) => { const k = r[2] === 'z' ? 'ext' : 'exp', id = 'seed' + i; if (!d[k].some(x => x.id === id)) n++; });
+            if (!d.owed.some(x => x.id === 'seed_owed')) n++;
             return n;
         }
         function ptSeed() {
             if (!ptSuper()) return; const n = ptSeedMissing(); if (!n) { showToast('كل البنود موجودة'); return; }
             askConfirm(`هيضيف ${n} بند ناقص من كشف فادي الأولي (البلاط 11,000 على زيزو، وبنود زيكو في "خارج حساب الشركاء"، والتزام متبقي الكاميرات 7,270). اللي موجود فعلاً مش هيتكرر.`, () => {
-                const d = ptData(), gone = ptSeedGone(), fady = d.list[0].id, zizo = (d.list[1] || d.list[0]).id;
+                const d = ptData(); d.trash = d.trash.filter(x => !/^seed/.test(x.id)); const gone = new Set(), fady = d.list[0].id, zizo = (d.list[1] || d.list[0]).id;
                 PT_SEED.forEach((r, i) => {
                     const id = 'seed' + i, k = r[2] === 'z' ? 'ext' : 'exp'; if (d[k].some(x => x.id === id) || gone.has(k + ':' + id)) return;
                     if (k === 'ext') d.ext.push({ id, item: r[0], amt: r[1], who: 'زيكو', date: '', note: '', own: '' });

@@ -297,7 +297,7 @@
                 if (isObj(rv) && isObj(lv)) { const o = {}; new Set([...Object.keys(rv), ...Object.keys(lv)]).forEach(k => { o[k] = mv(rv[k], lv[k]); }); return o; }
                 return lNew ? lv : rv;
             };
-            const m = mv(r, l); m._ts = Math.max(r._ts || 0, l._ts || 0) + 1; return m;
+            const m = mv(r, l); try { keepNewerCreds(m.users, r.users); keepNewerCreds(m.users, l.users); } catch (e) { } m._ts = Math.max(r._ts || 0, l._ts || 0) + 1; return m;
         }
         function attachCloud() {
             cloudRef.on('value', (snap) => {
@@ -322,7 +322,7 @@
             }, () => { cloudSynced = false; setSyncUi(); if (gateOn) gateRender('form', 'الجهاز مش مربوط. اكتب إيميل وباسورد الصالون.'); showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
         }
         function applyRemote(remote) {
-            isApplyingRemote = true; startedVirgin = false;
+            isApplyingRemote = true; const prevUsers = startedVirgin ? null : appState.users; startedVirgin = false;
             appState = {
                 ...JSON.parse(JSON.stringify(defaultState)),
                 ...remote,
@@ -339,8 +339,10 @@
             };
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch (e) { }
             setBase(remote._ts || 0); setDirty(false);
+            let kept = 0; try { if (prevUsers) kept = keepNewerCreds(appState.users, prevUsers); } catch (e) { }
             try { renderAll(); } finally { isApplyingRemote = false; }
             if (migrateAuth()) { saveState(true); renderAll(); }
+            if (kept) { showToast('تم الاحتفاظ بكلمة المرور الأحدث على الجهاز'); saveState(); }
             setSyncUi();
         }
 
@@ -402,7 +404,15 @@
             const out = new Uint8Array(32), ov = new DataView(out.buffer); for (let i = 0; i < 8; i++) ov.setUint32(i * 4, hw[i] >>> 0); return _hex(out);
         }
         function randBytes(n) { const a = new Uint8Array(n); if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for (let i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256); return a; }
-        const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); delete u.password; delete u.pin; };
+        const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); u.pwdVer = Date.now(); delete u.password; delete u.pin; };
+        // حماية الباسوردات من الرجوع لنسخة أقدم: بيانات الدخول (الباسورد وكود الاسترجاع) الأحدث هي اللي بتكسب دايماً، ومستحيل نسخة قديمة تغطّي عليها
+        const CRED_KEYS = ['salt', 'passHash', 'recSalt', 'recHash', 'mustChange', 'pwdVer'];
+        function keepNewerCreds(users, srcUsers) {
+            let n = 0; if (!Array.isArray(users) || !Array.isArray(srcUsers)) return 0;
+            users.forEach(u => { const p = srcUsers.find(x => x && x.id === u.id); if (!p || !p.passHash) return;
+                if ((p.pwdVer || 0) > (u.pwdVer || 0) || !u.passHash) { CRED_KEYS.forEach(k => { if (p[k] === undefined) delete u[k]; else u[k] = p[k]; }); delete u.password; delete u.pin; n++; } });
+            return n;
+        }
         const checkUserPass = (u, p) => !!(u && u.passHash && u.salt) && hashPass(p, u.salt) === u.passHash;
         const isMgrUser = u => !!u && u.roleTitle === 'مدير';
         // المدير الأساسي (صاحب البرنامج): حساب واحد ثابت. باقي الناس مهما كان دورهم مش مدير أساسي.
@@ -441,13 +451,21 @@
             setTimeout(() => msg.classList.add('hidden'), secs * 1000);
         }
         const clearFails = () => { failedAttempts = 0; try { localStorage.removeItem('tommy_lk'); localStorage.removeItem('tommy_lku'); } catch (e) {} };
+        // شاشة الدخول: الكاشير في الواجهة، والإدارة (مدير/شريك/محاسب/إداري) في قايمة منفصلة بزر "دخول الإدارة"
+        let loginAdminView = false;
         function renderLoginUsers() {
             const el = document.getElementById('login-users'); if (!el) return;
-            if (!loginUserId || !appState.users.some(u => u.id === loginUserId)) loginUserId = appState.users[0] && appState.users[0].id;
-            el.innerHTML = appState.users.map(u => { const on = u.id === loginUserId;
-                return `<button type="button" onclick="selectLoginUser('${u.id}')" class="flex flex-col items-center gap-1 rounded-2xl border px-2 py-3 text-center transition ${on ? 'border-gold bg-golddark/40 text-gold' : 'border-bordergold bg-darkbg text-gray-300 hover:border-gold/50'}"><svg class="ic w-6 h-6" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span class="text-xs font-black leading-tight">${esc(u.displayName)}</span><span class="text-[10px] opacity-70">${esc(u.roleTitle)}</span></button>`; }).join('');
+            const us = appState.users || [], cash = us.filter(u => u.roleTitle === 'كاشير'), adm = us.filter(u => u.roleTitle !== 'كاشير');
+            if (!cash.length) loginAdminView = true;
+            const list = loginAdminView ? adm : cash;
+            if (!loginUserId || !list.some(u => u.id === loginUserId)) loginUserId = list[0] && list[0].id;
+            const tile = u => { const on = u.id === loginUserId, ch = esc(String(u.displayName || '?').trim().charAt(0).toUpperCase());
+                return `<button type="button" onclick="selectLoginUser('${u.id}')" class="flex flex-col items-center gap-2 rounded-2xl border px-2 py-3.5 text-center transition ${on ? 'border-gold bg-golddark/40 text-gold' : 'border-bordergold bg-darkbg text-gray-300 hover:border-gold/50'}"><span class="w-10 h-10 rounded-full border ${on ? 'border-gold bg-gold text-black' : 'border-gold/40 text-gold'} flex items-center justify-center font-black text-base">${ch}</span><span class="text-xs font-black leading-tight">${esc(u.displayName)}</span></button>`; };
+            const sw = loginAdminView ? (cash.length ? '<button type="button" onclick="loginSwitchView(false)" class="col-span-3 text-xs text-gray-400 hover:text-gold py-1">← رجوع للكاشير</button>' : '') : (adm.length ? '<button type="button" onclick="loginSwitchView(true)" class="col-span-3 text-xs text-gray-400 hover:text-gold py-1 border-t border-bordergold/40 mt-1 pt-2">دخول الإدارة ←</button>' : '');
+            el.innerHTML = list.map(tile).join('') + sw;
             updatePinDots();
         }
+        function loginSwitchView(admin) { loginAdminView = !!admin; loginUserId = null; clearPin(); renderLoginUsers(); }
         function selectLoginUser(id) { loginUserId = id; clearPin(); renderLoginUsers(); }
         function updatePinDots() {
             const d = document.getElementById('pin-dots'); if (!d) return;
@@ -523,7 +541,7 @@
 
         function migrateAuth() {
             let ch = false;
-            if (appState.authVersion !== 2 && appState.authVersion !== 3) {
+            if (appState.authVersion !== 2 && appState.authVersion !== 3 && !(appState.users || []).some(u => u.passHash)) {   // ترحيل قديم: بس لو مفيش ولا باسورد متشفّر خالص
                 const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, finance: false, drawer: false, endShift: true, users: false, settings: false }, p || {});
                 const isMgr = u => u.id === 'u-admin' || u.roleTitle === 'مدير' || u.username === 'admin';
                 const mOld = old.find(isMgr) || {};

@@ -21,6 +21,7 @@
                                     <div class="flex items-center gap-4">
                                         <span class="font-black text-gold">${it.price} ج.م</span>
                                         <button onclick="openItemModal('${cat.id}', '${it.id}')" class="px-3 py-1 rounded-lg border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل</button>
+                                        <button onclick="svcHide('${it.id}')" class="px-3 py-1 rounded-lg border border-amber-700/60 bg-amber-950/20 text-amber-300 font-bold">${it.hidden ? 'إظهار' : 'إخفاء'}</button>${isMaster(currentUser) ? `<button onclick="svcDelete('${it.id}')" class="px-3 py-1 rounded-lg border border-red-800/60 bg-red-950/30 text-red-300 font-bold">حذف</button>` : ''}
                                     </div>
                                 </div>
                             `).join('')}
@@ -68,25 +69,21 @@
                 document.getElementById('edit-item-name').value = '';
                 document.getElementById('edit-item-price').value = '';
             }
-            document.getElementById('edit-item-extra').classList.toggle('hidden', !itemId);
-            const ex = document.getElementById('edit-item-extra'); if (itemId) { const it0 = appState.catalog.find(x => x.id === itemId); ex.textContent = it0 && it0.hidden ? 'إظهار الخدمة أو حذفها' : 'إخفاء / حذف الخدمة'; }
+            svcModalBtns();
             document.getElementById('item-modal').classList.remove('hidden');
         }
-        // إخفاء الخدمة (بتختفي من الكاشير والحجز وتفضل في الفواتير القديمة) أو حذفها نهائي (المدير الأساسي بس)
-        function svcOptions() {
-            const id = document.getElementById('edit-item-id').value, it = appState.catalog.find(x => x.id === id); if (!it) return;
+        // إخفاء الخدمة (بتختفي من الكاشير والحجز وتفضل في الفواتير القديمة) / حذفها نهائي (المدير الأساسي بس)
+        function svcHide(id) {
+            const it = appState.catalog.find(x => x.id === id); if (!it) return;
             if (!currentUser?.permissions?.catalog) { showToast('غير مصرح لك', 'error'); return; }
-            const o = document.createElement('div'); o.id = 'svc-opt'; o.className = 'fixed inset-0 z-[160] bg-black/80 flex items-center justify-center p-4';
-            const hid = !!it.hidden, canDel = isMaster(currentUser);
-            o.innerHTML = `<div class="bg-panelbg border border-bordergold rounded-2xl max-w-sm w-full p-5 space-y-3 text-sm"><h3 class="font-black text-gold">${esc(it.name)}</h3>
-                <button type="button" id="so-hide" class="w-full text-right bg-darkbg border border-gold/60 rounded-xl p-3"><b class="text-white block">${hid ? 'إظهار الخدمة' : 'إخفاء الخدمة (موصى بيه)'}</b><span class="text-gray-400 text-xs leading-relaxed">${hid ? 'هترجع تظهر في الكاشير وصفحة الحجز.' : 'بتختفي من الكاشير وصفحة الحجز، وبتفضل محفوظة في الفواتير القديمة، وتقدر ترجّعها في أي وقت.'}</span></button>
-                <button type="button" id="so-del" ${canDel ? '' : 'disabled'} class="w-full text-right bg-red-950/30 border border-red-800/60 rounded-xl p-3 ${canDel ? '' : 'opacity-40'}"><b class="text-red-300 block">حذف نهائي</b><span class="text-gray-400 text-xs leading-relaxed">${canDel ? 'بتتمسح من القايمة. الفواتير القديمة بتفضل بأسمها وسعرها زي ما هي.' : 'الحذف النهائي للمدير الأساسي بس.'}</span></button>
-                <button type="button" id="so-no" class="w-full bg-darkbg border border-bordergold text-gray-300 font-bold py-2.5 rounded-xl">إلغاء</button></div>`;
-            document.body.appendChild(o); const close = () => o.remove();
-            o.querySelector('#so-no').onclick = close;
-            o.querySelector('#so-hide').onclick = () => { it.hidden = !hid; logAudit((it.hidden ? 'إخفاء الخدمة: ' : 'إظهار الخدمة: ') + it.name); saveState(); close(); closeModal('item-modal'); renderAll(); showToast(it.hidden ? 'تم إخفاء الخدمة' : 'تم إظهار الخدمة'); };
-            if (canDel) o.querySelector('#so-del').onclick = () => { close(); askConfirm(`تحذف "${esc(it.name)}" نهائي؟ الأفضل تخفيها بدل الحذف.`, () => { appState.catalog = appState.catalog.filter(x => x.id !== id); logAudit('حذف الخدمة: ' + it.name); saveState(); closeModal('item-modal'); renderAll(); showToast('تم حذف الخدمة'); }, 'احذف نهائي'); };
+            it.hidden = !it.hidden; logAudit((it.hidden ? 'إخفاء الخدمة: ' : 'إظهار الخدمة: ') + it.name); saveState(); closeModal('item-modal'); renderAll(); showToast(it.hidden ? 'تم إخفاء الخدمة (بتظهر باهتة هنا وتقدر تظهرها)' : 'تم إظهار الخدمة');
         }
+        function svcDelete(id) {
+            const it = appState.catalog.find(x => x.id === id); if (!it) return;
+            if (!isMaster(currentUser)) { showToast('الحذف النهائي للمدير الأساسي بس', 'error'); return; }
+            askConfirm(`تحذف "${esc(it.name)}" نهائي؟ الفواتير القديمة هتفضل بأسمها وسعرها. لو مش متأكد الأفضل تخفيها.`, () => { appState.catalog = appState.catalog.filter(x => x.id !== id); logAudit('حذف الخدمة: ' + it.name); saveState(); closeModal('item-modal'); renderAll(); showToast('تم حذف الخدمة'); }, 'احذف نهائي');
+        }
+        function svcModalBtns() { const id = document.getElementById('edit-item-id').value, it = appState.catalog.find(x => x.id === id), w = document.getElementById('edit-item-extra'); if (!w) return; w.classList.toggle('hidden', !it); if (!it) return; w.innerHTML = `<button type="button" onclick="svcHide('${id}')" class="py-2.5 rounded-xl border border-amber-700/60 bg-amber-950/20 text-amber-300 font-bold">${it.hidden ? 'إظهار الخدمة' : 'إخفاء الخدمة'}</button>${isMaster(currentUser) ? `<button type="button" onclick="svcDelete('${id}')" class="py-2.5 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 font-bold">حذف نهائي</button>` : ''}`; }
 
         function saveCatalogItem(e) {
             e.preventDefault();
