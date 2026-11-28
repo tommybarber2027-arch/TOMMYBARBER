@@ -2,6 +2,7 @@
         // appState.shifts = [{id,no,status:'open'|'closed',openedAt,closedAt,cashierName,counted,expected,diff,carried,by,outs,invCount,total}]
         // appState.vaultAdj = [{id,at,amount,note}]   (manual deposit/withdraw on the vault)
         const dwP2 = n => String(n).padStart(2, '0');
+        const dwBiz = iso => localISO(new Date(new Date(iso).getTime() - BIZ_SHIFT));
         const dwISO = d => `${d.getFullYear()}-${dwP2(d.getMonth() + 1)}-${dwP2(d.getDate())}`;
         const dwMoney = n => Number(n || 0).toLocaleString('en-US') + ' ج.م';
         const dwDT = iso => iso ? new Date(iso).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : '--';
@@ -11,26 +12,42 @@
         const curShift = () => shiftsArr().find(s => s.status === 'open');
         function ensureShift() {
             let s = curShift();
+            if (s && currentUser && s.cashierName !== currentUser.displayName && !appState.invoices.some(i => i.shiftId === s.id) && !drawerOuts(s.id).length && !bkShiftTouched(s.id)) { s.cashierName = currentUser.displayName; saveState(); }
             if (!s) {
                 s = { id: 'sh' + Date.now().toString(36), no: shiftsArr().reduce((m, x) => Math.max(m, x.no || 0), 0) + 1, status: 'open', openedAt: new Date().toISOString(), cashierName: currentUser ? currentUser.displayName : '' };
                 shiftsArr().push(s); saveState();
             }
             return s;
         }
+        (function () {
+            const oc = window.closeModal;
+            window.closeModal = function (id) {
+                oc(id);
+                if (id === 'receipt-modal' && window.__handover) { window.__handover = false; logoutUser(); showToast('الشيفت اتسلّم. الكاشير التاني يدخل بباسورده'); }
+            };
+        })();
+        function dwClosedNote(inv) { const sh = shiftsArr().find(x => x.id === inv.shiftId); if (sh && sh.status === 'closed') showToast(`الفاتورة تابعة للشيفت رقم ${sh.no} المقفول، فمبلغ الترحيل في الخزنة ما اتغيرش`, 'error'); }
         function drawerOuts(shiftId) {
             const e = (appState.finExpenses || []).filter(x => x.src === 'drawer' && x.shiftId === shiftId).map(x => ({ kind: 'مصروف', label: x.item, note: x.note || '', amount: Number(x.amount) }));
             const a = (appState.finAdv || []).filter(x => x.src === 'drawer' && x.shiftId === shiftId).map(x => ({ kind: x.type, label: x.staffName, note: x.note || '', amount: Number(x.amount) }));
-            return e.concat(a);
+            const r = bkPayList().filter(x => x.p.kind === 'رد' && x.p.src === 'drawer' && x.p.shiftId === shiftId).map(x => ({ kind: 'رد عربون', label: x.b.clientName, note: x.p.note || '', amount: Number(x.p.amount) }));
+            return e.concat(a, r);
         }
         function shiftStats(s) {
             if (s.status === 'closed' && s.by) return { by: s.by, outs: s.outs || [], invCount: s.invCount || 0, total: s.total || 0, outTotal: (s.outs || []).reduce((t, o) => t + o.amount, 0), cash: s.by.cash || 0, expected: s.expected, counted: s.counted, diff: s.diff };
             const invs = appState.invoices.filter(i => !i.deleted && i.shiftId === s.id), by = {};
-            invs.forEach(i => { const m = i.paymentMethod || 'cash'; by[m] = (by[m] || 0) + Number(i.total || 0); });
+            invs.forEach(i => { const m = i.paymentMethod || 'cash'; by[m] = (by[m] || 0) + Number(i.total || 0) - Number(i.prepaid || 0); });
+            const bps = bkPayList().filter(x => x.p.kind !== 'رد' && x.p.shiftId === s.id);
+            bps.forEach(x => { const m = x.p.method || 'cash'; by[m] = (by[m] || 0) + Number(x.p.amount); });
             const outs = drawerOuts(s.id), outTotal = outs.reduce((t, o) => t + o.amount, 0), cash = by.cash || 0;
-            return { by, outs, invCount: invs.length, total: Object.values(by).reduce((t, v) => t + v, 0), outTotal, cash, expected: cash - outTotal };
+            return { by, outs, invCount: invs.length, bkCount: bps.length, total: Object.values(by).reduce((t, v) => t + v, 0), outTotal, cash, expected: cash - outTotal };
         }
+        const bkPayList = () => { const o = []; (appState.bookings || []).forEach(b => (b.pays || []).forEach(p => o.push({ b, p }))); return o; };
+        const bkShiftTouched = id => bkPayList().some(x => x.p.shiftId === id);
         function vaultMoves() {
             const m = [];
+            if (appState.vaultBase) m.push({ at: '0', label: 'رصيد مرحّل من الأرشيف', amount: Number(appState.vaultBase) });
+            bkPayList().filter(x => x.p.kind === 'رد' && x.p.src !== 'drawer').forEach(x => m.push({ at: x.p.at, label: 'رد عربون: ' + x.b.clientName, amount: -Number(x.p.amount) }));
             shiftsArr().filter(s => s.status === 'closed').forEach(s => m.push({ at: s.closedAt, label: `ترحيل الشيفت رقم ${s.no}`, amount: Number(s.carried || 0) }));
             (appState.vaultAdj || []).forEach(a => m.push({ at: a.at, label: (a.amount >= 0 ? 'إيداع: ' : 'سحب: ') + (a.note || ''), amount: Number(a.amount) }));
             (appState.finExpenses || []).filter(x => x.src !== 'drawer').forEach(x => m.push({ at: x.at || x.date, label: 'مصروف: ' + x.item, amount: -Number(x.amount) }));
@@ -55,7 +72,7 @@
             const s = shiftsArr().find(x => x.id === id); if (!s || s.status !== 'open') return; const st = shiftStats(s);
             Object.assign(s, { status: 'closed', closedAt: new Date().toISOString(), closedBy: currentUser ? currentUser.displayName : '', counted, expected: st.expected, diff: counted - st.expected, carried: counted, by: st.by, outs: st.outs, invCount: st.invCount, total: st.total });
             logAudit(`ترحيل الشيفت رقم ${s.no} للخزنة: ${counted} ج.م`);
-            ensureShift(); saveState(); renderDrawer(); showToast('تم الترحيل للخزنة'); openShiftReport(s.id);
+            window.__handover = true; saveState(); renderDrawer(); showToast('تم الترحيل للخزنة - اطبع التقرير وبعدها هيتقفل الدخول للتسليم'); openShiftReport(s.id);
         }
         function vaultAdjDlg() {
             askBox('تعديل رصيد الخزنة', `<select id="va-type" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"><option value="1">إيداع (زيادة)</option><option value="-1">سحب (نقص)</option></select><input id="va-amt" type="number" min="0" placeholder="المبلغ" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white"><input id="va-note" placeholder="السبب (مثلاً: رصيد أول المدة)" class="w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">`, d => {
@@ -72,14 +89,14 @@
             const row = (a, b, x) => `<div style="display:flex;justify-content:space-between;gap:8px;${x || ''}"><span>${a}</span><span>${b}</span></div>`;
             let h = `<div style="font-size:${fs}px;line-height:1.55;color:#000"><div style="text-align:center;${dash}"><div class="rec-salon-name" style="font-weight:900;font-size:1.4em">${esc(name)}</div><div style="font-weight:900">تقرير الشيفت رقم ${s.no}${s.status === 'open' ? ' (مؤقت)' : ''}</div></div>`;
             h += `<div style="${dash}font-size:.92em">${row('الكاشير:', esc(s.cashierName || '-'))}${row('فتح:', dwDT(s.openedAt))}${row('قفل:', s.status === 'closed' ? dwDT(s.closedAt) : '--')}</div>`;
-            h += `<div style="${dash}"><b>المبيعات (${st.invCount} فاتورة)</b>` + (Object.keys(st.by).map(m => row(esc(dwPayLabel(m)), dwMoney(st.by[m]))).join('') || row('-', '-')) + row('إجمالي المبيعات', dwMoney(st.total), 'font-weight:900;border-top:1px solid #000;margin-top:3px;padding-top:3px') + `</div>`;
+            h += `<div style="${dash}"><b>المبيعات (${st.invCount} فاتورة${st.bkCount ? ' + ' + st.bkCount + ' دفعة حجز' : ''})</b>` + (Object.keys(st.by).map(m => row(esc(dwPayLabel(m)), dwMoney(st.by[m]))).join('') || row('-', '-')) + row('إجمالي المبيعات', dwMoney(st.total), 'font-weight:900;border-top:1px solid #000;margin-top:3px;padding-top:3px') + `</div>`;
             h += `<div style="${dash}"><b>اللي خرج من الدرج</b>` + (st.outs.length ? st.outs.map(o => row(`${esc(o.kind)}: ${esc(o.label)}${o.note ? ' - ' + esc(o.note) : ''}`, dwMoney(o.amount))).join('') : row('لا يوجد', '-')) + row('إجمالي الخارج', dwMoney(st.outTotal), 'font-weight:900;border-top:1px solid #000;margin-top:3px;padding-top:3px') + `</div>`;
             h += `<div>${row('كاش الفواتير', dwMoney(st.cash))}${row('المتوقع في الدرج', dwMoney(st.expected), 'font-weight:900')}`;
             if (s.status === 'closed') h += `${row('المبلغ المعدود', dwMoney(st.counted))}${row('الفرق', (st.diff === 0 ? 'مظبوط' : (st.diff > 0 ? 'زيادة ' : 'عجز ') + dwMoney(Math.abs(st.diff))), 'font-weight:900')}${row('المرحّل للخزنة', dwMoney(s.carried), 'font-size:1.15em;font-weight:900;border-top:1px solid #000;margin-top:4px;padding-top:4px')}`;
             return h + `</div></div>`;
         }
-        function openShiftReport(id) {
-            const s = shiftsArr().find(x => x.id === id); if (!s) return;
+        function openShiftReport(id, obj) {
+            const s = obj || shiftsArr().find(x => x.id === id); if (!s) return;
             applyPaper(getInvSettings());
             document.getElementById('printable-receipt').innerHTML = buildShiftHtml(s);
             document.getElementById('receipt-modal').classList.remove('hidden');
@@ -106,7 +123,7 @@
         // ---------- Profit & loss panel inside Reports ----------
         let plPeriod = 'month', plDate = '';
         function plRange() {
-            const d = new Date((plDate || dwISO(new Date())) + 'T00:00:00'); let a = new Date(d), b = new Date(d);
+            const d = new Date((plDate || getTodayISO()) + 'T00:00:00'); let a = new Date(d), b = new Date(d);
             if (plPeriod === 'week') { a.setDate(d.getDate() - ((d.getDay() + 1) % 7)); b = new Date(a); b.setDate(a.getDate() + 6); }
             else if (plPeriod === 'month') { a = new Date(d.getFullYear(), d.getMonth(), 1); b = new Date(d.getFullYear(), d.getMonth() + 1, 0); }
             else if (plPeriod === 'year') { a = new Date(d.getFullYear(), 0, 1); b = new Date(d.getFullYear(), 11, 31); }
@@ -117,20 +134,21 @@
             const rep = document.getElementById('view-reports'); if (!rep) return;
             let box = document.getElementById('pl-box');
             if (!box) { box = document.createElement('div'); box.id = 'pl-box'; box.className = 'bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs'; rep.insertBefore(box, rep.firstChild); }
-            if (!plDate) plDate = dwISO(new Date());
+            if (!plDate) plDate = getTodayISO();
             const [from, to] = plRange(), inR = d => d && String(d).slice(0, 10) >= from && String(d).slice(0, 10) <= to;
-            const income = appState.invoices.filter(i => !i.deleted && inR(i.date)).reduce((t, i) => t + Number(i.total || 0), 0);
+            const bkInc = (typeof bkIncomeIn === 'function') ? bkIncomeIn(inR) : { income: 0, held: 0 };
+            const income = appState.invoices.filter(i => !i.deleted && inR(i.date)).reduce((t, i) => t + Number(i.total || 0), 0) + bkInc.income;
             const exps = (appState.finExpenses || []).filter(e => inR(e.date)).reduce((t, e) => t + Number(e.amount), 0);
             const advs = (appState.finAdv || []).filter(a => inR(a.date)).reduce((t, a) => t + Number(a.amount), 0);
             const out = exps + advs, net = income - out;
-            const sh = shiftsArr().filter(x => inR((x.openedAt || '').slice(0, 10) && dwISO(new Date(x.openedAt)))).sort((a, b) => b.no - a.no);
+            const sh = shiftsArr().filter(x => inR(x.openedAt ? dwBiz(x.openedAt) : '')).sort((a, b) => b.no - a.no);
             const pb = (k, l) => `<button onclick="plSet('${k}')" class="set-pill ${plPeriod === k ? 'on' : ''}">${l}</button>`;
             const kp = (l, v, c) => `<div class="bg-darkbg border border-bordergold rounded-xl p-3 text-center"><div class="text-gray-400">${l}</div><div class="font-black text-base ${c}">${dwMoney(v)}</div></div>`;
             box.innerHTML = `<div class="flex flex-wrap items-center gap-2"><h3 class="text-sm font-black text-gold ml-2">كسبت وصرفت</h3>${pb('day', 'يوم')}${pb('week', 'أسبوع')}${pb('month', 'شهر')}${pb('year', 'سنة')}<input type="date" value="${plDate}" onchange="plDate=this.value||plDate;renderPL()" class="bg-darkbg border border-bordergold rounded-xl px-3 py-1.5 text-white"></div>
               <p class="text-gray-500">من ${from} إلى ${to}</p>
               <div class="grid grid-cols-3 gap-2">${kp('كسبت', income, 'text-emerald-400')}${kp('صرفت', out, 'text-red-400')}${kp('الباقي', net, net < 0 ? 'text-red-400' : 'text-gold')}</div>
               <div class="rounded-xl py-2.5 text-center font-black text-base ${net < 0 ? 'bg-red-950/50 text-red-300 border border-red-800' : (net > 0 ? 'bg-emerald-950/50 text-emerald-300 border border-emerald-800' : 'bg-darkbg text-gray-300 border border-bordergold')}">${net < 0 ? 'خسران ' + dwMoney(-net) : (net > 0 ? 'ربحان ' + dwMoney(net) : 'متعادل')}</div>
-              <div class="flex justify-between text-gray-300"><span>مصاريف الصالون</span><b>${dwMoney(exps)}</b></div><div class="flex justify-between text-gray-300"><span>سلف وخصومات العاملين</span><b>${dwMoney(advs)}</b></div>
+              <div class="flex justify-between text-gray-300"><span>منها إيراد عربونات حجوزات ملغية</span><b>${dwMoney(bkInc.income)}</b></div><div class="flex justify-between text-gray-300"><span>عربونات حجوزات قادمة (مش محسوبة في كسبت)</span><b>${dwMoney(bkInc.held)}</b></div><div class="flex justify-between text-gray-300"><span>مصاريف الصالون</span><b>${dwMoney(exps)}</b></div><div class="flex justify-between text-gray-300"><span>سلف وخصومات العاملين</span><b>${dwMoney(advs)}</b></div>
               <p class="text-gray-500 leading-relaxed">الحساب ده كسبت (كل المبيعات) ناقص صرفت (المصاريف + السلف). مرتبات وعمولات العاملين نفسها مش داخلة فيه.</p>
               <div class="flex justify-between border-t border-bordergold/40 pt-2"><span class="text-white font-bold">في الدرج دلوقتي</span><b class="text-gold">${dwMoney(curShift() ? shiftStats(curShift()).expected : 0)}</b></div><div class="flex justify-between"><span class="text-white font-bold">في الخزنة</span><b class="text-gold">${dwMoney(vaultBalance())}</b></div>
               <div class="pt-1"><b class="text-white">الشيفتات في الفترة دي</b>${sh.map(x => { const t = shiftStats(x); return `<div class="flex justify-between border-t border-bordergold/40 pt-1.5 text-gray-300"><span><b class="text-white">شيفت ${x.no}</b> ${esc(x.cashierName || '')} • ${dwDT(x.openedAt)}</span><span>${dwMoney(t.total)}${x.status === 'open' ? ' (شغال)' : ''}</span></div>`; }).join('') || '<p class="text-gray-500">مفيش شيفتات في الفترة دي.</p>'}</div>`;

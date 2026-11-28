@@ -56,6 +56,7 @@
             if (S.showDiscount) h += row('الخصم:', `${inv.discount} ج.م`);
             if (S.showPayment) h += row('طريقة الدفع:', esc(payLabels[inv.paymentMethod] || inv.paymentMethod));
             h += row('الإجمالي:', `${inv.total} ج.م`, 'font-size:1.15em;font-weight:900;border-top:1px solid #000;margin-top:4px;padding-top:4px');
+            if (inv.prepaid > 0) { h += row('مدفوع مقدماً (عربون):', `${inv.prepaid} ج.م`); h += row('المدفوع الآن:', `${inv.total - inv.prepaid} ج.م`, 'font-weight:900'); }
             h += `</div>`;
             if (S.showPayNumbers && payNums && inv.paymentMethod && inv.paymentMethod !== 'cash') h += `<div style="text-align:center;font-size:.9em;margin-top:6px">${esc(payNums)}</div>`;
             if (S.showNotes && inv.notes) h += `<div style="font-size:.9em;margin-top:6px">ملاحظات: ${esc(inv.notes)}</div>`;

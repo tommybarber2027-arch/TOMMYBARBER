@@ -205,11 +205,11 @@
                 const existing = appState.invoices.find(i => i.id === editingInvoiceId);
                 if (existing) {
                     Object.assign(existing, { barberId: selectedBarberId, barberName, clientName, clientPhone, notes, paymentMethod: currentDraft.paymentMethod, subtotal, discount, total, items: JSON.parse(JSON.stringify(currentDraft.items)) });
-                    savedInv = existing;
+                    savedInv = existing; try { dwClosedNote(existing); } catch (e) { }
                     logAudit(`تعديل الفاتورة رقم ${existing.id}`);
                 }
             } else {
-                const nextId = appState.invoices.length > 0 ? Math.max(...appState.invoices.map(i => i.id)) + 1 : 1;
+                const nextId = Math.max(appState.lastInvId || 0, appState.invoices.length > 0 ? Math.max(...appState.invoices.map(i => i.id)) : 0) + 1;
                 savedInv = {
                     id: nextId, date: getTodayISO(), time: getTimeStr(), barberId: selectedBarberId, barberName,
                     clientName, clientPhone, notes, paymentMethod: currentDraft.paymentMethod, subtotal, discount, total,

@@ -9,7 +9,7 @@
             measurementId: "G-MQCJCNVDJQ"
         };
 
-        let db = null, cloudRef = null, isApplyingRemote = false;
+        let db = null, cloudRef = null, isApplyingRemote = false, startedVirgin = false, cloudSynced = false;
         let usbFileHandle = null;
 
         const STORAGE_KEY = 'tommy_barber_exact_clone_v7_local';
@@ -154,6 +154,7 @@
 
         function loadState() {
             try { const s = localStorage.getItem(STORAGE_KEY); if (s) return JSON.parse(s); } catch (e) {}
+            startedVirgin = true;
             return JSON.parse(JSON.stringify(defaultState));
         }
 
@@ -161,7 +162,7 @@
             if (!isApplyingRemote) appState._ts = Date.now();
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-                if (cloudRef && !isApplyingRemote) cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
+                if (cloudRef && cloudSynced && !isApplyingRemote) cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
                 if (usbFileHandle) writeToUsbFile();
             } catch (e) {}
         }
@@ -202,34 +203,46 @@
             try { if (typeof firebase !== 'undefined' && !firebase.apps.length) firebase.initializeApp(firebaseConfig); if (typeof firebase !== 'undefined') { db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } } catch (e) {}
             if (!cloudRef) return;
             cloudRef.on('value', (snap) => {
-                const remote = snap.val();
+                const remote = snap.val(), first = !cloudSynced; cloudSynced = true;
+                const push = () => cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
                 if (remote) {
                     const rt = remote._ts || 0, lt = appState._ts || 0;
-                    if (rt && rt === lt) return;
-                    if (rt < lt) { cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {}); return; }
-                    isApplyingRemote = true;
-                    appState = {
-                        ...JSON.parse(JSON.stringify(defaultState)),
-                        ...remote,
-                        salonInfo: { ...defaultState.salonInfo, ...(remote.salonInfo || {}) },
-                        users: remote.users || defaultState.users,
-                        barbers: remote.barbers || defaultState.barbers,
-                        clients: remote.clients || defaultState.clients,
-                        attendanceRecords: remote.attendanceRecords || {},
-                        advances: remote.advances || [],
-                        categories: remote.categories || defaultState.categories,
-                        catalog: remote.catalog || defaultState.catalog,
-                        invoices: remote.invoices || [],
-                        auditLogs: remote.auditLogs || []
-                    };
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-                    renderAll();
-                    isApplyingRemote = false;
-                    if (migrateAuth()) { saveState(); renderAll(); }
-                } else {
+                    // جهاز جديد/متمسح: ياخد اللي في السحابة دايماً ومايرفعش حاجة فوقها
+                    if (!startedVirgin) {
+                        if (rt && rt === lt) return;
+                        if (rt < lt) { push(); return; }
+                        const localInv = (appState.invoices || []).length, remoteInv = (remote.invoices || []).length;
+                        if (first && localInv > 0 && remoteInv === 0) {
+                            askBox('تنبيه مهم', `<p class="text-gray-200 leading-relaxed text-xs">السحابة فاضية من الفواتير، لكن الجهاز ده فيه <b class="text-gold">${localInv}</b> فاتورة. لو البيانات اتمسحت بالغلط ارفع بيانات الجهاز للسحابة. لو إنت عامل "بداية جديدة" قصداً اختار "خد بيانات السحابة".</p>`, () => { appState._ts = Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); push(); showToast('تم رفع بيانات الجهاز للسحابة'); }, 'ارفع بيانات الجهاز');
+                            const no = document.getElementById('ask-no'); if (no) { no.textContent = 'خد بيانات السحابة'; no.addEventListener('click', () => applyRemote(remote)); }
+                            return;
+                        }
+                    }
+                    applyRemote(remote);
+                } else if (!startedVirgin || first) {
                     saveState();
                 }
-            });
+            }, () => { });
+        }
+        function applyRemote(remote) {
+            isApplyingRemote = true; startedVirgin = false;
+            appState = {
+                ...JSON.parse(JSON.stringify(defaultState)),
+                ...remote,
+                salonInfo: { ...defaultState.salonInfo, ...(remote.salonInfo || {}) },
+                users: remote.users || defaultState.users,
+                barbers: remote.barbers || defaultState.barbers,
+                clients: remote.clients || defaultState.clients,
+                attendanceRecords: remote.attendanceRecords || {},
+                advances: remote.advances || [],
+                categories: remote.categories || defaultState.categories,
+                catalog: remote.catalog || defaultState.catalog,
+                invoices: remote.invoices || [],
+                auditLogs: remote.auditLogs || []
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            try { renderAll(); } finally { isApplyingRemote = false; }
+            if (migrateAuth()) { saveState(); renderAll(); }
         }
 
         function showToast(msg, type = 'success') {
@@ -384,7 +397,7 @@
                 const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, finance: false, drawer: true, users: false, settings: false }, p || {});
                 const isMgr = u => u.id === 'u-admin' || u.roleTitle === 'مدير' || u.username === 'admin';
                 const mOld = old.find(isMgr) || {};
-                const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, finance: true, drawer: true, users: true, settings: true } });
+                const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, finance: true, drawer: true, bookings: true, archive: true, users: true, settings: true } });
                 const c1 = { id: 'u-cashier1', displayName: 'كاشير 1', roleTitle: 'كاشير', username: 'cashier1', password: '1111', permissions: A() };
                 const c2 = { id: 'u-cashier2', displayName: 'كاشير 2', roleTitle: 'كاشير', username: 'cashier2', password: '2222', permissions: A() };
                 const others = old.filter(u => !isMgr(u) && !['u-omar', 'u-sara', 'u-cashier1', 'u-cashier2'].includes(u.id));
@@ -401,7 +414,8 @@
 
         function completeLogin(user) {
             if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = !!user.permissions.pos; }
-            currentUser = user;
+            try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMgrUser(u0)) { ['pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','bookings','finance','users','settings','archive'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; user.permissions = u0.permissions; } } catch (e) { }
+            currentUser = user; try { ensureShift(); } catch (e) { }
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('header-user-badge').textContent = `${user.displayName} • ${user.roleTitle}`;

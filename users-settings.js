@@ -13,7 +13,7 @@
         }
 
         function openUserModal(id = null) {
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'finance', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'bookings', 'finance', 'users', 'settings', 'archive'];
             if (id) {
                 const u = appState.users.find(x => x.id === id);
                 if (!u) return;
@@ -42,7 +42,7 @@
         function saveUser(e) {
             e.preventDefault();
             const id = document.getElementById('edit-user-id').value;
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'finance', 'users', 'settings'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'bookings', 'finance', 'users', 'settings', 'archive'];
             const perms = {};
             permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); perms[p] = cb ? cb.checked : false; });
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
@@ -132,17 +132,21 @@
 
         function openResetOperationalModal() {
             if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك بتنفيذ هذه العملية', 'error'); return; }
-            document.getElementById('reset-ops-modal').classList.remove('hidden');
+            confirmDanger('بداية جديدة: هيتمسح كل الفواتير (والترقيم يرجع لـ1)، والشيفتات والدرج والخزنة، والمصاريف والسلف، والحضور، والحجوزات، وسجل المراجعة. هيفضل زي ما هو: الحلاقين، العملاء، الخدمات والأسعار، المستخدمين، الإعدادات، والأرشيف.', executeOperationalReset, 'ابدأ من جديد');
         }
 
         function executeOperationalReset() {
-            appState.invoices = [];
-            appState.attendanceRecords = {};
-            appState.advances = [];
+            appState.invoices = []; appState.lastInvId = 0;
+            appState.attendanceRecords = {}; appState.attendanceLog = {};
+            appState.advances = []; appState.expenses = [];
+            appState.finExpenses = []; appState.finAdv = [];
+            appState.shifts = []; appState.vaultAdj = []; appState.vaultBase = 0; appState.bookings = [];
             appState.auditLogs = [];
-            logAudit('تم تصفير الفواتير والحركات والزيارات مع الاحتفاظ بأسماء وأرقام العملاء');
+            window.__handover = false;
+            logAudit('بداية جديدة: تصفير الفواتير والشيفتات والخزنة والمصاريف والحجوزات مع الاحتفاظ بالأساسيات');
+            try { ensureShift(); } catch (e) { }
             saveState(); resetCurrentInvoice(); renderAll(); closeModal('reset-ops-modal');
-            showToast('تم مسح الفواتير والحركات بنجاح مع الاحتفاظ بأسماء وأرقام العملاء!');
+            showToast('تمت البداية الجديدة. الأساسيات محفوظة والباقي اتصفّر');
         }
 
         function downloadFullBackup() {
@@ -329,5 +333,5 @@
             document.querySelectorAll('.pm-input').forEach(i => i.value = payrollMonth);
             renderPOS(); renderInvoicesTable(); renderClientsTable(); renderReports();
             renderCatalogManagement(); renderBarbersManage(); renderUsersManage(); renderSettings();
-            try { ensureNewPerms(); renderAttendance(); finRefresh(); renderDrawer(); renderPL(); } catch (e) { console.error(e); }
+            try { ensureNewPerms(); renderAttendance(); finRefresh(); renderDrawer(); renderPL(); renderBookings(); renderArchive(); } catch (e) { console.error(e); }
         }

@@ -79,7 +79,7 @@
             if (!currentUser?.permissions?.editInvoices) { showToast('ليس لديك صلاحية حذف الفواتير', 'error'); return; }
             const inv = appState.invoices.find(i => i.id === id);
             if (!inv) return;
-            inv.deleted = true; logAudit(`حذف الفاتورة رقم ${id}`); saveState(); renderAll(); showToast(`تم حذف الفاتورة ${id}`);
+            inv.deleted = true; logAudit(`حذف الفاتورة رقم ${id}`); try { dwClosedNote(inv); } catch (e) { } saveState(); renderAll(); showToast(`تم حذف الفاتورة ${id}`);
         }
 
         function restoreInvoice(id) {

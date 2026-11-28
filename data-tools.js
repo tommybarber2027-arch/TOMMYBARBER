@@ -15,7 +15,7 @@
             }, okText || 'احذف');
         }
         const WIPE = {
-            invoices: { t: 'مسح كل الفواتير', m: 'هيتم مسح كل الفواتير، وترقيم الفواتير الجاية هيبدأ من 1. العملاء والموظفين والخدمات هيفضلوا زي ما هم.', f: () => { appState.invoices = []; } },
+            invoices: { t: 'مسح كل الفواتير', m: 'هيتم مسح كل الفواتير، وترقيم الفواتير الجاية هيبدأ من 1. العملاء والموظفين والخدمات هيفضلوا زي ما هم.', f: () => { appState.invoices = []; appState.lastInvId = 0; } },
             attendance: { t: 'مسح سجل الحضور والانصراف', m: 'هيتم مسح سجل الحضور والانصراف لكل الموظفين.', f: () => { appState.attendanceRecords = {}; } },
             advances: { t: 'مسح السُلف والخصومات', m: 'هيتم مسح السُلف والخصومات وحركات المصاريف المرتبطة بيها.', f: () => { appState.advances = []; appState.expenses = (appState.expenses || []).filter(e => !e.advId); } },
             expenses: { t: 'مسح المصاريف', m: 'هيتم مسح كل حركات المصاريف.', f: () => { appState.expenses = []; } },
@@ -35,7 +35,7 @@
             confirmDanger('هيتم مسح كل شيء وإرجاع البرنامج لحالته الأولى. حساب المدير وكلمة مروره وكود الاسترجاع بيفضلوا زي ما هم.', () => {
                 const fresh = JSON.parse(JSON.stringify(defaultState));
                 fresh.invoices = []; fresh.clients = []; fresh.advances = []; fresh.auditLogs = []; fresh.barbers = []; fresh.attendanceRecords = {};
-                fresh.expenses = []; fresh.finExpenses = []; fresh.finAdv = []; fresh.attendanceLog = {}; fresh.shifts = []; fresh.vaultAdj = [];
+                fresh.expenses = []; fresh.finExpenses = []; fresh.finAdv = []; fresh.attendanceLog = {}; fresh.shifts = []; fresh.vaultAdj = []; fresh.vaultBase = 0; fresh.bookings = []; fresh.archive = []; fresh.lastInvId = 0;
                 fresh.users = appState.users.filter(isMgrUser); fresh.authVersion = 3; fresh._ts = Date.now();
                 appState = fresh; migrateAuth();
                 selectedBarberId = null; selectedCategoryId = appState.categories[0]?.id || 'cat_cut';
@@ -49,18 +49,7 @@
             b.hidden = !b.hidden; logAudit((b.hidden ? 'إخفاء الموظف: ' : 'إظهار الموظف: ') + b.name);
             saveState(); renderAll(); showToast(b.hidden ? 'تم إخفاء الموظف من الكاشير' : 'تم إظهار الموظف');
         }
-        function archiveOldInvoices() {
-            if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك', 'error'); return; }
-            const cut = getTodayISO().slice(0, 7) + '-01', old = appState.invoices.filter(i => (i.date || '') < cut);
-            if (!old.length) { showToast('مفيش فواتير قديمة للأرشفة', 'error'); return; }
-            askConfirm(`هننزّل ${old.length} فاتورة قبل الشهر الحالي في ملف على جهازك، وبعدها نشيلها من البرنامج.`, () => {
-                const blob = new Blob([JSON.stringify({ archivedAt: new Date().toISOString(), invoices: old }, null, 1)], { type: 'application/json' });
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tommy-invoices-archive-' + getTodayISO().slice(0, 7) + '.json';
-                document.body.appendChild(a); a.click(); a.remove();
-                appState.invoices = appState.invoices.filter(i => (i.date || '') >= cut);
-                logAudit(`أرشفة ${old.length} فاتورة قديمة`); saveState(); renderAll(); showToast('تمت الأرشفة');
-            }, 'أرشف');
-        }
+        function archiveOldInvoices() { switchTab('archive'); }
         function ensureCafe() {
             if (appState.cafeAdded) return; appState.cafeAdded = true;
             if (appState.categories.some(c => c.id === 'cat_cafe')) return;
