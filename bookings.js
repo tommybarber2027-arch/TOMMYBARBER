@@ -60,7 +60,7 @@
         let bkItems = [];
         function bkFormHtml(b) {
             const inp = 'w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white', lbl = 'block text-gray-400 mb-1';
-            const barbers = appState.barbers.filter(x => !x.hidden), cat = appState.catalog.filter(c => c.category !== 'cat_cafe');
+            const barbers = appState.barbers.filter(x => !x.hidden), cat = appState.catalog.filter(c => c.category !== 'cat_cafe' && !c.hidden);
             return `<div class="space-y-2 text-xs"><div class="grid grid-cols-2 gap-2"><div><label class="${lbl}">اسم العميل</label><input id="bk-name" class="${inp}" value="${esc(b ? b.clientName : '')}"></div><div><label class="${lbl}">الموبايل</label><input id="bk-phone" inputmode="tel" dir="ltr" class="${inp}" value="${esc(b ? b.phone : '')}"></div></div>
               <div class="grid grid-cols-2 gap-2"><div><label class="${lbl}">نوع الحجز</label><select id="bk-type" class="${inp}"><option ${b && b.type === 'عادي' ? 'selected' : ''}>عادي</option><option ${b && b.type === 'عريس' ? 'selected' : ''}>عريس</option></select></div><div><label class="${lbl}">الحلاق</label><select id="bk-barber" class="${inp}">${barbers.map(x => `<option value="${x.id}" ${b && b.barberId === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div></div>
               <div class="grid grid-cols-2 gap-2"><div><label class="${lbl}">اليوم</label><input id="bk-date" type="date" class="${inp}" value="${b ? b.date : getTodayISO()}"></div><div><label class="${lbl}">الساعة</label><select id="bk-time" class="${inp}">${bkSlots().map(t => `<option value="${t}" ${b && b.time === t ? 'selected' : ''}>${bkTime12(t)}</option>`).join('')}</select></div></div>

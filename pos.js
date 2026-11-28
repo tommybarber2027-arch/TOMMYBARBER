@@ -40,7 +40,7 @@
             const q = (document.getElementById('pos-search-input')?.value || '').trim().toLowerCase();
             document.getElementById('pos-categories-grid').innerHTML = appState.categories.map(cat => {
                 const isSel = selectedCategoryId === cat.id && !q;
-                const countInCat = appState.catalog.filter(i => i.category === cat.id).length;
+                const countInCat = appState.catalog.filter(i => i.category === cat.id && !i.hidden).length;
                 const selectedQty = currentDraft.items.filter(x => x.category === cat.id).reduce((s, x) => s + x.qty, 0);
                 return `
                     <button type="button" onclick="selectCategory('${cat.id}')" class="relative bg-panelbg border ${isSel ? 'border-gold bg-golddark/40' : 'border-bordergold hover:border-gold/40'} rounded-2xl p-3 text-center transition flex flex-col items-center justify-center gap-1.5 min-h-[115px]">
@@ -55,7 +55,7 @@
             }).join('');
 
             const catObj = appState.categories.find(c => c.id === selectedCategoryId);
-            const items = q ? appState.catalog.filter(i => i.name.toLowerCase().includes(q)) : appState.catalog.filter(i => i.category === selectedCategoryId);
+            const items = q ? appState.catalog.filter(i => !i.hidden && i.name.toLowerCase().includes(q)) : appState.catalog.filter(i => !i.hidden && i.category === selectedCategoryId);
             document.getElementById('pos-selected-cat-title').textContent = q ? `نتائج البحث: "${q}"` : (catObj ? catObj.name : 'الخدمات');
 
             document.getElementById('pos-items-grid').innerHTML = items.map(item => {

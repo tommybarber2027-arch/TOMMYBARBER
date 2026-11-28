@@ -8,7 +8,7 @@
             return c;
         }
         const bpBarbers = () => appState.barbers.filter(b => !b.hidden && isPerf(b));
-        const bpServices = () => appState.catalog.filter(c => c.category !== 'cat_cafe');
+        const bpServices = () => appState.catalog.filter(c => c.category !== 'cat_cafe' && !c.hidden);
         const bpB = id => { const c = bpCfg(); return c.barbers[id] = c.barbers[id] || { show: true, available: true, bio: '', photo: '', daysOff: [] }; };
         const bpS = s => { const c = bpCfg(); return c.services[s.id] = c.services[s.id] || { show: true, price: '', dur: 30 }; };
         const bpSvcDur = id => { const s = bpCfg().services[id]; return s && Number(s.dur) > 0 ? Number(s.dur) : 60; };
