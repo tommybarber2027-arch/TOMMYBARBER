@@ -54,6 +54,7 @@
             saveState(); renderAll(); showToast(b.hidden ? 'تم إخفاء الموظف من الكاشير' : 'تم إظهار الموظف');
         }
         function archiveOldInvoices() { switchTab('archive'); }
+        function archiveAllNow() { switchTab('archive'); setTimeout(() => { try { arDoAll(); } catch (e) { } }, 150); }
         function ensureCafe() {
             if (appState.cafeAdded) return; appState.cafeAdded = true;
             if (appState.categories.some(c => c.id === 'cat_cafe')) return;

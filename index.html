@@ -13,10 +13,10 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="tailwind.css?v=27">
+    <link rel="stylesheet" href="tailwind.css?v=28">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="base.css?v=27">
-    <link rel="stylesheet" href="theme.css?v=27">
+    <link rel="stylesheet" href="base.css?v=28">
+    <link rel="stylesheet" href="theme.css?v=28">
 </head>
 <body class="min-h-screen flex flex-col selection:bg-gold selection:text-black overflow-x-hidden pb-16 lg:pb-0">
 <svg width="0" height="0" style="position:absolute"><symbol id="logo" viewBox="0 0 360 468"><image href="logo-gold.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-g,1)"/><image href="logo-ink.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-i,0)"/></symbol></svg>
@@ -36,7 +36,7 @@
                 <svg class="app-logo w-44 h-44 mx-auto"><use href="#logo"/></svg>
                 <h1 class="text-2xl font-black text-gold">TOMMY BARBER</h1>
                 <p class="text-xs text-gray-400">صالون رجالي • تسجيل الدخول</p>
-                <p class="text-[10px] text-gray-600">نسخة 5.0 <a href="#" onclick="syncSetupDlg();return false" class="underline mr-2">الربط الآمن</a></p>
+                <p class="text-[10px] text-gray-600">نسخة 5.1 <a href="#" onclick="syncSetupDlg();return false" class="underline mr-2">الربط الآمن</a></p>
                 <p class="text-[11px] text-gray-500">للتواصل مع المهندس <a href="tel:01000746687" dir="ltr" class="text-gold font-bold">01000746687</a></p>
             </div>
             <div>
@@ -643,9 +643,14 @@
                 <!-- المسح والحذف وضبط المصنع -->
                 <div id="set-p-data" class="set-panel hidden max-w-2xl space-y-3">
                     <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs">
-                        <h3 class="text-sm font-black text-gold">أرشفة الفواتير القديمة</h3>
-                        <p class="text-gray-300 leading-relaxed">بتنزّل كل فواتير الشهور السابقة في ملف على جهازك وبتشيلها من البرنامج، عشان البرنامج يفضل سريع. تقارير الشهور القديمة مش هتظهر بعدها في البرنامج، فاحتفظ بالملف.</p>
-                        <button type="button" onclick="archiveOldInvoices()" class="w-full bg-gold text-black font-black py-2.5 rounded-xl">فتح الأرشيف</button>
+                        <h3 class="text-sm font-black text-gold">الأرشيف (نقل المعاملات القديمة)</h3>
+                        <p class="text-gray-300 leading-relaxed">بينقل فواتير ومصاريف وسلف وشيفتات وحجوزات الشهور المنتهية من الشغل اليومي والتقارير إلى الأرشيف، وتقدر ترجّعها في أي وقت. رصيد الخزنة مش بيتغير، والشهر الحالي مش بيتأرشف.</p>
+                        <div class="grid grid-cols-2 gap-2"><button type="button" onclick="archiveOldInvoices()" class="bg-gold text-black font-black py-2.5 rounded-xl">فتح الأرشيف</button><button type="button" onclick="archiveAllNow()" class="bg-darkbg border border-bordergold text-gold font-black py-2.5 rounded-xl">أرشفة كل الشهور المنتهية</button></div>
+                    </div>
+                    <div class="bg-panelbg border border-red-900/60 rounded-2xl p-4 space-y-3 text-xs">
+                        <h3 class="text-sm font-black text-red-400">الشركاء (مسح وإعادة ضبط)</h3>
+                        <p class="text-gray-300 leading-relaxed">للبدء من جديد في حساب الشركاء (للمدير الأساسي بس). المسح نهائي، فخد نسخة احتياطية الأول.</p>
+                        <div class="grid gap-2"><button type="button" onclick="ptResetData()" class="w-full bg-red-950/40 border border-red-800/60 text-red-300 font-bold py-2.5 rounded-xl">تصفير حركات الشركاء (البنود والتحويلات) مع إبقاء الشركاء</button><button type="button" onclick="ptResetAll()" class="w-full bg-red-950/40 border border-red-800/60 text-red-300 font-bold py-2.5 rounded-xl">مسح الشركاء بالكامل والبدء من الصفر</button></div>
                     </div>
                     <div class="bg-panelbg border border-red-900/60 rounded-2xl p-4 space-y-3 text-xs">
                         <div class="flex items-center gap-2 text-red-400">
@@ -990,30 +995,30 @@
         </div>
     </div>
 
-<script defer src="core.js?v=27"></script>
-<script defer src="payroll.js?v=27"></script>
-<script defer src="pos.js?v=27"></script>
-<script defer src="invoices.js?v=27"></script>
-<script defer src="clients.js?v=27"></script>
-<script defer src="reports.js?v=27"></script>
-<script defer src="catalog.js?v=27"></script>
-<script defer src="staff.js?v=27"></script>
-<script defer src="users-settings.js?v=27"></script>
-<script defer src="names.js?v=27"></script>
-<script defer src="invoice-settings.js?v=27"></script>
-<script defer src="data-tools.js?v=27"></script>
-<script defer src="attendance.js?v=27"></script>
-<script defer src="finance.js?v=27"></script>
-<script defer src="drawer.js?v=27"></script>
-<script defer src="bookings.js?v=27"></script>
-<script defer src="archive.js?v=27"></script>
-<script defer src="partners.js?v=27"></script>
-<script defer src="bookpage.js?v=27"></script>
-<script defer src="extras.js?v=27"></script>
-<script defer src="app.js?v=27"></script>
-<script defer src="icons.js?v=27"></script>
-<script defer src="theme.js?v=27"></script>
-<script defer src="ui.js?v=27"></script>
+<script defer src="core.js?v=28"></script>
+<script defer src="payroll.js?v=28"></script>
+<script defer src="pos.js?v=28"></script>
+<script defer src="invoices.js?v=28"></script>
+<script defer src="clients.js?v=28"></script>
+<script defer src="reports.js?v=28"></script>
+<script defer src="catalog.js?v=28"></script>
+<script defer src="staff.js?v=28"></script>
+<script defer src="users-settings.js?v=28"></script>
+<script defer src="names.js?v=28"></script>
+<script defer src="invoice-settings.js?v=28"></script>
+<script defer src="data-tools.js?v=28"></script>
+<script defer src="attendance.js?v=28"></script>
+<script defer src="finance.js?v=28"></script>
+<script defer src="drawer.js?v=28"></script>
+<script defer src="bookings.js?v=28"></script>
+<script defer src="archive.js?v=28"></script>
+<script defer src="partners.js?v=28"></script>
+<script defer src="bookpage.js?v=28"></script>
+<script defer src="extras.js?v=28"></script>
+<script defer src="app.js?v=28"></script>
+<script defer src="icons.js?v=28"></script>
+<script defer src="theme.js?v=28"></script>
+<script defer src="ui.js?v=28"></script>
 <div id="foot-bar" class="hidden"></div>
 </body>
 </html>
