@@ -375,7 +375,7 @@
         const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); delete u.password; delete u.pin; };
         const checkUserPass = (u, p) => !!(u && u.passHash && u.salt) && hashPass(p, u.salt) === u.passHash;
         const isMgrUser = u => !!u && u.roleTitle === 'مدير';
-        const minPassLen = u => isMgrUser(u) ? MGR_MIN : CASH_MIN;
+        const minPassLen = u => (isMgrUser(u) || (u && u.roleTitle === 'شريك')) ? MGR_MIN : CASH_MIN;
         function passProblem(p, u) {
             if (!/^\d+$/.test(p)) return 'الباسورد أرقام فقط';
             if (p.length < minPassLen(u)) return `الباسورد لازم يكون ${minPassLen(u)} أرقام على الأقل`;

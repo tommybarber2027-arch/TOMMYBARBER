@@ -26,7 +26,7 @@
                 document.getElementById('edit-user-pin').value = '';
                 permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); if (cb) cb.checked = !!(u.permissions && u.permissions[p]); });
             } else {
-                if (appState.users.length >= 7) { showToast('الحد الأقصى 1 مدير + 6 كاشير', 'error'); return; }
+                if (appState.users.length >= 12) { showToast('وصلت للحد الأقصى من المستخدمين', 'error'); return; }
                 document.getElementById('edit-user-id').value = '';
                 document.getElementById('edit-user-display').value = '';
                 { const e = document.getElementById('edit-user-display-en'); e.value = ''; e.dataset.manual = ''; }
@@ -36,7 +36,14 @@
                 document.getElementById('edit-user-pin').value = '';
                 permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); if (cb) cb.checked = (p === 'pos' || p === 'invoices' || p === 'clients'); });
             }
+            userRoleChanged(!id); { const u0 = id ? appState.users.find(x => x.id === id) : null; const ps = document.getElementById('edit-user-partner'); if (ps && u0 && u0.partnerId) ps.value = u0.partnerId; }
             document.getElementById('user-modal').classList.remove('hidden');
+        }
+        function userRoleChanged(applyDefaults) {
+            const r = document.getElementById('edit-user-role').value, w = document.getElementById('edit-user-partner-wrap'), ps = document.getElementById('edit-user-partner');
+            if (ps) ps.innerHTML = ptData().list.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+            if (w) w.classList.toggle('hidden', r !== 'شريك');
+            if (applyDefaults === true && r === 'شريك') ['pos', 'invoices', 'clients', 'reports', 'bookings', 'partners'].forEach(p => { const cb = document.getElementById('perm-' + p); if (cb) cb.checked = true; });
         }
 
         function saveUser(e) {
@@ -48,6 +55,8 @@
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
             const pwd = document.getElementById('edit-user-password').value.trim();
             const roleSel = document.getElementById('edit-user-role').value, tgt = id ? appState.users.find(x => x.id === id) : null;
+            if (currentUser && !isMgrUser(currentUser) && (roleSel === 'مدير' || roleSel === 'شريك' || (tgt && (isMgrUser(tgt) || tgt.roleTitle === 'شريك')))) { showToast('إدارة المدير والشركاء للمدير العام بس', 'error'); return; }
+            if (roleSel === 'شريك' && !document.getElementById('edit-user-partner').value) { showToast('اختار الشريك المربوط', 'error'); return; }
             if (tgt && isMgrUser(tgt) && roleSel !== 'مدير') { showToast('مينفعش تغيّر وظيفة المدير', 'error'); return; }
             if (!id && roleSel === 'مدير' && appState.users.some(isMgrUser)) { showToast('فيه مدير واحد بس', 'error'); return; }
             if (!id || pwd) { const pr = passProblem(pwd, { roleTitle: roleSel }); if (pr) { showToast(pr, 'error'); return; } }
@@ -57,7 +66,7 @@
                 return;
             }
 
-            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, permissions: perms };
+            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, permissions: perms, partnerId: document.getElementById('edit-user-role').value === 'شريك' ? document.getElementById('edit-user-partner').value : undefined };
             let newRec = null;
             if (id) {
                 const targetUser = appState.users.find(x => x.id === id);
