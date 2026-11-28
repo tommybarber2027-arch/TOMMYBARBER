@@ -26,6 +26,7 @@
             audit: { t: 'مسح سجل المراجعة', m: 'هيتم مسح سجل المراجعة والأمان.', f: () => { appState.auditLogs = []; } }
         };
         function wipeData(kind) {
+            if (!isMaster(currentUser)) { showToast('المسح والتصفير للمدير الأساسي بس', 'error'); return; }
             if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك بتنفيذ هذه العملية', 'error'); return; }
             const w = WIPE[kind]; if (!w) return;
             confirmDanger(w.m, () => {
@@ -33,6 +34,7 @@
             });
         }
         function factoryReset() {
+            if (!isMaster(currentUser)) { showToast('المسح والتصفير للمدير الأساسي بس', 'error'); return; }
             if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك بتنفيذ هذه العملية', 'error'); return; }
             confirmDanger('هيتم مسح كل شيء وإرجاع البرنامج لحالته الأولى. حساب المدير وكلمة مروره وكود الاسترجاع بيفضلوا زي ما هم.', () => {
                 const fresh = JSON.parse(JSON.stringify(defaultState));

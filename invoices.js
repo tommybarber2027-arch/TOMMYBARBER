@@ -50,7 +50,7 @@
                         <button onclick="openThermalReceipt(${inv.id})" class="px-2.5 py-1 rounded-lg border border-bordergold text-gold hover:bg-gold hover:text-black font-bold">طباعة</button>
                         ${canEditInv ? (!inv.deleted ? `
                             <button onclick="editExistingInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-bordergold text-gray-300 hover:border-gold font-bold">تعديل</button>
-                            <button onclick="deleteInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-red-900/50 bg-red-950/30 text-red-400 hover:bg-red-900/50 font-bold">حذف</button>
+                            ${currentUser?.permissions?.invDelete ? `<button onclick="deleteInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-red-900/50 bg-red-950/30 text-red-400 hover:bg-red-900/50 font-bold">حذف</button>` : ''}
                         ` : `<button onclick="restoreInvoice(${inv.id})" class="px-2.5 py-1 rounded-lg border border-emerald-800 text-emerald-400 font-bold">استرجاع</button>`) : ''}
                     </td>
                 </tr>
@@ -76,13 +76,14 @@
         }
 
         function deleteInvoice(id) {
-            if (!currentUser?.permissions?.editInvoices) { showToast('ليس لديك صلاحية حذف الفواتير', 'error'); return; }
+            if (!currentUser?.permissions?.invDelete) { showToast('ليس لديك صلاحية حذف الفواتير', 'error'); return; }
             const inv = appState.invoices.find(i => i.id === id);
             if (!inv) return;
             inv.deleted = true; logAudit(`حذف الفاتورة رقم ${id}`); try { dwClosedNote(inv); } catch (e) { } saveState(); renderAll(); showToast(`تم حذف الفاتورة ${id}`);
         }
 
         function restoreInvoice(id) {
+            if (!isMaster(currentUser)) { showToast('استرجاع المحذوف للمدير الأساسي بس', 'error'); return; }
             const inv = appState.invoices.find(i => i.id === id);
             if (!inv) return;
             inv.deleted = false; logAudit(`استرجاع الفاتورة رقم ${id}`); saveState(); renderAll();

@@ -10,6 +10,10 @@
             let ch = false;
             (appState.users || []).forEach(u => {
                 u.permissions = u.permissions || {};
+                if (u.roleTitle === 'مدير' && u.id !== masterId()) { u.roleTitle = 'إدارة'; ch = true; }   // مدير أساسي واحد بس
+                if (u.id === masterId() && (u.displayName !== 'المدير' || u.roleTitle !== 'مدير')) { u.displayName = 'المدير'; u.displayNameEn = 'Admin'; u.roleTitle = 'مدير'; ch = true; }
+                if (u.permissions.invDelete === undefined) { u.permissions.invDelete = !!u.permissions.editInvoices; ch = true; }
+                if (u.permissions.finEdit === undefined) { u.permissions.finEdit = (u.id === masterId()); ch = true; }
                 if (u.permissions.attendance === undefined) { u.permissions.attendance = !!u.permissions.barbers; ch = true; }
                 if (u.permissions.drawer === undefined) { u.permissions.drawer = true; ch = true; }
                 if (u.permissions.endShift === undefined) { u.permissions.endShift = !!u.permissions.pos; ch = true; }
@@ -47,6 +51,7 @@
             });
         }
         function finDel(kind, id) {
+            if (!currentUser?.permissions?.finEdit) { showToast('حذف السجلات المالية محتاج صلاحية خاصة من المدير', 'error'); return; }
             askConfirm('تحذف السجل ده؟', () => { const k = kind === 'exp' ? 'finExpenses' : 'finAdv'; appState[k] = appState[k].filter(x => x.id !== id); saveState(); finRefresh(); }, 'احذف');
         }
         function finRefresh() {
@@ -72,7 +77,7 @@
             document.getElementById('fin-month').value = finMonth;
             document.getElementById('fin-p-exp').classList.toggle('hidden', finTab !== 'exp'); document.getElementById('fin-p-adv').classList.toggle('hidden', finTab !== 'adv');
             document.getElementById('fin-t-exp').classList.toggle('on', finTab === 'exp'); document.getElementById('fin-t-adv').classList.toggle('on', finTab === 'adv');
-            const del = (k, id) => `<button onclick="finDel('${k}','${id}')" class="px-2 py-1 rounded-lg border border-red-800/60 bg-red-950/30 text-red-300 text-xs font-bold">حذف</button>`;
+            const del = (k, id) => !currentUser?.permissions?.finEdit ? '' : `<button onclick="finDel('${k}','${id}')" class="px-2 py-1 rounded-lg border border-red-800/60 bg-red-950/30 text-red-300 text-xs font-bold">حذف</button>`;
             const ex = appState.finExpenses.filter(e => (e.date || '').startsWith(finMonth)), exT = ex.reduce((s, e) => s + e.amount, 0);
             document.getElementById('fin-exp-list').innerHTML = `<div class="flex justify-between mb-2"><b class="text-gold">مصاريف ${finMonth}</b><b class="text-white">${finMoney(exT)}</b></div>` + (ex.map(e => `<div class="flex items-center justify-between gap-2 py-2 border-t border-bordergold/40"><div><b class="text-white">${esc(e.item)}</b> <span class="text-gray-400">${esc(e.date)} • ${e.src === 'drawer' ? 'من الدرج' : 'من الخزنة'}${e.note ? ' • ' + esc(e.note) : ''}</span></div><div class="flex items-center gap-2"><b class="text-white">${finMoney(e.amount)}</b>${del('exp', e.id)}</div></div>`).join('') || '<p class="text-gray-400">مفيش مصاريف في الشهر ده.</p>');
             const sel = document.getElementById('fa-staff'), cur = sel.value; sel.innerHTML = appState.barbers.map(b => `<option value="${b.id}">${esc(b.name)}</option>`).join(''); if (cur) sel.value = cur;

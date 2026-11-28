@@ -405,7 +405,10 @@
         const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); delete u.password; delete u.pin; };
         const checkUserPass = (u, p) => !!(u && u.passHash && u.salt) && hashPass(p, u.salt) === u.passHash;
         const isMgrUser = u => !!u && u.roleTitle === 'مدير';
-        const minPassLen = u => (isMgrUser(u) || (u && u.roleTitle === 'شريك')) ? MGR_MIN : CASH_MIN;
+        // المدير الأساسي (صاحب البرنامج): حساب واحد ثابت. باقي الناس مهما كان دورهم مش مدير أساسي.
+        const masterId = () => ((appState.users || []).find(u => u.id === 'u-admin') || (appState.users || []).find(isMgrUser) || {}).id;
+        const isMaster = u => !!u && u.id === masterId();
+        const minPassLen = u => (u && u.roleTitle && u.roleTitle !== 'كاشير') ? MGR_MIN : CASH_MIN;
         function passProblem(p, u) {
             if (!/^\d+$/.test(p)) return 'الباسورد أرقام فقط';
             if (p.length < minPassLen(u)) return `الباسورد لازم يكون ${minPassLen(u)} أرقام على الأقل`;
@@ -541,7 +544,7 @@
 
         function completeLogin(user) {
             if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = isMgrUser(user); }
-            try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMgrUser(u0)) { ['pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','endShift','bookings','finance','users','settings','archive','partners'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; if (u0.permissions.endShift === undefined) u0.permissions.endShift = !!u0.permissions.pos; user.permissions = u0.permissions; } } catch (e) { }
+            try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMaster(u0)) { ['invDelete','finEdit','pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','endShift','bookings','finance','users','settings','archive','partners'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; if (u0.permissions.endShift === undefined) u0.permissions.endShift = !!u0.permissions.pos; user.permissions = u0.permissions; } } catch (e) { }
             currentUser = user; try { ensureShift(); } catch (e) { }
             try { logAudit('تسجيل دخول: ' + user.displayName); flushFails(); if (typeof saveState === 'function') saveState(true); } catch (e) { }
             document.getElementById('auth-screen').classList.add('hidden');

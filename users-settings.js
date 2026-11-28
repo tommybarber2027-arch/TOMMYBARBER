@@ -1,19 +1,19 @@
         // 6. USERS & 7. SETTINGS
         function renderUsersManage() {
-            document.getElementById('users-manage-grid').innerHTML = appState.users.map(u => `
+            document.getElementById('users-manage-grid').innerHTML = appState.users.filter(u => isMaster(currentUser) || !isMaster(u)).map(u => `
                 <div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2 text-xs">
                     <div class="flex justify-between items-center">
                         <h4 class="font-black text-white text-sm">${u.displayName}</h4>
                         <span class="px-2.5 py-0.5 rounded-full bg-golddark border border-gold/40 text-gold font-bold">${u.roleTitle}</span>
                     </div>
                     <p class="text-gray-400 font-mono">${u.mustChange ? '<b class="text-red-400">لازم يغيّر كلمة المرور</b>' : 'كلمة المرور محفوظة مشفّرة'}</p>
-                    <div class="grid grid-cols-2 gap-2"><button onclick="openUserModal('${u.id}')" class="py-2 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل الصلاحيات</button>${isMgrUser(u) ? '' : `<button onclick="deleteUser('${u.id}')" class="py-2 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 font-bold">حذف المستخدم</button>`}</div>
+                    <div class="grid grid-cols-2 gap-2">${(!isMaster(currentUser) && u.roleTitle !== 'كاشير') ? '<span class="col-span-2 text-center text-gray-500 py-2">يديرها المدير الأساسي بس</span>' : ''}<button ${(!isMaster(currentUser) && u.roleTitle !== 'كاشير') ? 'hidden ' : ''}onclick="openUserModal('${u.id}')" class="py-2 rounded-xl border border-bordergold bg-darkbg hover:border-gold text-gray-300 font-bold">تعديل الصلاحيات</button>${isMgrUser(u) ? '' : `<button onclick="deleteUser('${u.id}')" class="py-2 rounded-xl border border-red-800/60 bg-red-950/30 text-red-300 hover:bg-red-900/50 font-bold">حذف المستخدم</button>`}</div>
                 </div>
             `).join('');
         }
 
         function openUserModal(id = null) {
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'endShift', 'bookings', 'finance', 'users', 'settings', 'archive', 'partners'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'invDelete', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'endShift', 'bookings', 'finance', 'finEdit', 'users', 'settings', 'archive', 'partners'];
             if (id) {
                 const u = appState.users.find(x => x.id === id);
                 if (!u) return;
@@ -39,26 +39,30 @@
             userRoleChanged(!id); { const u0 = id ? appState.users.find(x => x.id === id) : null; const ps = document.getElementById('edit-user-partner'); if (ps && u0 && u0.partnerId) ps.value = u0.partnerId; }
             document.getElementById('user-modal').classList.remove('hidden');
         }
+        const ROLE_PRESETS = { 'إدارة': ['pos', 'invoices', 'clients', 'reports', 'bookings', 'partners'], 'محاسب': ['invoices', 'reports', 'finance', 'drawer', 'partners'], 'إداري': ['pos', 'invoices', 'clients', 'attendance', 'bookings', 'barbers', 'partners'], 'شريك': ['pos', 'invoices', 'clients', 'reports', 'bookings', 'partners'], 'كاشير': ['pos', 'invoices', 'clients'] };
         function userRoleChanged(applyDefaults) {
             const r = document.getElementById('edit-user-role').value, w = document.getElementById('edit-user-partner-wrap'), ps = document.getElementById('edit-user-partner');
-            if (ps) ps.innerHTML = ptData().list.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
-            if (w) w.classList.toggle('hidden', r !== 'شريك');
-            if (applyDefaults === true && r === 'شريك') ['pos', 'invoices', 'clients', 'reports', 'bookings', 'partners'].forEach(p => { const cb = document.getElementById('perm-' + p); if (cb) cb.checked = true; });
+            if (ps) ps.innerHTML = '<option value="">— مش مربوط بشريك —</option>' + ptData().list.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+            if (w) w.classList.toggle('hidden', r === 'كاشير' || r === 'مدير');
+            if (applyDefaults === true && ROLE_PRESETS[r]) { ['pos', 'invoices', 'clients', 'editInvoices', 'invDelete', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'endShift', 'bookings', 'finance', 'finEdit', 'users', 'settings', 'archive', 'partners'].forEach(p => { const cb = document.getElementById('perm-' + p); if (cb) cb.checked = ROLE_PRESETS[r].includes(p); }); }
         }
 
         function saveUser(e) {
             e.preventDefault();
             const id = document.getElementById('edit-user-id').value;
-            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'endShift', 'bookings', 'finance', 'users', 'settings', 'archive', 'partners'];
+            const permsKeys = ['pos', 'invoices', 'clients', 'editInvoices', 'invDelete', 'reports', 'catalog', 'barbers', 'attendance', 'drawer', 'endShift', 'bookings', 'finance', 'finEdit', 'users', 'settings', 'archive', 'partners'];
             const perms = {};
             permsKeys.forEach(p => { const cb = document.getElementById(`perm-${p}`); perms[p] = cb ? cb.checked : false; });
             const username = document.getElementById('edit-user-username').value.trim() || ('u' + Date.now());
             const pwd = document.getElementById('edit-user-password').value.trim();
             const roleSel = document.getElementById('edit-user-role').value, tgt = id ? appState.users.find(x => x.id === id) : null;
-            if (currentUser && !isMgrUser(currentUser) && (roleSel === 'مدير' || roleSel === 'شريك' || (tgt && (isMgrUser(tgt) || tgt.roleTitle === 'شريك')))) { showToast('إدارة المدير والشركاء للمدير العام بس', 'error'); return; }
+            const me = currentUser, master = isMaster(me);
+            if (!master && !(me && me.permissions && me.permissions.users)) { showToast('غير مصرح لك', 'error'); return; }
+            if (tgt && isMaster(tgt) && !master) { showToast('حساب المدير الأساسي محمي', 'error'); return; }
+            if (!master && (roleSel !== 'كاشير' || (tgt && tgt.roleTitle !== 'كاشير'))) { showToast('الأدوار الإدارية (إدارة/محاسب/إداري/شريك) المدير الأساسي بس هو اللي يديها أو يعدّلها', 'error'); return; }
+            if (roleSel === 'مدير' && !(tgt && isMaster(tgt))) { showToast('المدير الأساسي واحد بس ومينفعش حد تاني ياخد الدور ده', 'error'); return; }
+            if (tgt && isMaster(tgt) && roleSel !== 'مدير') { showToast('مينفعش تغيّر وظيفة المدير الأساسي', 'error'); return; }
             if (roleSel === 'شريك' && !document.getElementById('edit-user-partner').value) { showToast('اختار الشريك المربوط', 'error'); return; }
-            if (tgt && isMgrUser(tgt) && roleSel !== 'مدير') { showToast('مينفعش تغيّر وظيفة المدير', 'error'); return; }
-            if (!id && roleSel === 'مدير' && appState.users.some(isMgrUser)) { showToast('فيه مدير واحد بس', 'error'); return; }
             if (!id || pwd) { const pr = passProblem(pwd, { roleTitle: roleSel }); if (pr) { showToast(pr, 'error'); return; } }
 
             if (appState.users.some(u => u.id !== id && (u.username.toLowerCase() === username.toLowerCase()))) {
@@ -66,11 +70,12 @@
                 return;
             }
 
-            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, permissions: perms, partnerId: document.getElementById('edit-user-role').value === 'شريك' ? document.getElementById('edit-user-partner').value : undefined };
+            const _dn = document.getElementById('edit-user-display').value.trim(), data = { displayName: _dn, displayNameEn: document.getElementById('edit-user-display-en').value.trim() || (hasAr(_dn) ? trAr2En(_dn) : _dn), roleTitle: document.getElementById('edit-user-role').value, username, permissions: perms, partnerId: (['إدارة', 'محاسب', 'إداري', 'شريك'].includes(document.getElementById('edit-user-role').value) && document.getElementById('edit-user-partner').value) || undefined };
             let newRec = null;
             if (id) {
                 const targetUser = appState.users.find(x => x.id === id);
                 if (targetUser) {
+                    if (isMaster(targetUser)) { data.displayName = 'المدير'; data.displayNameEn = 'Admin'; data.permissions = targetUser.permissions; data.roleTitle = 'مدير'; }
                     Object.assign(targetUser, data);
                     if (pwd) { setUserPass(targetUser, pwd); targetUser.mustChange = false; if (isMgrUser(targetUser)) newRec = makeRecovery(targetUser); }
                     logAudit(`تعديل صلاحيات المستخدم: ${data.displayName}`);
@@ -140,6 +145,7 @@
         }
 
         function openResetOperationalModal() {
+            if (!isMaster(currentUser)) { showToast('المسح والتصفير للمدير الأساسي بس', 'error'); return; }
             if (!currentUser?.permissions?.settings) { showToast('غير مصرح لك بتنفيذ هذه العملية', 'error'); return; }
             confirmDanger('بداية جديدة: هيتمسح كل الفواتير (والترقيم يرجع لـ1)، والشيفتات والدرج والخزنة، والمصاريف والسلف، والحضور، والحجوزات، وسجل المراجعة. هيفضل زي ما هو: الحلاقين، العملاء، الخدمات والأسعار، المستخدمين، الإعدادات، والأرشيف.', executeOperationalReset, 'ابدأ من جديد');
         }
