@@ -163,6 +163,7 @@
             try {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
                 if (cloudRef && cloudSynced && !isApplyingRemote) cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
+                if (cloudRef && cloudSynced && !isApplyingRemote) { try { bpSchedule(); } catch (e) { } }
                 if (usbFileHandle) writeToUsbFile();
             } catch (e) {}
         }
@@ -202,6 +203,11 @@
         function initCloudSync() {
             try { if (typeof firebase !== 'undefined' && !firebase.apps.length) firebase.initializeApp(firebaseConfig); if (typeof firebase !== 'undefined') { db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } } catch (e) {}
             if (!cloudRef) return;
+            const em = localStorage.getItem('tb_sync_email'), pw = localStorage.getItem('tb_sync_pass');
+            if (em && pw && firebase.auth) firebase.auth().signInWithEmailAndPassword(em, pw).then(attachCloud).catch(() => { showToast('فشل الربط الآمن: راجع الإيميل والباسورد', 'error'); attachCloud(); });
+            else attachCloud();
+        }
+        function attachCloud() {
             cloudRef.on('value', (snap) => {
                 const remote = snap.val(), first = !cloudSynced; cloudSynced = true;
                 const push = () => cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
@@ -222,7 +228,8 @@
                 } else if (!startedVirgin || first) {
                     saveState();
                 }
-            }, () => { });
+                if (first) { try { bpListen(); bpPublish(); bpBadge(); } catch (e) { } }
+            }, () => { cloudSynced = false; showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
         }
         function applyRemote(remote) {
             isApplyingRemote = true; startedVirgin = false;
@@ -394,10 +401,10 @@
         function migrateAuth() {
             let ch = false;
             if (appState.authVersion !== 2 && appState.authVersion !== 3) {
-                const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, finance: false, drawer: true, users: false, settings: false }, p || {});
+                const old = appState.users || [], A = p => Object.assign({ pos: true, invoices: true, clients: true, editInvoices: false, reports: false, catalog: false, barbers: false, attendance: true, finance: false, drawer: false, endShift: true, users: false, settings: false }, p || {});
                 const isMgr = u => u.id === 'u-admin' || u.roleTitle === 'مدير' || u.username === 'admin';
                 const mOld = old.find(isMgr) || {};
-                const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, finance: true, drawer: true, bookings: true, archive: true, users: true, settings: true } });
+                const mgr = Object.assign({}, mOld, { id: mOld.id || 'u-admin', displayName: 'المدير', roleTitle: 'مدير', username: 'admin', password: '8800', permissions: { pos: true, invoices: true, clients: true, editInvoices: true, reports: true, catalog: true, barbers: true, attendance: true, finance: true, drawer: true, endShift: true, bookings: true, archive: true, users: true, settings: true } });
                 const c1 = { id: 'u-cashier1', displayName: 'كاشير 1', roleTitle: 'كاشير', username: 'cashier1', password: '1111', permissions: A() };
                 const c2 = { id: 'u-cashier2', displayName: 'كاشير 2', roleTitle: 'كاشير', username: 'cashier2', password: '2222', permissions: A() };
                 const others = old.filter(u => !isMgr(u) && !['u-omar', 'u-sara', 'u-cashier1', 'u-cashier2'].includes(u.id));
@@ -413,8 +420,8 @@
         if (migrateAuth()) saveState();
 
         function completeLogin(user) {
-            if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = !!user.permissions.pos; }
-            try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMgrUser(u0)) { ['pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','bookings','finance','users','settings','archive'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; user.permissions = u0.permissions; } } catch (e) { }
+            if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = isMgrUser(user); }
+            try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMgrUser(u0)) { ['pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','endShift','bookings','finance','users','settings','archive'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; if (u0.permissions.endShift === undefined) u0.permissions.endShift = !!u0.permissions.pos; user.permissions = u0.permissions; } } catch (e) { }
             currentUser = user; try { ensureShift(); } catch (e) { }
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
@@ -433,6 +440,7 @@
 
             renderAll();
             if (firstTab) switchTab(firstTab);
+            try { alOnLogin(); } catch (e) { }
         }
 
         function logoutUser() {

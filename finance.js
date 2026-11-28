@@ -12,11 +12,14 @@
                 u.permissions = u.permissions || {};
                 if (u.permissions.attendance === undefined) { u.permissions.attendance = !!u.permissions.barbers; ch = true; }
                 if (u.permissions.drawer === undefined) { u.permissions.drawer = true; ch = true; }
+                if (u.permissions.endShift === undefined) { u.permissions.endShift = !!u.permissions.pos; ch = true; }
+                if (!appState.permsV2 && u.roleTitle !== 'مدير' && u.permissions.drawer) { u.permissions.drawer = false; ch = true; }
                 if (u.permissions.bookings === undefined) { u.permissions.bookings = !!u.permissions.pos; ch = true; }
                 if (u.permissions.archive === undefined) { u.permissions.archive = (u.roleTitle === 'مدير'); ch = true; }
                 if (u.roleTitle === 'مدير' && (!u.permissions.archive || !u.permissions.bookings)) { u.permissions.archive = u.permissions.bookings = true; ch = true; }
                 if (u.permissions.finance === undefined) { u.permissions.finance = !!u.permissions.settings; ch = true; }
             });
+            appState.permsV2 = true;
             if (currentUser) { const u = appState.users.find(x => x.id === currentUser.id); if (u) currentUser.permissions = u.permissions; }
             if (ch) saveState();
         }

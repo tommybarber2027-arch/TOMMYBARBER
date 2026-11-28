@@ -22,7 +22,7 @@
             return { income: inc, out: exp + adv, net: inc - exp - adv, invCount: d.invoices.filter(i => !i.deleted).length, shiftCount: d.shifts.length };
         }
         function arVaultDelta(d) {
-            return d.shifts.reduce((t, s) => t + Number(s.carried || 0), 0)
+            return d.shifts.reduce((t, s) => t + shiftTransferTotal(s), 0)
                 - d.finExpenses.filter(x => x.src !== 'drawer').reduce((t, x) => t + Number(x.amount), 0)
                 - d.finAdv.filter(x => x.src !== 'drawer').reduce((t, x) => t + Number(x.amount), 0)
                 - d.bookings.reduce((t, b) => t + (b.pays || []).filter(p => p.kind === 'رد' && p.src !== 'drawer').reduce((u, p) => u + Number(p.amount), 0), 0);

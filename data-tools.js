@@ -5,6 +5,8 @@
             document.querySelectorAll('#view-settings .set-panel').forEach(p => p.classList.toggle('hidden', p.id !== 'set-p-' + id));
             document.querySelectorAll('#set-pills .set-pill').forEach(b => b.classList.toggle('on', b.getAttribute('data-sp') === id));
             if (id === 'invoice') updateInvPreview();
+            if (id === 'booking') renderBookingSettings();
+            if (id === 'extras') renderExtrasSettings();
         }
 
         function confirmDanger(msg, fn, okText) {

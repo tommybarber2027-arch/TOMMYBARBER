@@ -13,16 +13,16 @@
     <link rel="manifest" href="manifest.webmanifest">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="stylesheet" href="tailwind.css?v=11">
+    <link rel="stylesheet" href="tailwind.css?v=13">
     <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="base.css?v=11">
-    <link rel="stylesheet" href="theme.css?v=11">
+    <link rel="stylesheet" href="base.css?v=13">
+    <link rel="stylesheet" href="theme.css?v=13">
 </head>
 <body class="min-h-screen flex flex-col selection:bg-gold selection:text-black overflow-x-hidden pb-16 lg:pb-0">
 <svg width="0" height="0" style="position:absolute"><symbol id="logo" viewBox="0 0 360 468"><image href="logo-gold.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-g,1)"/><image href="logo-ink.webp" x="0" y="0" width="360" height="468" style="opacity:var(--lg-i,0)"/></symbol></svg>
-<div id="contact-bar"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span>للتواصل:</span><b>فادي سعد</b><a href="tel:01000746687" dir="ltr">01000746687</a></div>
 <div id="splash" role="presentation"><svg class="wolf app-logo" viewBox="0 0 360 468"><use href="#logo"/></svg><div class="rule"></div><div class="by">By</div><div class="name">Fady Saad</div><div class="tel"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>01000746687</div><div class="tap">Tap to continue</div><div class="bar"><i></i></div></div>
 
     <!-- Toast Container -->
@@ -39,7 +39,7 @@
                 <svg class="app-logo w-44 h-44 mx-auto"><use href="#logo"/></svg>
                 <h1 class="text-2xl font-black text-gold">TOMMY BARBER</h1>
                 <p class="text-xs text-gray-400">صالون رجالي • تسجيل الدخول</p>
-                <p class="text-[10px] text-gray-600">نسخة 2.1</p>
+                <p class="text-[10px] text-gray-600">نسخة 3.1 <a href="#" onclick="syncSetupDlg();return false" class="underline mr-2">الربط الآمن</a></p>
             </div>
             <div>
                 <p class="text-[11px] text-gray-400 mb-2">اختر المستخدم</p>
@@ -89,14 +89,14 @@
                 </div>
 
                 <nav id="main-nav-scroll" class="w-full lg:w-auto order-3 lg:order-2 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pt-2 lg:pt-0 border-t border-bordergold/50 lg:border-t-0 no-scrollbar">
-                    <button onclick="switchTab('pos')" id="tab-pos" data-perm="pos" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0">المبيعات</button>
+                    <button onclick="switchTab('pos')" id="tab-pos" data-perm="pos" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-black transition whitespace-nowrap shrink-0">فاتورة جديدة</button>
                     <button onclick="switchTab('bookings')" id="tab-bookings" data-perm="bookings" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحجوزات</button>
                     <button onclick="switchTab('invoices')" id="tab-invoices" data-perm="invoices" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الفواتير</button>
                     <button onclick="switchTab('clients')" id="tab-clients" data-perm="clients" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">العملاء</button>
                     <button onclick="switchTab('catalog')" id="tab-catalog" data-perm="catalog" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الخدمات</button>
                     <button onclick="switchTab('barbers')" id="tab-barbers" data-perm="barbers" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الفريق</button>
                     <button onclick="switchTab('attendance')" id="tab-attendance" data-perm="attendance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الحضور</button>
-                    <button onclick="switchTab('drawer')" id="tab-drawer" data-perm="drawer" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الدرج والخزنة</button>
+                    <button onclick="switchTab('drawer')" id="tab-drawer" data-perm="drawer" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">الخزنة</button>
                     <button onclick="switchTab('finance')" id="tab-finance" data-perm="finance" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المالية</button>
                     <button onclick="switchTab('reports')" id="tab-reports" data-perm="reports" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">التقارير</button>
                     <button onclick="switchTab('users')" id="tab-users" data-perm="users" class="nav-btn px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap shrink-0">المستخدمون</button>
@@ -196,6 +196,7 @@
                         </div>
                     </div>
                 </div>
+            <div id="pos-shift-box"></div>
             </section>
 
             <!-- 2. الفواتير -->
@@ -460,6 +461,8 @@
                     <button type="button" data-sp="general" onclick="showSettingsPanel('general')" class="set-pill">بيانات الصالون</button>
                     <button type="button" data-sp="invoice" onclick="showSettingsPanel('invoice')" class="set-pill">الفاتورة والإيصال</button>
                     <button type="button" data-sp="roles" onclick="showSettingsPanel('roles')" class="set-pill">الوظائف</button>
+                    <button type="button" data-sp="extras" onclick="showSettingsPanel('extras')" class="set-pill">الشريط والتنبيهات</button>
+                    <button type="button" data-sp="booking" onclick="showSettingsPanel('booking')" class="set-pill">صفحة الحجز</button>
                     <button type="button" data-sp="backup" onclick="showSettingsPanel('backup')" class="set-pill">النسخ الاحتياطي والاسترجاع</button>
                     <button type="button" data-sp="data" onclick="showSettingsPanel('data')" class="set-pill">المسح والحذف وضبط المصنع</button>
                     <button type="button" data-sp="audit" onclick="showSettingsPanel('audit')" class="set-pill">سجل المراجعة والأمان</button>
@@ -607,6 +610,10 @@
                 </div>
 
                 <!-- النسخ الاحتياطي -->
+                <div id="set-p-extras" class="set-panel hidden"></div>
+
+                <div id="set-p-booking" class="set-panel hidden"></div>
+
                 <div id="set-p-backup" class="set-panel hidden max-w-2xl">
                     <div class="bg-panelbg border border-emerald-800/60 rounded-2xl p-4 space-y-3 text-xs">
                         <div class="flex items-center justify-between">
@@ -917,7 +924,8 @@
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-catalog" class="accent-gold"> تعديل الخدمات والأسعار</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-barbers" class="accent-gold"> الحلاقين والرواتب</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-attendance" class="accent-gold"> الحضور والانصراف</label>
-                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-drawer" class="accent-gold"> الدرج والخزنة</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-drawer" class="accent-gold"> الخزنة (الرصيد والتسليم)</label>
+                        <label class="flex items-center gap-2"><input type="checkbox" id="perm-endShift" class="accent-gold"> إنهاء الشيفت</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-bookings" class="accent-gold"> الحجوزات</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-archive" class="accent-gold"> الأرشيف (للمدير)</label>
                         <label class="flex items-center gap-2"><input type="checkbox" id="perm-finance" class="accent-gold"> المالية</label>
@@ -972,26 +980,29 @@
         </div>
     </div>
 
-<script defer src="core.js?v=11"></script>
-<script defer src="payroll.js?v=11"></script>
-<script defer src="pos.js?v=11"></script>
-<script defer src="invoices.js?v=11"></script>
-<script defer src="clients.js?v=11"></script>
-<script defer src="reports.js?v=11"></script>
-<script defer src="catalog.js?v=11"></script>
-<script defer src="staff.js?v=11"></script>
-<script defer src="users-settings.js?v=11"></script>
-<script defer src="names.js?v=11"></script>
-<script defer src="invoice-settings.js?v=11"></script>
-<script defer src="data-tools.js?v=11"></script>
-<script defer src="attendance.js?v=11"></script>
-<script defer src="finance.js?v=11"></script>
-<script defer src="drawer.js?v=11"></script>
-<script defer src="bookings.js?v=11"></script>
-<script defer src="archive.js?v=11"></script>
-<script defer src="app.js?v=11"></script>
-<script defer src="icons.js?v=11"></script>
-<script defer src="theme.js?v=11"></script>
-<script defer src="ui.js?v=11"></script>
+<script defer src="core.js?v=13"></script>
+<script defer src="payroll.js?v=13"></script>
+<script defer src="pos.js?v=13"></script>
+<script defer src="invoices.js?v=13"></script>
+<script defer src="clients.js?v=13"></script>
+<script defer src="reports.js?v=13"></script>
+<script defer src="catalog.js?v=13"></script>
+<script defer src="staff.js?v=13"></script>
+<script defer src="users-settings.js?v=13"></script>
+<script defer src="names.js?v=13"></script>
+<script defer src="invoice-settings.js?v=13"></script>
+<script defer src="data-tools.js?v=13"></script>
+<script defer src="attendance.js?v=13"></script>
+<script defer src="finance.js?v=13"></script>
+<script defer src="drawer.js?v=13"></script>
+<script defer src="bookings.js?v=13"></script>
+<script defer src="archive.js?v=13"></script>
+<script defer src="bookpage.js?v=13"></script>
+<script defer src="extras.js?v=13"></script>
+<script defer src="app.js?v=13"></script>
+<script defer src="icons.js?v=13"></script>
+<script defer src="theme.js?v=13"></script>
+<script defer src="ui.js?v=13"></script>
+<div id="foot-bar" class="hidden"></div>
 </body>
 </html>

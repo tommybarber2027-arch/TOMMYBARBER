@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>احجز ميعادك</title>
+<meta name="theme-color" content="#0B0A08">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#0B0A08;--panel:#16130E;--line:#3a2f1c;--gold:#D4AF37;--gold2:#8a6d1c;--txt:#f3ead6;--mut:#9a8f78;--ok:#34d399;--bad:#f87171}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:15px;line-height:1.6;padding:0 16px 40px}
+.wrap{max-width:520px;margin:0 auto}
+header{text-align:center;padding:24px 0 8px}
+header img{width:120px;height:auto}
+h1{margin:6px 0 0;font-size:22px;color:var(--gold);letter-spacing:1px}
+.sub{color:var(--mut);font-size:13px}
+.welcome{text-align:center;color:var(--txt);margin:10px 0 18px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:15px;color:var(--gold)}
+.num{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#000;text-align:center;line-height:24px;font-size:13px;font-weight:900;margin-left:8px}
+.barbers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.b{background:#0f0d09;border:2px solid var(--line);border-radius:16px;padding:8px 4px;text-align:center;cursor:pointer;position:relative}
+.b img,.b .ph{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 4px;display:block;background:#1d1810;border:1px solid var(--line)}
+.b .ph{display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:24px;font-weight:900}
+.b .n{font-size:13px;font-weight:700}
+.b .bio{font-size:11px;color:var(--mut)}
+.b.on{border-color:var(--gold);background:#1c1608}
+.b.off{opacity:.45;cursor:not-allowed}
+.b .tag{font-size:10px;color:var(--bad)}
+.svc{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.svc:first-of-type{border-top:0}
+.svc input{width:20px;height:20px;accent-color:var(--gold)}
+.svc .nm{flex:1}
+.svc .pr{color:var(--gold);font-weight:800}
+.svc .du{color:var(--mut);font-size:12px}
+.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.d{flex:0 0 auto;min-width:66px;text-align:center;background:#0f0d09;border:2px solid var(--line);border-radius:14px;padding:8px 6px;cursor:pointer}
+.d .w{font-size:12px;color:var(--mut)}.d .dn{font-size:18px;font-weight:900}
+.d.on{border-color:var(--gold);background:#1c1608}.d.off{opacity:.35;cursor:not-allowed}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.s{background:#0f0d09;border:2px solid var(--line);border-radius:12px;padding:10px 0;text-align:center;cursor:pointer;font-weight:700;font-size:14px}
+.s.on{border-color:var(--gold);background:var(--gold);color:#000}
+input.t,textarea.t{width:100%;background:#0f0d09;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--txt);font-size:16px;font-family:inherit;margin-bottom:10px}
+input.t:focus,textarea.t:focus{outline:none;border-color:var(--gold)}
+.sum{display:flex;justify-content:space-between;color:var(--mut);padding:3px 0}
+.sum b{color:var(--txt)}
+.btn{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(180deg,#e6c24f,#b8921f);color:#000;font-size:17px;font-weight:900;cursor:pointer;margin-top:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.msg{text-align:center;padding:30px 10px}
+.msg .big{font-size:48px}
+.err{color:var(--bad);font-size:13px;margin:6px 0;text-align:center}
+.mut{color:var(--mut);font-size:12px;text-align:center}
+a{color:var(--gold)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><img src="logo-gold.webp" alt=""><h1 id="sn">TOMMY BARBER</h1><div class="sub" id="ss"></div></header>
+<div id="app"><div class="msg mut">جاري التحميل...</div></div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+apiKey: "AIzaSyD3NFgHKlVKJbZ4_tBaYQbreDOTdK6QI3I",
+authDomain: "tommy-barber.firebaseapp.com",
+databaseURL: "https://tommy-barber-default-rtdb.firebaseio.com",
+projectId: "tommy-barber",
+storageBucket: "tommy-barber.firebasestorage.app",
+messagingSenderId: "401586383604",
+appId: "1:401586383604:web:f3da40e6960cbe86c44ca1",
+measurementId: "G-MQCJCNVDJQ"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAYN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const BIZ=5*3600000;
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const toMin=t=>{const [h,m]=t.split(':').map(Number);return h*60+m};
+const t12=m=>{m=((m%1440)+1440)%1440;const h=Math.floor(m/60),mm=m%60,ap=h>=12?'م':'ص';return (h%12||12)+':'+String(mm).padStart(2,'0')+' '+ap};
+const hhmm=m=>{m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+let P=null,sel={barber:null,svc:{},date:null,time:null};
+function digits(s){return String(s||'').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d))}
+function totals(){let p=0,d=0;(P.services||[]).forEach(s=>{if(sel.svc[s.id]){p+=Number(s.price)||0;d+=Number(s.dur)||30}});return{p,d}}
+function bizToday(){return iso(new Date(Date.now()-BIZ))}
+function dayList(){const out=[],start=new Date(bizToday()+'T12:00:00'),n=Math.min(Number(P.daysAhead)||30,90);for(let i=0;i<n;i++){const d=new Date(start);d.setDate(d.getDate()+i);out.push({iso:iso(d),wd:d.getDay(),dn:d.getDate()})}return out}
+function slotsFor(dateISO){
+  const tot=totals(),dur=Math.max(tot.d,Number(P.step)||30),open=toMin(P.open);let close=toMin(P.close);if(close<=open)close+=1440;
+  const step=Number(P.step)||30,res=[],busy=(((P.busy||{})[dateISO]||{})[sel.barber]||[]).map(b=>{let s=toMin(b.t);if(s<open)s+=1440;return[s,s+(Number(b.d)||60)]});
+  const now=new Date(),realISO=iso(now),nowMin=(realISO===dateISO?0:1440)+now.getHours()*60+now.getMinutes()+(Number(P.minNotice)||0);
+  const isToday=dateISO===bizToday();
+  for(let s=open;s+dur<=close;s+=step){
+    if(isToday&&s<nowMin)continue;
+    if(busy.some(([a,b])=>s<b&&a<s+dur))continue;
+    res.push(s)}
+  return res}
+function render(){
+  const A=$('app');
+  if(!P||!P.enabled){A.innerHTML='<div class="card msg"><div class="big">🔒</div><p>الحجز أونلاين مقفول حالياً.</p>'+(P&&P.salon&&P.salon.phone?'<p>للحجز اتصل بينا: <a dir="ltr" href="tel:'+esc(P.salon.phone)+'">'+esc(P.salon.phone)+'</a></p>':'')+'</div>';return}
+  const bs=P.barbers||[],sv=P.services||[];
+  let h='';
+  if(P.salon.welcome)h+='<div class="welcome">'+esc(P.salon.welcome)+'</div>';
+  h+='<div class="card"><h2><span class="num">1</span>اختار الحلاق</h2><div class="barbers">'+bs.map(b=>{const off=!b.available;return '<div class="b'+(sel.barber===b.id?' on':'')+(off?' off':'')+'" data-b="'+esc(b.id)+'">'+(b.photo?'<img src="'+esc(b.photo)+'" alt="">':'<div class="ph">'+esc((b.name||'?').charAt(0))+'</div>')+'<div class="n">'+esc(b.name)+'</div>'+(off?'<div class="tag">مش متاح حالياً</div>':(b.bio?'<div class="bio">'+esc(b.bio)+'</div>':''))+'</div>'}).join('')+'</div></div>';
+  h+='<div class="card"><h2><span class="num">2</span>اختار الخدمة</h2>'+sv.map(s=>'<label class="svc"><input type="checkbox" data-s="'+esc(s.id)+'"'+(sel.svc[s.id]?' checked':'')+'><span class="nm">'+esc(s.name)+'<div class="du">'+(Number(s.dur)||30)+' دقيقة</div></span><span class="pr">'+(Number(s.price)||0)+' ج.م</span></label>').join('')+'</div>';
+  h+='<div class="card"><h2><span class="num">3</span>اختار اليوم والساعة</h2>';
+  if(!sel.barber||!Object.keys(sel.svc).some(k=>sel.svc[k]))h+='<div class="mut">اختار الحلاق والخدمة الأول.</div>';
+  else{const b=bs.find(x=>x.id===sel.barber);h+='<div class="days">'+dayList().map(d=>{const off=(b.daysOff||[]).includes(d.wd);return '<div class="d'+(sel.date===d.iso?' on':'')+(off?' off':'')+'" data-d="'+d.iso+'"'+(off?' data-off="1"':'')+'><div class="w">'+DAYN[d.wd]+'</div><div class="dn">'+d.dn+'</div></div>'}).join('')+'</div>';
+    if(sel.date){const sl=slotsFor(sel.date);h+=sl.length?'<div class="slots">'+sl.map(m=>'<div class="s'+(sel.time===hhmm(m)?' on':'')+'" data-t="'+hhmm(m)+'">'+t12(m)+'</div>').join('')+'</div>':'<div class="err">مفيش مواعيد فاضية في اليوم ده. جرّب يوم تاني.</div>'}}
+  h+='</div>';
+  if(sel.time){const t=totals();h+='<div class="card"><h2><span class="num">4</span>بياناتك</h2><input class="t" id="nm" placeholder="الاسم" maxlength="60" autocomplete="name"><input class="t" id="ph" placeholder="رقم الموبايل (01xxxxxxxxx)" inputmode="tel" dir="ltr" maxlength="14" autocomplete="tel"><textarea class="t" id="nt" rows="2" placeholder="ملاحظات (اختياري)" maxlength="200"></textarea>'
+    +'<div class="sum"><span>الإجمالي التقريبي</span><b>'+t.p+' ج.م</b></div><div class="sum"><span>المدة</span><b>'+t.d+' دقيقة</b></div><div class="sum"><span>الميعاد</span><b>'+esc((P.barbers.find(x=>x.id===sel.barber)||{}).name)+' • '+sel.date+' • '+t12(toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time))+'</b></div><div class="err" id="er"></div><button class="btn" id="go">إرسال طلب الحجز</button><div class="mut">الطلب بيوصل للصالون وبيتأكد معاك. السعر النهائي بيتحدد وقت الخدمة.</div></div>'}
+  A.innerHTML=h;
+  A.querySelectorAll('[data-b]').forEach(e=>e.onclick=()=>{const b=bs.find(x=>x.id===e.dataset.b);if(!b.available)return;sel.barber=b.id;sel.date=sel.time=null;render()});
+  A.querySelectorAll('[data-s]').forEach(e=>e.onchange=()=>{sel.svc[e.dataset.s]=e.checked;sel.time=null;render()});
+  A.querySelectorAll('[data-d]').forEach(e=>e.onclick=()=>{if(e.dataset.off)return;sel.date=e.dataset.d;sel.time=null;render()});
+  A.querySelectorAll('[data-t]').forEach(e=>e.onclick=()=>{sel.time=e.dataset.t;render();setTimeout(()=>{const n=$('nm');n&&n.scrollIntoView({behavior:'smooth',block:'center'})},50)});
+  const go=$('go');if(go)go.onclick=submit}
+async function submit(){
+  const er=$('er'),go=$('go');er.textContent='';
+  const name=$('nm').value.trim(),phone=digits($('ph').value).replace(/[\s-]/g,''),note=$('nt').value.trim();
+  if(name.length<2){er.textContent='اكتب اسمك';return}
+  if(!/^01[0-9]{9}$/.test(phone)){er.textContent='اكتب رقم موبايل صحيح مكوّن من 11 رقم يبدأ بـ 01';return}
+  let cnt=0;try{const k='bk_'+iso(new Date());cnt=Number(localStorage.getItem(k)||0);if(cnt>=5){er.textContent='وصلت للحد الأقصى من الطلبات النهاردة. اتصل بينا.';return}}catch(e){}
+  const svcs=P.services.filter(s=>sel.svc[s.id]).map(s=>({id:s.id,name:s.name,price:Number(s.price)||0,dur:Number(s.dur)||30})),t=totals(),b=P.barbers.find(x=>x.id===sel.barber);
+  const obj={name,phone,barberId:b.id,barberName:b.name,date:sel.date,time:sel.time,dur:t.d,total:t.p,note,services:svcs,createdAt:firebase.database.ServerValue.TIMESTAMP,source:'web'};
+  go.disabled=true;go.textContent='جاري الإرسال...';
+  let ok=false,last=null;
+  for(let n=1;n<=3&&!ok;n++){try{await db.ref('booking_requests/'+phone+'_'+sel.date+'_'+n).set(obj);ok=true}catch(e){last=e}}
+  if(!ok){go.disabled=false;go.textContent='إرسال طلب الحجز';er.textContent=(last&&/permission/i.test(last.message||''))?'مش قادرين نستلم طلب جديد منك على اليوم ده (وصلت للحد الأقصى). اتصل بينا.':'حصلت مشكلة في الإرسال. جرّب تاني بعد شوية.';return}
+  try{localStorage.setItem('bk_'+iso(new Date()),String(cnt+1))}catch(e){}
+  $('app').innerHTML='<div class="card msg"><div class="big">✅</div><h2 style="color:var(--ok)">وصلنا طلبك</h2><p>'+esc(name)+'، طلبك مع <b>'+esc(b.name)+'</b> يوم <b>'+esc(sel.date)+'</b> الساعة <b>'+t12(toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time))+'</b> اتبعت.</p><p>هنتواصل معاك لتأكيد الحجز.</p>'+(P.salon.phone?'<p><a dir="ltr" href="tel:'+esc(P.salon.phone)+'">'+esc(P.salon.phone)+'</a></p>':'')+'</div>'}
+db.ref('booking_public').once('value').then(s=>{P=s.val();if(P&&P.salon){$('sn').textContent=P.salon.name||'TOMMY BARBER';$('ss').textContent=P.salon.sub||'';document.title='احجز - '+(P.salon.name||'')}if(P){P.barbers=P.barbers||[];P.services=P.services||[]}render()}).catch(()=>{$('app').innerHTML='<div class="card msg"><p>تعذر تحميل الصفحة. جرّب تاني.</p></div>'});
+</script>
+</body>
+</html>

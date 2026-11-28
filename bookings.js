@@ -31,7 +31,7 @@
         }
         function setBkFilter(f) { bkFilter = f; renderBookings(); }
         function renderBookings() {
-            const root = document.getElementById('view-bookings'); if (!root) return;
+            const root = document.getElementById('view-bookings'); if (!root) return; setTimeout(() => { try { bpBadge(); } catch (e) { } }, 0);
             const all = bkArr(), pill = (k, l) => `<button onclick="setBkFilter('${k}')" class="set-pill ${bkFilter === k ? 'on' : ''}">${l}</button>`;
             let list = all.filter(b => bkFilter === 'upcoming' ? bkActive(b) : bkFilter === 'done' ? b.status === 'منفذ' : bkFilter === 'cancelled' ? b.status === 'ملغي' : true);
             list = list.sort((a, b) => bkFilter === 'upcoming' ? bkSortKey(a).localeCompare(bkSortKey(b)) : bkSortKey(b).localeCompare(bkSortKey(a)));
@@ -39,8 +39,9 @@
             const card = b => {
                 const rem = bkRemain(b), act = bkActive(b);
                 const pays = (b.pays || []).map(p => `<div class="flex justify-between text-gray-400 border-t border-bordergold/30 pt-1"><span>${p.kind} • ${esc(BK_PAYM[p.method] || p.method || '')} • ${esc(dwDT(p.at))}${p.note ? ' • ' + esc(p.note) : ''}${p.kind === 'رد' ? ' • من ' + (p.src === 'drawer' ? 'الدرج' : 'الخزنة') : ''}</span><b class="${p.kind === 'رد' ? 'text-red-300' : 'text-emerald-300'}">${p.kind === 'رد' ? '-' : '+'} ${bkMoney(p.amount)}</b></div>`).join('');
-                return `<div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2 text-xs">
-                  <div class="flex justify-between gap-2 items-start"><div><b class="text-white text-sm">${esc(b.clientName)}</b> <span class="px-2 py-0.5 rounded-lg bg-darkbg border border-bordergold text-gold text-[11px]">${esc(b.type)}</span><br><a href="tel:${esc(b.phone || '')}" class="text-gray-400" dir="ltr">${esc(b.phone || '')}</a></div><div class="text-left"><b class="text-gold">${esc(b.date)}</b><br><span class="text-gray-300">${bkTime12(b.time)}</span></div></div>
+                const tdy = act && b.date === getTodayISO();
+                return `<div class="bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2 text-xs${tdy ? ' today-ring' : ''}">
+                  ${tdy ? '<div><span class="px-2 py-0.5 rounded-lg bg-gold text-black text-[11px] font-black">النهارده</span></div>' : ''}<div class="flex justify-between gap-2 items-start"><div><b class="text-white text-sm">${esc(b.clientName)}</b> ${b.source === 'web' ? '<span class="px-2 py-0.5 rounded-lg bg-sky-950/60 text-sky-300 text-[11px] font-black">من صفحة الحجز</span>' : ''} <span class="px-2 py-0.5 rounded-lg bg-darkbg border border-bordergold text-gold text-[11px]">${esc(b.type)}</span><br><a href="tel:${esc(b.phone || '')}" class="text-gray-400" dir="ltr">${esc(b.phone || '')}</a></div><div class="text-left"><b class="text-gold">${esc(b.date)}</b><br><span class="text-gray-300">${bkTime12(b.time)}</span></div></div>
                   <div class="text-gray-300">الحلاق: <b class="text-white">${esc(b.barberName || '-')}</b> • الباكدج: <b class="text-white">${esc(b.pkgName || '-')}</b>${b.notes ? '<br>ملاحظات: ' + esc(b.notes) : ''}</div>
                   <div class="grid grid-cols-3 gap-2 text-center"><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">الإجمالي</div><b class="text-white">${bkMoney(b.total)}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">المدفوع</div><b class="text-emerald-400">${bkMoney(bkNet(b))}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">المتبقي</div><b class="${rem > 0 && act ? 'text-red-300' : 'text-gray-300'}">${bkMoney(act ? rem : 0)}</b></div></div>
                   <div>${bkStatusBadge(b)}</div>${pays}
@@ -98,7 +99,7 @@
                 if (dep > total) { showToast('العربون أكبر من الإجمالي', 'error'); return false; }
                 const save = () => {
                     const rec = b || { id: 'bk' + Date.now().toString(36), no: bkArr().reduce((m, x) => Math.max(m, x.no || 0), 0) + 1, status: 'مقبول', pays: [] };
-                    Object.assign(rec, { clientName: name, phone, type: q('#bk-type').value, barberId: bar ? bar.id : '', barberName: bar ? bar.name : '', date, time, total, notes: q('#bk-notes').value.trim(), items: JSON.parse(JSON.stringify(bkItems)), pkgName: bkItems.map(i => i.name).join(' + ') });
+                    Object.assign(rec, { clientName: name, phone, type: q('#bk-type').value, barberId: bar ? bar.id : '', barberName: bar ? bar.name : '', date, time, total, notes: q('#bk-notes').value.trim(), items: JSON.parse(JSON.stringify(bkItems)), pkgName: bkItems.map(i => i.name).join(' + '), dur: bkItems.reduce((t, i) => t + (typeof bpSvcDur === 'function' ? bpSvcDur(i.cid) : 60) * (i.qty || 1), 0) || (rec.dur || 0) });
                     if (!b) { bkArr().unshift(rec); if (dep > 0) bkPush(rec, dep, q('#bk-depm').value, 'عربون', ''); }
                     logAudit((b ? 'تعديل' : 'إضافة') + ' حجز ' + name); saveState(); renderBookings(); renderDrawer(); byId('ask-box')?.remove();
                 };

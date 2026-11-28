@@ -7,10 +7,11 @@
             renderAll();
             initCloudSync();
             checkBuild();
+            try { renderFootBar(true); } catch (e) { }
         };
         // يتأكد إن كل الملفات الجديدة اتحمّلت (لو ملف ناقص أو قديم بيظهر تحذير)
         function checkBuild() {
-            const need = { 'drawer.js': 'renderDrawer', 'bookings.js': 'renderBookings', 'archive.js': 'renderArchive', 'finance.js': 'finRefresh', 'core.js': 'migrateAuth', 'users-settings.js': 'askBox', 'data-tools.js': 'factoryReset' };
+            const need = { 'drawer.js': 'renderDrawer', 'bookings.js': 'renderBookings', 'archive.js': 'renderArchive', 'bookpage.js': 'renderBookingSettings', 'extras.js': 'renderFootBar', 'finance.js': 'finRefresh', 'core.js': 'migrateAuth', 'users-settings.js': 'askBox', 'data-tools.js': 'factoryReset' };
             const miss = Object.keys(need).filter(f => { try { return typeof eval(need[f]) !== 'function'; } catch (e) { return true; } });
             ['view-bookings', 'view-archive', 'view-drawer', 'tab-bookings', 'tab-archive'].forEach(id => { if (!document.getElementById(id)) miss.push('index.html (' + id + ')'); });
             if (!miss.length) return;
