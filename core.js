@@ -158,14 +158,42 @@
             return JSON.parse(JSON.stringify(defaultState));
         }
 
-        function saveState() {
-            if (!isApplyingRemote) appState._ts = Date.now();
+        // ---- المزامنة: dirty = في تعديلات على الجهاز لسه ماوصلتش للسحابة | base = آخر نسخة معروفة في السحابة ----
+        const LS_DIRTY = 'tb_dirty', LS_BASE = 'tb_base';
+        const isDirty = () => { try { return localStorage.getItem(LS_DIRTY) === '1'; } catch (e) { return false; } };
+        const setDirty = v => { try { v ? localStorage.setItem(LS_DIRTY, '1') : localStorage.removeItem(LS_DIRTY); } catch (e) { } };
+        const getBase = () => { try { return Number(localStorage.getItem(LS_BASE)) || 0; } catch (e) { return 0; } };
+        const setBase = t => { try { localStorage.setItem(LS_BASE, String(t || 0)); } catch (e) { } };
+        let cloudOnline = false, quotaWarned = false;
+        function setSyncUi() {
+            const el = document.getElementById('sync-ind'); if (!el) return;
+            let t, c;
+            if (!cloudRef) { t = navigator.onLine === false ? 'أوفلاين - محفوظ على الجهاز' : 'جاري الاتصال...'; c = navigator.onLine === false ? 'text-amber-300' : 'text-gray-400'; }
+            else if (!cloudOnline || !cloudSynced) { t = isDirty() ? 'أوفلاين - هيترفع لما النت يرجع' : 'أوفلاين'; c = 'text-amber-300'; }
+            else if (isDirty()) { t = 'جاري الرفع...'; c = 'text-sky-300'; }
+            else { t = 'متزامن ✓'; c = 'text-emerald-400'; }
+            el.textContent = t; el.className = 'text-[10px] font-bold whitespace-nowrap ' + c;
+        }
+        function syncNow() {
+            if (!cloudRef || !cloudOnline) { showToast('مفيش نت دلوقتي. التعديلات محفوظة على الجهاز وهتترفع لوحدها لما النت يرجع', 'error'); return; }
+            if (isDirty()) { pushCloud(); showToast('جاري رفع التعديلات...'); return; }
+            cloudRef.once('value').then(sn => { const r = sn.val(); if (r && (r._ts || 0) !== (appState._ts || 0) && !isDirty()) applyRemote(r); showToast('البيانات متزامنة ✓'); }).catch(() => showToast('تعذر الاتصال بالسحابة', 'error'));
+        }
+        function pushCloud() {
+            if (!cloudRef || !cloudSynced) return;
             try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-                if (cloudRef && cloudSynced && !isApplyingRemote) cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
-                if (cloudRef && cloudSynced && !isApplyingRemote) { try { bpSchedule(); } catch (e) { } }
-                if (usbFileHandle) writeToUsbFile();
-            } catch (e) {}
+                const snap = JSON.parse(JSON.stringify(appState)), ts = snap._ts;
+                cloudRef.set(snap).then(() => { setBase(ts); if ((appState._ts || 0) === ts) setDirty(false); setSyncUi(); }).catch(() => { });
+            } catch (e) { }
+        }
+        function saveState(quiet) {
+            // quiet = ترقيع داخلي (ترحيل بيانات) مايتحسبش تعديل ومايبوّظش نسخة السحابة
+            const real = !quiet && !isApplyingRemote;
+            if (real) appState._ts = Date.now();
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); }
+            catch (e) { if (!quotaWarned) { quotaWarned = true; try { showToast('مساحة التخزين على الجهاز ممتلئة! صغّر الصور أو اعمل نسخة احتياطية', 'error'); } catch (x) { } } }
+            if (real) { setDirty(true); pushCloud(); if (cloudRef && cloudSynced) { try { bpSchedule(); } catch (e) { } } setSyncUi(); }
+            try { if (usbFileHandle) writeToUsbFile(); } catch (e) { }
         }
 
         async function linkUsbBackupFolder() {
@@ -200,36 +228,68 @@
             appState.auditLogs.unshift({ id: 'a-' + Date.now(), text, user: currentUser ? currentUser.displayName : 'النظام', time: `${getTodayISO()} ${getTimeStr()}` });
         }
 
+        // تحميل مكتبة Firebase بعد ما البرنامج يشتغل (عشان النت الضعيف مايعلّقش البرنامج)، وبيعيد المحاولة لوحده
+        let fbLoading = false;
+        function loadFirebase() {
+            if (fbLoading) return; fbLoading = true;
+            const urls = ['app', 'database', 'auth'].map(n => `https://www.gstatic.com/firebasejs/10.12.2/firebase-${n}-compat.js`);
+            const run = (i, tries) => {
+                if (i >= urls.length) { fbLoading = false; initCloudSync(); return; }
+                const sc = document.createElement('script'); sc.src = urls[i];
+                sc.onload = () => run(i + 1, 0);
+                sc.onerror = () => { sc.remove(); if (i === 2 && tries >= 1) { run(i + 1, 0); return; } setTimeout(() => run(i, tries + 1), 8000); };
+                document.head.appendChild(sc);
+            };
+            run(0, 0);
+        }
+        window.addEventListener('online', () => { if (typeof firebase === 'undefined' || !cloudRef) { fbLoading = false; initCloudSync(); } setSyncUi(); });
+        window.addEventListener('offline', () => { cloudOnline = false; setSyncUi(); });
         function initCloudSync() {
-            try { if (typeof firebase !== 'undefined' && !firebase.apps.length) firebase.initializeApp(firebaseConfig); if (typeof firebase !== 'undefined') { db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } } catch (e) {}
+            if (typeof firebase === 'undefined' || !firebase.database) { loadFirebase(); return; }
+            try { if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } catch (e) { }
             if (!cloudRef) return;
+            try { db.ref('.info/connected').on('value', s => { cloudOnline = s.val() === true; setSyncUi(); if (cloudOnline && cloudSynced && isDirty()) pushCloud(); }); } catch (e) { }
             const em = localStorage.getItem('tb_sync_email'), pw = localStorage.getItem('tb_sync_pass');
             if (em && pw && firebase.auth) firebase.auth().signInWithEmailAndPassword(em, pw).then(attachCloud).catch(() => { showToast('فشل الربط الآمن: راجع الإيميل والباسورد', 'error'); attachCloud(); });
             else attachCloud();
         }
+        // دمج نسختين لما الجهازين اتعدّلوا في نفس الوقت: بنضم العناصر من الطرفين (بالـ id) والأحدث بيكسب لو نفس العنصر
+        function mergeStates(r, l) {
+            const lNew = (l._ts || 0) >= (r._ts || 0);
+            const isObj = x => x && typeof x === 'object' && !Array.isArray(x);
+            const idArr = a => Array.isArray(a) && a.every(x => isObj(x) && x.id !== undefined);
+            const mv = (rv, lv) => {
+                if (rv === undefined) return lv; if (lv === undefined) return rv;
+                if (idArr(rv) && idArr(lv) && (rv.length || lv.length)) {
+                    const win = lNew ? lv : rv, lose = lNew ? rv : lv, ids = new Set(win.map(x => x.id));
+                    return win.concat(lose.filter(x => !ids.has(x.id)));
+                }
+                if (isObj(rv) && isObj(lv)) { const o = {}; new Set([...Object.keys(rv), ...Object.keys(lv)]).forEach(k => { o[k] = mv(rv[k], lv[k]); }); return o; }
+                return lNew ? lv : rv;
+            };
+            const m = mv(r, l); m._ts = Math.max(r._ts || 0, l._ts || 0) + 1; return m;
+        }
         function attachCloud() {
             cloudRef.on('value', (snap) => {
-                const remote = snap.val(), first = !cloudSynced; cloudSynced = true;
+                const remote = snap.val(), first = !cloudSynced; cloudSynced = true; cloudOnline = true; setSyncUi();
                 if (first) setTimeout(() => { try { bpListen(); bpPublish(); bpBadge(); } catch (e) { } }, 1500);
-                const push = () => cloudRef.set(JSON.parse(JSON.stringify(appState))).catch(() => {});
-                if (remote) {
-                    const rt = remote._ts || 0, lt = appState._ts || 0;
-                    // جهاز جديد/متمسح: ياخد اللي في السحابة دايماً ومايرفعش حاجة فوقها
-                    if (!startedVirgin) {
-                        if (rt && rt === lt) return;
-                        if (rt < lt) { push(); return; }
-                        const localInv = (appState.invoices || []).length, remoteInv = (remote.invoices || []).length;
-                        if (first && localInv > 0 && remoteInv === 0) {
-                            askBox('تنبيه مهم', `<p class="text-gray-200 leading-relaxed text-xs">السحابة فاضية من الفواتير، لكن الجهاز ده فيه <b class="text-gold">${localInv}</b> فاتورة. لو البيانات اتمسحت بالغلط ارفع بيانات الجهاز للسحابة. لو إنت عامل "بداية جديدة" قصداً اختار "خد بيانات السحابة".</p>`, () => { appState._ts = Date.now(); localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); push(); showToast('تم رفع بيانات الجهاز للسحابة'); }, 'ارفع بيانات الجهاز');
-                            const no = document.getElementById('ask-no'); if (no) { no.textContent = 'خد بيانات السحابة'; no.addEventListener('click', () => applyRemote(remote)); }
-                            return;
-                        }
-                    }
-                    applyRemote(remote);
-                } else if (!startedVirgin || first) {
-                    saveState();
+                if (!remote) { if (!startedVirgin || first) saveState(); return; }
+                const rt = remote._ts || 0, lt = appState._ts || 0;
+                if (startedVirgin) { applyRemote(remote); return; }          // جهاز جديد/متمسح: ياخد اللي في السحابة ومايرفعش حاجة فوقها
+                if (rt === lt) { if (isDirty() && rt === getBase()) setDirty(false); setSyncUi(); return; }
+                if (isDirty()) {
+                    if (rt === getBase()) { pushCloud(); return; }            // السحابة زي ما سيبناها، والتعديل بتاعنا بس -> نرفعه
+                    const merged = mergeStates(remote, appState);              // الاتنين اتعدّلوا -> ندمج
+                    applyRemote(merged); saveState(); showToast('تم دمج تعديلات من جهاز تاني'); return;
                 }
-            }, () => { cloudSynced = false; showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
+                const localInv = (appState.invoices || []).length, remoteInv = (remote.invoices || []).length;
+                if (first && localInv > 0 && remoteInv === 0) {
+                    askBox('تنبيه مهم', `<p class="text-gray-200 leading-relaxed text-xs">السحابة فاضية من الفواتير، لكن الجهاز ده فيه <b class="text-gold">${localInv}</b> فاتورة. لو البيانات اتمسحت بالغلط ارفع بيانات الجهاز للسحابة. لو إنت اللي مسحتها (بداية جديدة) خد بيانات السحابة.</p>`, () => { appState._ts = Date.now(); setDirty(true); pushCloud(); }, 'ارفع بيانات الجهاز');
+                    const no = document.getElementById('ask-no'); if (no) { no.textContent = 'خد بيانات السحابة'; no.addEventListener('click', () => applyRemote(remote)); }
+                    return;
+                }
+                applyRemote(remote);
+            }, () => { cloudSynced = false; setSyncUi(); showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
         }
         function applyRemote(remote) {
             isApplyingRemote = true; startedVirgin = false;
@@ -247,9 +307,11 @@
                 invoices: remote.invoices || [],
                 auditLogs: remote.auditLogs || []
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(appState)); } catch (e) { }
+            setBase(remote._ts || 0); setDirty(false);
             try { renderAll(); } finally { isApplyingRemote = false; }
-            if (migrateAuth()) { saveState(); renderAll(); }
+            if (migrateAuth()) { saveState(true); renderAll(); }
+            setSyncUi();
         }
 
         function showToast(msg, type = 'success') {
@@ -264,7 +326,7 @@
         function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 
         // AUTH
-        const MGR_MIN = 10, CASH_MIN = 6, PIN_MAX = 12;
+        const MGR_MIN = 6, CASH_MIN = 4, PIN_MAX = 12;
         const _K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
         function sha256b(msg) {
             let h0 = 0x6a09e667, h1 = 0xbb67ae85, h2 = 0x3c6ef372, h3 = 0xa54ff53a, h4 = 0x510e527f, h5 = 0x9b05688c, h6 = 0x1f83d9ab, h7 = 0x5be0cd19;
@@ -285,10 +347,29 @@
             const out = new Uint8Array(32), ov = new DataView(out.buffer); [h0, h1, h2, h3, h4, h5, h6, h7].forEach((x, i) => ov.setUint32(i * 4, x >>> 0)); return out;
         }
         const _hex = a => [...a].map(x => x.toString(16).padStart(2, '0')).join('');
+        // نسخة سريعة من نفس الحساب (نفس النتيجة بالظبط) عشان الدخول ما يعلقش على الموبايل
+        const _IV = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];
+        function _compress(H, w) {
+            for (let i = 16; i < 64; i++) { const a = w[i - 15], b = w[i - 2]; w[i] = (w[i - 16] + (((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3)) + w[i - 7] + (((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10))) | 0; }
+            let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+            for (let i = 0; i < 64; i++) {
+                const t1 = (h + (((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7))) + ((e & f) ^ (~e & g)) + _K[i] + w[i]) | 0;
+                const t2 = ((((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10))) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+                h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+            }
+            H[0] = (H[0] + a) | 0; H[1] = (H[1] + b) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0; H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+        }
         function hashPass(pass, salt) {
             const enc = new TextEncoder(), s = enc.encode(salt); let h = sha256b(enc.encode(salt + ':' + pass));
-            for (let i = 0; i < 20000; i++) { const m = new Uint8Array(32 + s.length); m.set(h); m.set(s, 32); h = sha256b(m); }
-            return _hex(h);
+            if (s.length !== 32) { for (let i = 0; i < 20000; i++) { const m = new Uint8Array(32 + s.length); m.set(h); m.set(s, 32); h = sha256b(m); } return _hex(h); }
+            const dv = new DataView(s.buffer, s.byteOffset, 32), sw = []; for (let i = 0; i < 8; i++) sw.push(dv.getUint32(i * 4));
+            const hv = new DataView(h.buffer), H = new Int32Array(8), w = new Int32Array(64), hw = new Int32Array(8);
+            for (let i = 0; i < 8; i++) hw[i] = hv.getUint32(i * 4);
+            for (let n = 0; n < 20000; n++) {
+                H.set(_IV); for (let i = 0; i < 8; i++) { w[i] = hw[i]; w[8 + i] = sw[i]; } _compress(H, w);
+                w.fill(0); w[0] = 0x80000000 | 0; w[15] = 512; _compress(H, w); hw.set(H);
+            }
+            const out = new Uint8Array(32), ov = new DataView(out.buffer); for (let i = 0; i < 8; i++) ov.setUint32(i * 4, hw[i] >>> 0); return _hex(out);
         }
         function randBytes(n) { const a = new Uint8Array(n); if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(a); else for (let i = 0; i < n; i++) a[i] = Math.floor(Math.random() * 256); return a; }
         const setUserPass = (u, p) => { u.salt = _hex(randBytes(16)); u.passHash = hashPass(p, u.salt); delete u.password; delete u.pin; };
@@ -334,7 +415,7 @@
         function selectLoginUser(id) { loginUserId = id; clearPin(); renderLoginUsers(); }
         function updatePinDots() {
             const d = document.getElementById('pin-dots'); if (!d) return;
-            const n = Math.max(4, pinBuffer.length);
+            const n = Math.max(minPassLen(appState.users.find(x => x.id === loginUserId)), pinBuffer.length);
             { const f = document.getElementById('forgot-link'); if (f) { const u = appState.users.find(x => x.id === loginUserId); f.classList.toggle('hidden', !(u && isMgrUser(u) && u.recHash)); } }
             d.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-gold' : 'w-3 h-3 rounded-full border border-gold/50'}"></span>`).join('');
         }
@@ -345,14 +426,20 @@
         }
         function backPin() { pinBuffer = pinBuffer.slice(0, -1); updatePinDots(); }
         function clearPin() { pinBuffer = ''; updatePinDots(); }
+        let loginBusy = false;
         function submitLogin() {
+            if (loginBusy) return;
             if (Date.now() < lockedUntil) { showToast('الدخول مقفول مؤقتاً، استنى شوية', 'error'); return; }
             const user = appState.users.find(u => u.id === loginUserId); if (!user) return;
             if (!pinBuffer) { showToast('اكتب كلمة المرور', 'error'); return; }
-            const ok = checkUserPass(user, pinBuffer); clearPin();
-            if (!ok) { registerFail(); return; }
-            clearFails(); document.getElementById('pin-lock-msg').classList.add('hidden');
-            if (user.mustChange) forcePassChange(user, () => completeLogin(user)); else completeLogin(user);
+            const typed = pinBuffer; clearPin(); loginBusy = true;
+            const m = document.getElementById('pin-lock-msg'); if (m) { m.textContent = 'جاري التحقق...'; m.classList.remove('hidden'); m.classList.replace('text-red-400', 'text-gray-400'); }
+            setTimeout(() => {
+                let ok = false; try { ok = checkUserPass(user, typed); } finally { loginBusy = false; if (m) { m.classList.add('hidden'); m.classList.replace('text-gray-400', 'text-red-400'); } }
+                if (!ok) { registerFail(); return; }
+                clearFails();
+                if (user.mustChange) forcePassChange(user, () => completeLogin(user)); else completeLogin(user);
+            }, 30);
         }
         document.addEventListener('keydown', e => {
             const a = document.getElementById('auth-screen'); if (!a || a.classList.contains('hidden') || document.getElementById('sec-box')) return;
@@ -417,7 +504,7 @@
             if (appState.authVersion !== 3) { appState.authVersion = 3; ch = true; }
             return ch;
         }
-        if (migrateAuth()) saveState();
+        if (migrateAuth()) saveState(true);
 
         function completeLogin(user) {
             if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = isMgrUser(user); }

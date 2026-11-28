@@ -1,8 +1,8 @@
         // ===================== EXTRAS: الشريط السفلي + تنبيهات الحجوزات =====================
         // appState.footBar = {enabled,speed:'slow'|'normal'|'fast',items:[...],contactOn,contactLabel,contactPhone}
         // appState.alerts  = {enabled,onOpen,hourBefore,lead}
-        const FOOT_DEFAULT = { enabled: true, speed: 'normal', contactOn: true, contactLabel: 'للتواصل مع المهندس', contactPhone: '01000746687', items: ['سبحان الله وبحمده سبحان الله العظيم', 'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير', 'أستغفر الله العظيم وأتوب إليه', 'اللهم صلِّ وسلِّم على نبينا محمد'] };
-        const fbCfg = () => { const c = appState.footBar = appState.footBar || JSON.parse(JSON.stringify(FOOT_DEFAULT)); c.items = c.items || []; return c; };
+        const FOOT_DEFAULT = { enabled: false, speed: 'normal', contactOn: false, contactLabel: 'للتواصل مع المهندس', contactPhone: '01000746687', items: [] };
+        const fbCfg = () => { if (!appState.footV2) { appState.footV2 = true; appState.footBar = JSON.parse(JSON.stringify(FOOT_DEFAULT)); } const c = appState.footBar = appState.footBar || JSON.parse(JSON.stringify(FOOT_DEFAULT)); c.items = c.items || []; return c; };
         const alCfg = () => (appState.alerts = appState.alerts || { enabled: true, onOpen: true, hourBefore: true, lead: 60 });
         let fbIdx = 0, fbAnim = null, fbLast = '';
         const FB_SPEED = { slow: 38, normal: 70, fast: 120 };

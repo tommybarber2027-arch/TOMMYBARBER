@@ -21,7 +21,7 @@
             });
             appState.permsV2 = true;
             if (currentUser) { const u = appState.users.find(x => x.id === currentUser.id); if (u) currentUser.permissions = u.permissions; }
-            if (ch) saveState();
+            if (ch) saveState(true);
         }
         function finShow(t) { finTab = t; finRefresh(); }
         function finAddExp() {

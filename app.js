@@ -6,6 +6,7 @@
             setRepPeriod('month');
             renderAll();
             initCloudSync();
+            try { setSyncUi(); } catch (e) { }
             checkBuild();
             try { renderFootBar(true); } catch (e) { }
         };
