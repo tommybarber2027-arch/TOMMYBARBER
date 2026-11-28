@@ -119,7 +119,7 @@
             document.getElementById('set-payment-numbers').value = appState.salonInfo.paymentNumbers || '';
             setInvForm(getInvSettings()); applyPaper(getInvSettings()); showSettingsPanel(setPanel);
 
-            document.getElementById('audit-log-box').innerHTML = appState.auditLogs.slice(0, 30).map(a => `
+            document.getElementById('audit-log-box').innerHTML = appState.auditLogs.slice(0, 120).map(a => `
                 <div class="bg-darkbg border border-bordergold/50 rounded-xl p-2.5 flex justify-between items-center">
                     <span><b class="text-gold">${a.user}:</b> ${a.text}</span>
                     <span class="text-[10px] text-gray-500">${a.time}</span>

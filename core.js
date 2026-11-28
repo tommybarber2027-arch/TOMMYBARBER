@@ -226,6 +226,7 @@
 
         function logAudit(text) {
             appState.auditLogs.unshift({ id: 'a-' + Date.now(), text, user: currentUser ? currentUser.displayName : 'النظام', time: `${getTodayISO()} ${getTimeStr()}` });
+            if (appState.auditLogs.length > 600) appState.auditLogs.length = 600;
         }
 
         // تحميل مكتبة Firebase بعد ما البرنامج يشتغل (عشان النت الضعيف مايعلّقش البرنامج)، وبيعيد المحاولة لوحده
@@ -244,13 +245,42 @@
         }
         window.addEventListener('online', () => { if (typeof firebase === 'undefined' || !cloudRef) { fbLoading = false; initCloudSync(); } setSyncUi(); });
         window.addEventListener('offline', () => { cloudOnline = false; setSyncUi(); });
+
+        // ===== بوابة الربط الإجباري: الجهاز لازم يتربط بالسحابة مرة (بإيميل الصالون) قبل ما يسجّل دخول =====
+        const linkedOk = () => { try { return localStorage.getItem('tb_linked_ok') === '1'; } catch (e) { return false; } };
+        let gateOn = !linkedOk(), gateTimer = null, cloudAuthed = false;
+        function gateRender(mode, msg) {
+            if (!gateOn) return;
+            let g = document.getElementById('link-gate');
+            if (!g) { g = document.createElement('div'); g.id = 'link-gate'; g.className = 'fixed inset-0 z-[400] bg-[#0B0A08] flex items-center justify-center p-4 overflow-y-auto'; document.body.appendChild(g); }
+            const inp = 'w-full bg-darkbg border border-bordergold rounded-xl px-3 py-3 text-white text-center';
+            g.innerHTML = `<div class="w-full max-w-sm bg-panelbg border border-bordergold rounded-3xl p-6 space-y-4 text-center"><div class="text-gold font-black text-lg">TOMMY BARBER</div>` + (mode === 'check'
+                ? `<p class="text-gray-300 text-sm">جاري التحقق من ربط الجهاز...</p>`
+                : `<h2 class="text-white font-black">الجهاز ده لازم يتربط الأول</h2><p class="text-gray-400 text-xs leading-relaxed">اكتب إيميل وباسورد الصالون (اللي مع المدير) مرة واحدة. بعدها هتسجّل دخول باسمك وباسوردك عادي.</p>${msg ? `<p class="text-red-400 text-xs font-bold">${msg}</p>` : ''}<input id="gt-e" dir="ltr" type="email" autocomplete="off" placeholder="الإيميل" class="${inp}"><input id="gt-p" dir="ltr" type="password" autocomplete="off" placeholder="الباسورد" class="${inp}"><button type="button" onclick="gateLink()" class="w-full bg-gold text-black font-black py-3 rounded-xl">ربط الجهاز</button>`) + `</div>`;
+            clearTimeout(gateTimer); if (mode === 'check') gateTimer = setTimeout(() => gateRender('form', 'مفيش اتصال بالسحابة. اتأكد من النت وجرّب تاني.'), 25000);
+        }
+        function gateHide() { gateOn = false; clearTimeout(gateTimer); document.getElementById('link-gate')?.remove(); }
+        function gateInit() { if (!gateOn) return; gateRender(localStorage.getItem('tb_sync_email') && localStorage.getItem('tb_sync_pass') ? 'check' : 'form'); }
+        function gateLink() {
+            const e = document.getElementById('gt-e').value.trim(), p = document.getElementById('gt-p').value;
+            if (!e || !p) { gateRender('form', 'اكتب الإيميل والباسورد'); return; }
+            // جهاز عمره ما اتربط: بياناته تجريبية أو قديمة، فبنمسحها ونسحب بيانات الصالون من السحابة
+            if (!localStorage.getItem('tb_sync_email')) { try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(LS_DIRTY); localStorage.removeItem(LS_BASE); } catch (x) { } }
+            localStorage.setItem('tb_sync_email', e); localStorage.setItem('tb_sync_pass', p); gateRender('check'); setTimeout(() => location.reload(), 200);
+        }
+        function gateAuthFail(err) {
+            const bad = /auth\/(invalid-credential|wrong-password|user-not-found|user-disabled|invalid-email|invalid-login-credentials)/.test((err && err.code) || '');
+            if (bad) { try { localStorage.removeItem('tb_linked_ok'); localStorage.removeItem('tb_sync_pass'); } catch (x) { } gateOn = true; gateRender('form', 'الإيميل أو الباسورد غلط، أو الربط اتلغى.'); }
+            else if (gateOn) gateRender('form', 'تعذر الاتصال بالسحابة. اتأكد من النت وجرّب تاني.');
+        }
         function initCloudSync() {
             if (typeof firebase === 'undefined' || !firebase.database) { loadFirebase(); return; }
             try { if (!firebase.apps.length) firebase.initializeApp(firebaseConfig); db = firebase.database(); cloudRef = db.ref('tommy_barber_exact_clone_v7'); } catch (e) { }
             if (!cloudRef) return;
             try { db.ref('.info/connected').on('value', s => { cloudOnline = s.val() === true; setSyncUi(); if (cloudOnline && cloudSynced && isDirty()) pushCloud(); }); } catch (e) { }
             const em = localStorage.getItem('tb_sync_email'), pw = localStorage.getItem('tb_sync_pass');
-            if (em && pw && firebase.auth) firebase.auth().signInWithEmailAndPassword(em, pw).then(attachCloud).catch(() => { showToast('فشل الربط الآمن: راجع الإيميل والباسورد', 'error'); attachCloud(); });
+            if (em && pw && firebase.auth) firebase.auth().signInWithEmailAndPassword(em, pw).then(() => { cloudAuthed = true; attachCloud(); }).catch(err => { gateAuthFail(err); showToast('فشل الربط الآمن: راجع الإيميل والباسورد', 'error'); attachCloud(); });
+            else if (gateOn) { gateRender('form'); }   // جهاز مش مربوط: مفيش اتصال بالسحابة ولا دخول لحد ما يتربط
             else attachCloud();
         }
         // دمج نسختين لما الجهازين اتعدّلوا في نفس الوقت: بنضم العناصر من الطرفين (بالـ id) والأحدث بيكسب لو نفس العنصر
@@ -271,7 +301,7 @@
         }
         function attachCloud() {
             cloudRef.on('value', (snap) => {
-                const remote = snap.val(), first = !cloudSynced; cloudSynced = true; cloudOnline = true; setSyncUi();
+                const remote = snap.val(), first = !cloudSynced; cloudSynced = true; cloudOnline = true; setSyncUi(); if (cloudAuthed) { try { localStorage.setItem('tb_linked_ok', '1'); } catch (x) { } gateHide(); }
                 if (first) setTimeout(() => { try { bpListen(); bpPublish(); bpBadge(); } catch (e) { } }, 1500);
                 if (!remote) { if (!startedVirgin || first) saveState(); return; }
                 const rt = remote._ts || 0, lt = appState._ts || 0;
@@ -289,7 +319,7 @@
                     return;
                 }
                 applyRemote(remote);
-            }, () => { cloudSynced = false; setSyncUi(); showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
+            }, () => { cloudSynced = false; setSyncUi(); if (gateOn) gateRender('form', 'الجهاز مش مربوط. اكتب إيميل وباسورد الصالون.'); showToast('الجهاز مش مربوط بالسحابة (صلاحيات). فعّل الربط الآمن', 'error'); });
         }
         function applyRemote(remote) {
             isApplyingRemote = true; startedVirgin = false;
@@ -394,8 +424,11 @@
 
         let pinBuffer = '', failedAttempts = 0, loginUserId = null;
         let lockedUntil = Number((() => { try { return localStorage.getItem('tommy_lku'); } catch (e) { return 0; } })()) || 0;
+        // سجل محاولات الدخول الفاشلة على الجهاز، بيتنقل لسجل المراجعة أول ما حد يدخل بنجاح
+        function noteFail() { try { const L = JSON.parse(localStorage.getItem('tb_fl') || '[]'), u = (appState.users || []).find(x => x.id === loginUserId); L.push({ n: u ? u.displayName : '?', t: getTodayISO() + ' ' + getTimeStr() }); localStorage.setItem('tb_fl', JSON.stringify(L.slice(-40))); } catch (e) { } }
+        function flushFails() { try { const L = JSON.parse(localStorage.getItem('tb_fl') || '[]'); if (!L.length) return; localStorage.removeItem('tb_fl'); const by = {}; L.forEach(x => { by[x.n] = (by[x.n] || 0) + 1; }); logAudit('⚠ محاولات دخول فاشلة على الجهاز ده: ' + Object.keys(by).map(k => k + ' (' + by[k] + ')').join('، ') + ' - آخر محاولة ' + L[L.length - 1].t); showToast('⚠ كان فيه ' + L.length + ' محاولة دخول فاشلة على الجهاز ده (اتسجلت في سجل المراجعة)', 'error'); } catch (e) { } }
         function registerFail() {
-            failedAttempts++;
+            noteFail(); failedAttempts++;
             if (failedAttempts < 5) { showToast('كلمة المرور غير صحيحة', 'error'); return; }
             let lv = 0; try { lv = Number(localStorage.getItem('tommy_lk')) || 0; } catch (e) {}
             lv++; const secs = 30 * Math.pow(2, Math.min(lv - 1, 7));
@@ -420,7 +453,7 @@
             d.innerHTML = Array.from({ length: n }, (_, i) => `<span class="${i < pinBuffer.length ? 'w-3.5 h-3.5 rounded-full bg-gold' : 'w-3 h-3 rounded-full border border-gold/50'}"></span>`).join('');
         }
         function pressPin(d) {
-            if (Date.now() < lockedUntil) return;
+            if (Date.now() < lockedUntil || gateOn) return;
             if (pinBuffer.length >= PIN_MAX) return;
             pinBuffer += d; updatePinDots();
         }
@@ -428,7 +461,7 @@
         function clearPin() { pinBuffer = ''; updatePinDots(); }
         let loginBusy = false;
         function submitLogin() {
-            if (loginBusy) return;
+            if (loginBusy || gateOn) return;
             if (Date.now() < lockedUntil) { showToast('الدخول مقفول مؤقتاً، استنى شوية', 'error'); return; }
             const user = appState.users.find(u => u.id === loginUserId); if (!user) return;
             if (!pinBuffer) { showToast('اكتب كلمة المرور', 'error'); return; }
@@ -510,6 +543,7 @@
             if (user.permissions) { if (user.permissions.drawer === undefined) user.permissions.drawer = isMgrUser(user); }
             try { const u0 = appState.users.find(x => x.id === user.id); if (u0 && isMgrUser(u0)) { ['pos','invoices','clients','editInvoices','reports','catalog','barbers','attendance','drawer','endShift','bookings','finance','users','settings','archive','partners'].forEach(k => { u0.permissions = u0.permissions || {}; u0.permissions[k] = true; }); user.permissions = u0.permissions; } else if (u0) { u0.permissions = u0.permissions || {}; if (u0.permissions.bookings === undefined) u0.permissions.bookings = !!u0.permissions.pos; if (u0.permissions.archive === undefined) u0.permissions.archive = false; if (u0.permissions.endShift === undefined) u0.permissions.endShift = !!u0.permissions.pos; user.permissions = u0.permissions; } } catch (e) { }
             currentUser = user; try { ensureShift(); } catch (e) { }
+            try { logAudit('تسجيل دخول: ' + user.displayName); flushFails(); if (typeof saveState === 'function') saveState(true); } catch (e) { }
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             document.getElementById('header-user-badge').textContent = `${user.displayName} • ${user.roleTitle}`;

@@ -5,6 +5,7 @@
             if (toEl) toEl.value = today;
             setRepPeriod('month');
             renderAll();
+            try { gateInit(); } catch (e) { }
             initCloudSync();
             try { setSyncUi(); } catch (e) { }
             checkBuild();

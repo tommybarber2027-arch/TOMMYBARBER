@@ -66,7 +66,7 @@
             const inp = 'w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white', e = localStorage.getItem('tb_sync_email') || '';
             askBox('الربط الآمن بالسحابة', `<p class="text-gray-300 text-xs leading-relaxed">اكتب إيميل وباسورد حساب الصالون اللي عملته في Firebase. بيتحفظوا على الجهاز ده بس. لو سبتهم فاضيين، الربط الآمن بيتقفل على الجهاز ده.</p><input id="sy-e" dir="ltr" type="email" placeholder="الإيميل" value="${esc(e)}" class="${inp}"><input id="sy-p" dir="ltr" type="password" placeholder="الباسورد" class="${inp}">`, d => {
                 const em = d.querySelector('#sy-e').value.trim(), pw = d.querySelector('#sy-p').value;
-                if (em && pw) { localStorage.setItem('tb_sync_email', em); localStorage.setItem('tb_sync_pass', pw); } else { localStorage.removeItem('tb_sync_email'); localStorage.removeItem('tb_sync_pass'); }
+                if (em && pw) { localStorage.setItem('tb_sync_email', em); localStorage.setItem('tb_sync_pass', pw); } else { localStorage.removeItem('tb_sync_email'); localStorage.removeItem('tb_sync_pass'); localStorage.removeItem('tb_linked_ok'); }
                 setTimeout(() => location.reload(), 300);
             }, 'حفظ وإعادة تحميل');
         }
