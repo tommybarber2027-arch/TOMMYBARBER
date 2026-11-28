@@ -27,7 +27,7 @@
             if (b.status === 'ملغي') return tag(b.cancel && b.cancel.mode === 'refund' ? 'ملغي ومردود' : 'ملغي (العربون محتفظ به)', 'bg-red-950/60 text-red-300');
             if (b.status === 'منفذ') return tag('منفذ - فاتورة ' + (b.invId || ''), 'bg-emerald-950/60 text-emerald-300');
             const pay = paid <= 0 ? tag('لم يُدفع', 'bg-darkbg text-gray-300') : (bkRemain(b) <= 0 ? tag('مدفوع بالكامل', 'bg-emerald-950/60 text-emerald-300') : tag('عربون', 'bg-golddark text-gold'));
-            return tag(b.status, b.status === 'مقبول' ? 'bg-sky-950/60 text-sky-300' : 'bg-amber-950/60 text-amber-300') + ' ' + pay;
+            return (b.status === 'مقبول' ? tag('✔ تم التأكيد' + (b.confAt ? ' • ' + esc(dwDT(b.confAt)) : ''), 'bg-sky-950/60 text-sky-300') : b.noAns ? tag('📵 مردش - حاول تاني', 'bg-red-950/60 text-red-300') : tag('🆕 طلب جديد - لم يتم الاتصال', 'bg-amber-950/60 text-amber-300')) + ' ' + pay;
         }
         function setBkFilter(f) { bkFilter = f; renderBookings(); }
         function renderBookings() {
@@ -44,11 +44,11 @@
                   ${tdy ? '<div><span class="px-2 py-0.5 rounded-lg bg-gold text-black text-[11px] font-black">النهارده</span></div>' : ''}<div class="flex justify-between gap-2 items-start"><div><b class="text-white text-sm">${esc(b.clientName)}</b> ${b.source === 'web' ? '<span class="px-2 py-0.5 rounded-lg bg-sky-950/60 text-sky-300 text-[11px] font-black">من صفحة الحجز</span>' : ''} <span class="px-2 py-0.5 rounded-lg bg-darkbg border border-bordergold text-gold text-[11px]">${esc(b.type)}</span><br><a href="tel:${esc(b.phone || '')}" class="text-gray-400" dir="ltr">${esc(b.phone || '')}</a></div><div class="text-left"><b class="text-gold">${esc(b.date)}</b><br><span class="text-gray-300">${bkTime12(b.time)}</span></div></div>
                   <div class="text-gray-300">الحلاق: <b class="text-white">${esc(b.barberName || '-')}</b> • الباكدج: <b class="text-white">${esc(b.pkgName || '-')}</b>${b.notes ? '<br>ملاحظات: ' + esc(b.notes) : ''}</div>
                   <div class="grid grid-cols-3 gap-2 text-center"><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">الإجمالي</div><b class="text-white">${bkMoney(b.total)}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">المدفوع</div><b class="text-emerald-400">${bkMoney(bkNet(b))}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">المتبقي</div><b class="${rem > 0 && act ? 'text-red-300' : 'text-gray-300'}">${bkMoney(act ? rem : 0)}</b></div></div>
-                  <div>${bkStatusBadge(b)}</div>${pays}
+                  <div>${bkStatusBadge(b)}</div>${act && b.phone ? `<div class="grid ${b.status === 'مقبول' ? 'grid-cols-2' : 'grid-cols-3'} gap-2"><a href="tel:${esc(b.phone)}" class="text-center bg-emerald-900/50 border border-emerald-700 text-emerald-200 font-black py-2 rounded-xl">📞 اتصال</a><a target="_blank" href="https://wa.me/2${esc(String(b.phone).replace(/\D/g, '').replace(/^0/, ''))}" class="text-center bg-darkbg border border-emerald-700 text-emerald-300 font-bold py-2 rounded-xl">واتساب</a>${b.status === 'مقبول' ? '' : `<button onclick="bkNoAns('${b.id}')" class="bg-darkbg border border-red-800 text-red-300 font-bold py-2 rounded-xl">${b.noAns ? 'رجّعها (لسه ما كلمتوش)' : 'مردش'}</button>`}</div>` : ''}${pays}
                   <div class="grid grid-cols-2 gap-2 pt-1">${act ? `
                     <button onclick="bkAddPay('${b.id}')" class="bg-gold text-black font-black py-2 rounded-xl">إضافة دفعة</button>
                     <button onclick="bkConvert('${b.id}')" class="bg-darkbg border border-emerald-700 text-emerald-300 font-bold py-2 rounded-xl">تنفيذ وتحويل لفاتورة</button>
-                    <button onclick="bkSetStatus('${b.id}','${b.status === 'مقبول' ? 'انتظار' : 'مقبول'}')" class="bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl">${b.status === 'مقبول' ? 'رجّعه انتظار' : 'قبول الحجز'}</button>
+                    ${b.status === 'مقبول' ? `<button onclick="bkSetStatus('${b.id}','انتظار')" class="bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl">رجّعه طلب جديد</button>` : `<button onclick="bkSetStatus('${b.id}','مقبول')" class="bg-sky-900/60 border border-sky-600 text-sky-200 font-black py-2 rounded-xl">✔ تم التأكيد (كلمته)</button>`}
                     <button onclick="bkEdit('${b.id}')" class="bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl">تعديل</button>
                     <button onclick="bkCancel('${b.id}')" class="col-span-2 bg-red-950/40 border border-red-800 text-red-300 font-bold py-2 rounded-xl">إلغاء الحجز</button>` : ''}</div></div>`;
             };
@@ -114,7 +114,8 @@
             b.pays.push(Object.assign({ id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 4), at: new Date().toISOString(), amount, method, kind, note, shiftId: s.id }, extra || {}));
             logAudit(`${kind} حجز ${b.clientName}: ${amount}`);
         }
-        function bkSetStatus(id, st) { const b = bkArr().find(x => x.id === id); if (!b) return; b.status = st; logAudit(`حجز ${b.clientName}: ${st}`); saveState(); renderBookings(); }
+        function bkNoAns(id) { const b = bkArr().find(x => x.id === id); if (!b) return; b.noAns = !b.noAns; saveState(); renderBookings(); }
+        function bkSetStatus(id, st) { const b = bkArr().find(x => x.id === id); if (!b) return; b.status = st; if (st === 'مقبول') { b.confAt = Date.now(); b.confBy = currentUser ? currentUser.name || currentUser.username : ''; b.noAns = false; } else { delete b.confAt; } logAudit(`حجز ${b.clientName}: ${st}`); saveState(); renderBookings(); }
         function bkAddPay(id) {
             const b = bkArr().find(x => x.id === id); if (!b) return; const inp = 'w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white';
             askBox('إضافة دفعة - ' + b.clientName, `<p class="text-gray-300 text-xs">الإجمالي ${bkMoney(b.total)} • المدفوع ${bkMoney(bkNet(b))} • المتبقي <b class="text-gold">${bkMoney(bkRemain(b))}</b></p><input id="bp-amt" type="number" min="0" placeholder="المبلغ" value="${bkRemain(b) || ''}" class="${inp}"><select id="bp-m" class="${inp}"><option value="cash">كاش (يدخل الدرج)</option><option value="visa">فيزا</option><option value="wallet">محفظة / إنستاباي</option></select><input id="bp-note" placeholder="ملاحظة (اختياري)" class="${inp}">`, d => {

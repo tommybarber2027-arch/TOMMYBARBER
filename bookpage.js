@@ -86,11 +86,13 @@
             if (!currentUser?.permissions?.settings) { root.innerHTML = ''; return; }
             const c = bpCfg(), inp = 'w-full bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white', lbl = 'block text-gray-400 mb-1', card = 'bg-panelbg border border-bordergold rounded-2xl p-4 space-y-3 text-xs';
             const times = bkSlots().map(t => `<option value="${t}">${bkTime12(t)}</option>`).join('');
+            setTimeout(bpQrShow, 0);
             const sel = (id, v) => { setTimeout(() => { const e = document.getElementById(id); if (e) e.value = v; }, 0); };
             root.innerHTML = `<div class="space-y-3 max-w-2xl">
               <div class="${card}"><div class="flex items-center justify-between"><h3 class="text-sm font-black text-gold">إعدادات الحجز أونلاين</h3><label class="flex items-center gap-2 text-white font-bold"><input type="checkbox" ${c.enabled ? 'checked' : ''} onchange="bpSet('enabled',this.checked);renderBookingSettings()" class="accent-gold w-5 h-5"> مفعّلة</label></div>
                 <p class="text-gray-300 leading-relaxed">العميل بيفتح الرابط ده من موبايله، يختار الحلاق والخدمة والميعاد، والطلبات بتوصلك في تبويب <b class="text-gold">الحجوزات</b> (في الشريط الرئيسي) بحالة "انتظار" وإنت تقبل أو ترفض. كل اللي تعدله هنا بينزل على الصفحة لوحده.</p>
                 <div class="flex gap-2"><input dir="ltr" readonly value="${esc(bpLink())}" onclick="this.select()" class="${inp} text-gold"><button onclick="bpCopy()" class="px-4 bg-gold text-black font-black rounded-xl">نسخ</button></div>
+                <div class="flex items-center gap-4 pt-1"><div id="bp-qr" class="shrink-0 text-gray-400"></div><div class="space-y-2"><div class="text-white font-black">باركود صفحة الحجز</div><div class="text-gray-400">العميل يصوّره بكاميرا الموبايل ويفتح صفحة الحجز على طول. نزّله أو اطبعه وعلّقه في الصالون أو ابعته على واتساب.</div><div class="flex gap-2"><button onclick="bpQrSave()" class="px-3 py-1.5 bg-gold text-black font-black rounded-xl">تنزيل الباركود</button><button onclick="bpQrPrint()" class="px-3 py-1.5 bg-darkbg border border-bordergold text-gold font-black rounded-xl">طباعة ملصق</button></div></div></div>
                 <div class="flex items-center justify-between"><span id="bp-status" class="text-gray-400">${bpPubAt ? 'اتنشرت آخر تعديلات ' + bpPubAt : ''}</span><button onclick="bpPublish(true)" class="px-3 py-1.5 bg-darkbg border border-bordergold text-gold font-bold rounded-xl">انشر دلوقتي</button></div></div>
               <div class="${card}"><h3 class="text-sm font-black text-white">مواعيد الصالون</h3>
                 <div class="grid grid-cols-2 gap-2"><div><label class="${lbl}">بنفتح الساعة</label><select id="bp-open" onchange="bpSet('open',this.value)" class="${inp}">${times}</select></div><div><label class="${lbl}">بنقفل الساعة</label><select id="bp-close" onchange="bpSet('close',this.value)" class="${inp}">${times}</select></div>
@@ -103,3 +105,74 @@
               <div class="${card}"><h3 class="text-sm font-black text-white">الربط الآمن</h3><p class="text-gray-300 leading-relaxed">بيحمي بيانات الصالون وأرقام العملاء من أي حد معاه رابط قاعدة البيانات. لازم يتفعّل على كل جهاز بنفس الإيميل والباسورد. الحالة على الجهاز ده: <b class="${localStorage.getItem('tb_sync_email') ? 'text-emerald-300' : 'text-red-300'}">${localStorage.getItem('tb_sync_email') ? 'مفعّل (' + esc(localStorage.getItem('tb_sync_email')) + ')' : 'غير مفعّل'}</b></p><button onclick="syncSetupDlg()" class="w-full bg-darkbg border border-bordergold text-gold font-bold py-2.5 rounded-xl">إعداد الربط الآمن</button></div></div>`;
             sel('bp-open', c.open); sel('bp-close', c.close); sel('bp-step', String(c.step));
         }
+
+// ===================== QR code (offline generator, byte mode, ECC M, versions 1-10) =====================
+function qrMake(text) {
+    const data = [...new TextEncoder().encode(text)];
+    const EC = [10, 16, 26, 18, 24, 16, 18, 22, 22, 26], NB = [1, 1, 1, 2, 2, 4, 4, 4, 5, 5];
+    const raw = v => { let r = (16 * v + 128) * v + 64; if (v >= 2) { const n = Math.floor(v / 7) + 2; r -= (25 * n - 10) * n - 55; if (v >= 7) r -= 36; } return r; };
+    let ver = 1;
+    for (; ver <= 10; ver++) { const cap = Math.floor(raw(ver) / 8) - EC[ver - 1] * NB[ver - 1]; if (4 + (ver < 10 ? 8 : 16) + 8 * data.length <= cap * 8) break; }
+    if (ver > 10) return null;
+    const cap = Math.floor(raw(ver) / 8) - EC[ver - 1] * NB[ver - 1], bits = [];
+    const put = (v, n) => { for (let i = n - 1; i >= 0; i--) bits.push((v >>> i) & 1); };
+    put(4, 4); put(data.length, ver < 10 ? 8 : 16); data.forEach(b => put(b, 8));
+    put(0, Math.min(4, cap * 8 - bits.length)); while (bits.length % 8) bits.push(0);
+    for (let p = 0xEC; bits.length < cap * 8; p ^= 0xEC ^ 0x11) put(p, 8);
+    const cw = []; for (let i = 0; i < bits.length; i += 8) cw.push(parseInt(bits.slice(i, i + 8).join(''), 2));
+    // Reed-Solomon
+    const exp = [], log = []; { let x = 1; for (let i = 0; i < 255; i++) { exp[i] = x; log[x] = i; x <<= 1; if (x & 256) x ^= 0x11D; } }
+    const mul = (a, b) => a && b ? exp[(log[a] + log[b]) % 255] : 0;
+    const ecl = EC[ver - 1], nb = NB[ver - 1];
+    let g = [1]; for (let i = 0; i < ecl; i++) { const n = new Array(g.length + 1).fill(0); g.forEach((c, j) => { n[j] ^= c; n[j + 1] ^= mul(c, exp[i]); }); g = n; }
+    const rs = d => { const r = new Array(ecl).fill(0); d.forEach(b => { const f = b ^ r.shift(); r.push(0); for (let i = 0; i < ecl; i++) r[i] ^= mul(g[i + 1], f); }); return r; };
+    const rawCw = Math.floor(raw(ver) / 8), shortN = nb - rawCw % nb, shortLen = Math.floor(rawCw / nb);
+    const blocks = []; for (let i = 0, k = 0; i < nb; i++) { const len = shortLen - ecl + (i < shortN ? 0 : 1); const d = cw.slice(k, k + len); k += len; blocks.push({ d, e: rs(d) }); }
+    const fin = []; for (let i = 0; i < blocks[nb - 1].d.length; i++) blocks.forEach(b => { if (i < b.d.length) fin.push(b.d[i]); });
+    for (let i = 0; i < ecl; i++) blocks.forEach(b => fin.push(b.e[i]));
+    const size = ver * 4 + 17, m = [], fn = [];
+    for (let i = 0; i < size; i++) { m.push(new Array(size).fill(false)); fn.push(new Array(size).fill(false)); }
+    const set = (x, y, v) => { m[y][x] = v; fn[y][x] = true; };
+    for (let i = 0; i < size; i++) { set(6, i, i % 2 == 0); set(i, 6, i % 2 == 0); }
+    const finder = (cx, cy) => { for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) { const x = cx + dx, y = cy + dy; if (x >= 0 && x < size && y >= 0 && y < size) set(x, y, Math.max(Math.abs(dx), Math.abs(dy)) != 2 && Math.max(Math.abs(dx), Math.abs(dy)) != 4); } };
+    finder(3, 3); finder(size - 4, 3); finder(3, size - 4);
+    if (ver > 1) {
+        const na = Math.floor(ver / 7) + 2, step = Math.ceil((ver * 4 + 4) / (na * 2 - 2)) * 2, pos = [6];
+        for (let p = size - 7; pos.length < na; p -= step) pos.splice(1, 0, p);
+        pos.forEach((cy, i) => pos.forEach((cx, j) => { if ((i == 0 && j == 0) || (i == 0 && j == na - 1) || (i == na - 1 && j == 0)) return; for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) set(cx + dx, cy + dy, Math.max(Math.abs(dx), Math.abs(dy)) != 1); }));
+    }
+    const fmt = mask => {
+        const d = mask; let r = d; for (let i = 0; i < 10; i++) r = (r << 1) ^ ((r >>> 9) * 0x537);
+        const b = ((d << 10) | r) ^ 0x5412, bit = i => ((b >>> i) & 1) != 0;
+        for (let i = 0; i <= 5; i++) set(8, i, bit(i)); set(8, 7, bit(6)); set(8, 8, bit(7)); set(7, 8, bit(8)); for (let i = 9; i < 15; i++) set(14 - i, 8, bit(i));
+        for (let i = 0; i < 8; i++) set(size - 1 - i, 8, bit(i)); for (let i = 8; i < 15; i++) set(8, size - 15 + i, bit(i)); set(8, size - 8, true);
+    };
+    fmt(0);
+    if (ver >= 7) { let r = ver; for (let i = 0; i < 12; i++) r = (r << 1) ^ ((r >>> 11) * 0x1F25); const b = (ver << 12) | r; for (let i = 0; i < 18; i++) { const a = size - 11 + i % 3, c = Math.floor(i / 3), v = ((b >>> i) & 1) != 0; set(a, c, v); set(c, a, v); } }
+    let i = 0;
+    for (let right = size - 1; right >= 1; right -= 2) { if (right == 6) right = 5; for (let vert = 0; vert < size; vert++) for (let j = 0; j < 2; j++) { const x = right - j, y = ((right + 1) & 2) == 0 ? size - 1 - vert : vert; if (!fn[y][x] && i < fin.length * 8) { m[y][x] = ((fin[i >>> 3] >>> (7 - (i & 7))) & 1) != 0; i++; } } }
+    const mk = [(x, y) => (x + y) % 2 == 0, (x, y) => y % 2 == 0, (x, y) => x % 3 == 0, (x, y) => (x + y) % 3 == 0, (x, y) => (Math.floor(x / 3) + Math.floor(y / 2)) % 2 == 0, (x, y) => x * y % 2 + x * y % 3 == 0, (x, y) => (x * y % 2 + x * y % 3) % 2 == 0, (x, y) => ((x + y) % 2 + x * y % 3) % 2 == 0];
+    const apply = k => { for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) if (!fn[y][x] && mk[k](x, y)) m[y][x] = !m[y][x]; };
+    const pen = () => {
+        let p = 0;
+        for (let t = 0; t < 2; t++) for (let a = 0; a < size; a++) { let run = 1; for (let b = 1; b < size; b++) { const c = t ? m[b][a] : m[a][b], pv = t ? m[b - 1][a] : m[a][b - 1]; if (c == pv) { run++; if (run == 5) p += 3; else if (run > 5) p++; } else run = 1; } }
+        for (let y = 0; y < size - 1; y++) for (let x = 0; x < size - 1; x++) if (m[y][x] == m[y][x + 1] && m[y][x] == m[y + 1][x] && m[y][x] == m[y + 1][x + 1]) p += 3;
+        let dark = 0; m.forEach(r => r.forEach(v => { if (v) dark++; })); p += Math.floor(Math.abs(dark * 20 - size * size * 10) / (size * size)) * 10; return p;
+    };
+    let best = 0, bp = 1e9;
+    for (let k = 0; k < 8; k++) { apply(k); fmt(k); const p = pen(); if (p < bp) { bp = p; best = k; } apply(k); }
+    apply(best); fmt(best);
+    return m;
+}
+function qrCanvas(text, px) {
+    const m = qrMake(text); if (!m) return null; const q = 4, n = m.length + q * 2, s = Math.max(2, Math.floor((px || 320) / n));
+    const c = document.createElement('canvas'); c.width = c.height = n * s; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.fillStyle = '#000';
+    m.forEach((r, y) => r.forEach((v, x) => { if (v) g.fillRect((x + q) * s, (y + q) * s, s, s); })); return c;
+}
+function bpQrShow() { const c = qrCanvas(bpLink(), 640), box = document.getElementById('bp-qr'); if (!box) return; if (!c) { box.textContent = 'الرابط طويل أوي على الباركود'; return; } c.style.cssText = 'width:200px;height:200px;border-radius:12px;background:#fff'; box.innerHTML = ''; box.appendChild(c); }
+function bpQrSave() { const c = qrCanvas(bpLink(), 1000); if (!c) return; const a = document.createElement('a'); a.download = 'باركود-الحجز.png'; a.href = c.toDataURL('image/png'); document.body.appendChild(a); a.click(); a.remove(); }
+function bpQrPrint() {
+    const c = qrCanvas(bpLink(), 1000); if (!c) return; const nm = (typeof appState !== 'undefined' && appState.settings && (appState.settings.salonName || appState.settings.name)) || 'TOMMY BARBER';
+    const w = window.open('', '_blank'); if (!w) { showToast('اسمح بالنوافذ المنبثقة عشان الطباعة'); return; }
+    w.document.write(`<html dir="rtl"><head><meta charset="utf-8"><title>باركود الحجز</title><style>body{font-family:Tahoma,Arial;text-align:center;padding:40px}h1{font-size:34px;margin:0}h2{font-size:22px;font-weight:normal}img{width:380px;height:380px;margin:20px 0}p{direction:ltr;font-size:14px;color:#555}</style></head><body><h1>${esc(nm)}</h1><h2>احجز ميعادك أونلاين - امسح الباركود</h2><img src="${c.toDataURL('image/png')}"><p>${esc(bpLink())}</p><script>onload=()=>setTimeout(()=>print(),300)<\/script></body></html>`); w.document.close();
+}

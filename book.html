@@ -6,49 +6,72 @@
 <title>احجز ميعادك</title>
 <meta name="theme-color" content="#0B0A08">
 <link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0B0A08;--panel:#16130E;--line:#3a2f1c;--gold:#D4AF37;--gold2:#8a6d1c;--txt:#f3ead6;--mut:#9a8f78;--ok:#34d399;--bad:#f87171}
+:root{--bg:#0A0907;--bg2:#12100c;--panel:#15120d;--line:#2b2417;--line2:#3d3220;--gold:#D9B44A;--gold2:#a8842a;--txt:#f5eedd;--mut:#a39878;--ok:#34d399;--bad:#f87171}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:"Segoe UI",Tahoma,Arial,sans-serif;font-size:15px;line-height:1.6;padding:0 16px 40px}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(1000px 500px at 50% -150px,#2a2110 0,var(--bg) 70%) no-repeat,var(--bg);color:var(--txt);font-family:"Cairo","Segoe UI",Tahoma,Arial,sans-serif;font-size:15px;line-height:1.55;padding:0 16px 120px;min-height:100vh}
 .wrap{max-width:520px;margin:0 auto}
-header{text-align:center;padding:24px 0 8px}
-header img{width:120px;height:auto}
-h1{margin:6px 0 0;font-size:22px;color:var(--gold);letter-spacing:1px}
+header{text-align:center;padding:26px 0 14px}
+header img{width:84px;height:auto;filter:drop-shadow(0 6px 18px rgba(217,180,74,.25))}
+h1{margin:8px 0 0;font-size:21px;font-weight:900;color:var(--gold);letter-spacing:2px}
 .sub{color:var(--mut);font-size:13px}
-.welcome{text-align:center;color:var(--txt);margin:10px 0 18px}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
-.card h2{margin:0 0 12px;font-size:15px;color:var(--gold)}
-.num{display:inline-block;width:24px;height:24px;border-radius:50%;background:var(--gold);color:#000;text-align:center;line-height:24px;font-size:13px;font-weight:900;margin-left:8px}
-.barbers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.b{background:#0f0d09;border:2px solid var(--line);border-radius:16px;padding:8px 4px;text-align:center;cursor:pointer;position:relative}
-.b img,.b .ph{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 4px;display:block;background:#1d1810;border:1px solid var(--line)}
-.b .ph{display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:24px;font-weight:900}
-.b .n{font-size:13px;font-weight:700}
-.b .bio{font-size:11px;color:var(--mut)}
-.b.on{border-color:var(--gold);background:#1c1608}
-.b.off{opacity:.45;cursor:not-allowed}
-.b .tag{font-size:10px;color:var(--bad)}
-.svc{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
-.svc:first-of-type{border-top:0}
-.svc input{width:20px;height:20px;accent-color:var(--gold)}
-.svc .nm{flex:1}
-.svc .pr{color:var(--gold);font-weight:800}
-.svc .du{color:var(--mut);font-size:12px}
-.days{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
-.d{flex:0 0 auto;min-width:66px;text-align:center;background:#0f0d09;border:2px solid var(--line);border-radius:14px;padding:8px 6px;cursor:pointer}
-.d .w{font-size:12px;color:var(--mut)}.d .dn{font-size:18px;font-weight:900}
-.d.on{border-color:var(--gold);background:#1c1608}.d.off{opacity:.35;cursor:not-allowed}
-.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.s{background:#0f0d09;border:2px solid var(--line);border-radius:12px;padding:10px 0;text-align:center;cursor:pointer;font-weight:700;font-size:14px}
+.welcome{text-align:center;color:var(--mut);margin:0 0 14px;font-size:13.5px}
+.steps{display:flex;align-items:center;gap:6px;margin:6px 0 18px}
+.st{flex:1;text-align:center;font-size:11.5px;color:var(--mut);font-weight:600}
+.st i{display:block;height:4px;border-radius:4px;background:var(--line);margin-bottom:6px;transition:.3s}
+.st.done i{background:var(--gold2)}.st.on i{background:var(--gold)}.st.on{color:var(--gold)}
+.st.done{cursor:pointer}
+.card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:up .35s ease}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card h2{margin:0 0 4px;font-size:18px;font-weight:900}
+.card .hint{color:var(--mut);font-size:12.5px;margin-bottom:14px}
+.barbers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.b{background:var(--bg);border:1.5px solid var(--line);border-radius:18px;padding:16px 8px 12px;text-align:center;cursor:pointer;transition:.2s}
+.b:active{transform:scale(.97)}
+.b img,.b .ph{width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:block;background:#1d1810;border:2px solid var(--line2)}
+.b .ph{display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:30px;font-weight:900}
+.b .n{font-size:15px;font-weight:700}
+.b .bio{font-size:11.5px;color:var(--mut)}
+.b.on{border-color:var(--gold);background:#1b1608;box-shadow:0 0 0 3px rgba(217,180,74,.15)}
+.b.off{opacity:.4;cursor:not-allowed}
+.b .tag{font-size:11px;color:var(--bad)}
+.svc{display:flex;align-items:center;gap:12px;padding:13px 14px;margin-bottom:8px;background:var(--bg);border:1.5px solid var(--line);border-radius:14px;cursor:pointer;transition:.2s}
+.svc .ck{width:22px;height:22px;border-radius:7px;border:2px solid var(--line2);flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:transparent;font-size:14px;font-weight:900}
+.svc.on{border-color:var(--gold);background:#1b1608}
+.svc.on .ck{background:var(--gold);border-color:var(--gold);color:#000}
+.svc .nm{flex:1;font-weight:700}
+.svc .du{color:var(--mut);font-size:12px;font-weight:400}
+.svc .pr{color:var(--gold);font-weight:900;white-space:nowrap}
+.svc .pr small{font-size:11px;font-weight:600;color:var(--mut)}
+.days{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.d{flex:0 0 auto;width:62px;text-align:center;background:var(--bg);border:1.5px solid var(--line);border-radius:16px;padding:9px 4px;cursor:pointer}
+.d .w{font-size:11.5px;color:var(--mut)}.d .dn{font-size:20px;font-weight:900;line-height:1.2}.d .mo{font-size:10.5px;color:var(--mut)}
+.d.on{border-color:var(--gold);background:var(--gold);color:#000}.d.on .w,.d.on .mo{color:#3b2e08}
+.d.off{opacity:.3;cursor:not-allowed}
+.quick{display:flex;align-items:center;justify-content:space-between;gap:10px;background:rgba(217,180,74,.09);border:1px dashed var(--gold2);border-radius:14px;padding:11px 14px;margin:2px 0 14px;cursor:pointer}
+.quick b{color:var(--gold)}.quick span{font-size:13px}
+.per{font-size:12.5px;color:var(--mut);margin:14px 0 8px;font-weight:700;display:flex;align-items:center;gap:8px}
+.per:after{content:"";flex:1;height:1px;background:var(--line)}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.s{background:var(--bg);border:1.5px solid var(--line);border-radius:11px;padding:9px 0;text-align:center;cursor:pointer;font-weight:700;font-size:13px;transition:.15s}
 .s.on{border-color:var(--gold);background:var(--gold);color:#000}
-input.t,textarea.t{width:100%;background:#0f0d09;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--txt);font-size:16px;font-family:inherit;margin-bottom:10px}
+input.t,textarea.t{width:100%;background:var(--bg);border:1.5px solid var(--line);border-radius:13px;padding:13px 14px;color:var(--txt);font-size:16px;font-family:inherit;margin-bottom:10px}
 input.t:focus,textarea.t:focus{outline:none;border-color:var(--gold)}
-.sum{display:flex;justify-content:space-between;color:var(--mut);padding:3px 0}
-.sum b{color:var(--txt)}
-.btn{width:100%;border:0;border-radius:14px;padding:15px;background:linear-gradient(180deg,#e6c24f,#b8921f);color:#000;font-size:17px;font-weight:900;cursor:pointer;margin-top:8px}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.recap{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:6px 0 12px}
+.sum{display:flex;justify-content:space-between;gap:10px;color:var(--mut);padding:4px 0;font-size:13.5px}
+.sum b{color:var(--txt);text-align:left}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(10,9,7,.92);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.bar .in{max-width:520px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.bar .tot{flex:1;font-size:12px;color:var(--mut);line-height:1.3}.bar .tot b{display:block;font-size:17px;color:var(--gold)}
+.btn{border:0;border-radius:14px;padding:14px 26px;background:linear-gradient(180deg,#ecc958,#b8921f);color:#000;font-size:16px;font-weight:900;cursor:pointer;font-family:inherit}
+.btn.full{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.back{background:none;border:0;color:var(--mut);font-family:inherit;font-size:13px;cursor:pointer;padding:0 0 10px}
 .msg{text-align:center;padding:30px 10px}
-.msg .big{font-size:48px}
+.msg .big{font-size:52px}
 .err{color:var(--bad);font-size:13px;margin:6px 0;text-align:center}
 .mut{color:var(--mut);font-size:12px;text-align:center}
 a{color:var(--gold)}
@@ -98,26 +121,47 @@ function slotsFor(dateISO){
     if(busy.some(([a,b])=>s<b&&a<s+dur))continue;
     res.push(s)}
   return res}
+const STEPS=['الحلاق','الخدمة','الموعد','بياناتك'];let step=1;
+const MON=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const hasSvc=()=>Object.keys(sel.svc).some(k=>sel.svc[k]);
+function dayLbl(i,wd){return i===0?'اليوم':i===1?'بكرة':DAYN[wd]}
+function periods(sl){const g=[['الظهر',[]],['العصر',[]],['المساء',[]],['بعد منتصف الليل',[]]];sl.forEach(m=>{const h=Math.floor((m%1440)/60);(m>=1440?g[3]:h<16?g[0]:h<20?g[1]:g[2])[1].push(m)});return g.filter(x=>x[1].length)}
 function render(){
   const A=$('app');
   if(!P||!P.enabled){A.innerHTML='<div class="card msg"><div class="big">🔒</div><p>الحجز أونلاين مقفول حالياً.</p>'+(P&&P.salon&&P.salon.phone?'<p>للحجز اتصل بينا: <a dir="ltr" href="tel:'+esc(P.salon.phone)+'">'+esc(P.salon.phone)+'</a></p>':'')+'</div>';return}
-  const bs=P.barbers||[],sv=P.services||[];
+  const bs=P.barbers||[],sv=P.services||[],t=totals(),bar=bs.find(x=>x.id===sel.barber);
   let h='';
-  if(P.salon.welcome)h+='<div class="welcome">'+esc(P.salon.welcome)+'</div>';
-  h+='<div class="card"><h2><span class="num">1</span>اختار الحلاق</h2><div class="barbers">'+bs.map(b=>{const off=!b.available;return '<div class="b'+(sel.barber===b.id?' on':'')+(off?' off':'')+'" data-b="'+esc(b.id)+'">'+(b.photo?'<img src="'+esc(b.photo)+'" alt="">':'<div class="ph">'+esc((b.name||'?').charAt(0))+'</div>')+'<div class="n">'+esc(b.name)+'</div>'+(off?'<div class="tag">مش متاح حالياً</div>':(b.bio?'<div class="bio">'+esc(b.bio)+'</div>':''))+'</div>'}).join('')+'</div></div>';
-  h+='<div class="card"><h2><span class="num">2</span>اختار الخدمة</h2>'+sv.map(s=>'<label class="svc"><input type="checkbox" data-s="'+esc(s.id)+'"'+(sel.svc[s.id]?' checked':'')+'><span class="nm">'+esc(s.name)+'<div class="du">'+(Number(s.dur)||30)+' دقيقة</div></span><span class="pr">'+(Number(s.price)||0)+' ج.م</span></label>').join('')+'</div>';
-  h+='<div class="card"><h2><span class="num">3</span>اختار اليوم والساعة</h2>';
-  if(!sel.barber||!Object.keys(sel.svc).some(k=>sel.svc[k]))h+='<div class="mut">اختار الحلاق والخدمة الأول.</div>';
-  else{const b=bs.find(x=>x.id===sel.barber);h+='<div class="days">'+dayList().map(d=>{const off=(b.daysOff||[]).includes(d.wd);return '<div class="d'+(sel.date===d.iso?' on':'')+(off?' off':'')+'" data-d="'+d.iso+'"'+(off?' data-off="1"':'')+'><div class="w">'+DAYN[d.wd]+'</div><div class="dn">'+d.dn+'</div></div>'}).join('')+'</div>';
-    if(sel.date){const sl=slotsFor(sel.date);h+=sl.length?'<div class="slots">'+sl.map(m=>'<div class="s'+(sel.time===hhmm(m)?' on':'')+'" data-t="'+hhmm(m)+'">'+t12(m)+'</div>').join('')+'</div>':'<div class="err">مفيش مواعيد فاضية في اليوم ده. جرّب يوم تاني.</div>'}}
-  h+='</div>';
-  if(sel.time){const t=totals();h+='<div class="card"><h2><span class="num">4</span>بياناتك</h2><input class="t" id="nm" placeholder="الاسم" maxlength="60" autocomplete="name"><input class="t" id="ph" placeholder="رقم الموبايل (01xxxxxxxxx)" inputmode="tel" dir="ltr" maxlength="14" autocomplete="tel"><textarea class="t" id="nt" rows="2" placeholder="ملاحظات (اختياري)" maxlength="200"></textarea>'
-    +'<div class="sum"><span>الإجمالي التقريبي</span><b>'+t.p+' ج.م</b></div><div class="sum"><span>المدة</span><b>'+t.d+' دقيقة</b></div><div class="sum"><span>الميعاد</span><b>'+esc((P.barbers.find(x=>x.id===sel.barber)||{}).name)+' • '+sel.date+' • '+t12(toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time))+'</b></div><div class="err" id="er"></div><button class="btn" id="go">إرسال طلب الحجز</button><div class="mut">الطلب بيوصل للصالون وبيتأكد معاك. السعر النهائي بيتحدد وقت الخدمة.</div></div>'}
+  if(step===1&&P.salon.welcome)h+='<div class="welcome">'+esc(P.salon.welcome)+'</div>';
+  h+='<div class="steps">'+STEPS.map((n,i)=>'<div class="st'+(i+1===step?' on':i+1<step?' done':'')+'" data-g="'+(i+1)+'"><i></i>'+n+'</div>').join('')+'</div>';
+  if(step>1)h+='<button class="back" id="bk">→ رجوع</button>';
+  let foot='';
+  if(step===1){
+    h+='<div class="card"><h2>اختار الحلاق</h2><div class="hint">اضغط على الحلاق اللي تحب تحجز معاه</div><div class="barbers">'+bs.map(b=>{const off=!b.available;return '<div class="b'+(sel.barber===b.id?' on':'')+(off?' off':'')+'" data-b="'+esc(b.id)+'">'+(b.photo?'<img src="'+esc(b.photo)+'" alt="">':'<div class="ph">'+esc((b.name||'?').charAt(0))+'</div>')+'<div class="n">'+esc(b.name)+'</div>'+(off?'<div class="tag">مش متاح حالياً</div>':(b.bio?'<div class="bio">'+esc(b.bio)+'</div>':''))+'</div>'}).join('')+'</div></div>';
+  }else if(step===2){
+    h+='<div class="card"><h2>اختار الخدمة</h2><div class="hint">تقدر تختار أكتر من خدمة</div>'+sv.map(s=>'<div class="svc'+(sel.svc[s.id]?' on':'')+'" data-s="'+esc(s.id)+'"><span class="ck">✓</span><span class="nm">'+esc(s.name)+'<div class="du">'+(Number(s.dur)||30)+' دقيقة</div></span><span class="pr">'+(Number(s.price)||0)+' <small>ج.م</small></span></div>').join('')+'</div>';
+    foot='<div class="tot">'+(hasSvc()?t.d+' دقيقة<b>'+t.p+' ج.م</b>':'اختار خدمة للمتابعة')+'</div><button class="btn" id="nx"'+(hasSvc()?'':' disabled')+'>التالي</button>';
+  }else if(step===3){
+    const days=dayList();
+    h+='<div class="card"><h2>اختار الموعد</h2><div class="hint">مع '+esc(bar.name)+' • '+t.d+' دقيقة</div><div class="days">'+days.map((d,i)=>{const off=(bar.daysOff||[]).includes(d.wd);return '<div class="d'+(sel.date===d.iso?' on':'')+(off?' off':'')+'" data-d="'+d.iso+'"'+(off?' data-off="1"':'')+'><div class="w">'+dayLbl(i,d.wd)+'</div><div class="dn">'+d.dn+'</div><div class="mo">'+MON[Number(d.iso.slice(5,7))-1]+'</div></div>'}).join('')+'</div>';
+    if(!sel.date){const nx=days.find(d=>!(bar.daysOff||[]).includes(d.wd)&&slotsFor(d.iso).length);if(nx){const f=slotsFor(nx.iso)[0];h+='<div class="quick" data-q="'+nx.iso+'|'+hhmm(f)+'"><span>⚡ أقرب ميعاد متاح: <b>'+(nx.iso===bizToday()?'النهارده':DAYN[nx.wd]+' '+nx.dn+' '+MON[Number(nx.iso.slice(5,7))-1])+' - '+t12(f)+'</b></span><span style="color:var(--gold)">احجزه ←</span></div>'}h+='<div class="mut">أو اختار اليوم اللي يناسبك من فوق.</div>'}
+    else{const sl=slotsFor(sel.date);h+=sl.length?periods(sl).map(g=>'<div class="per">'+g[0]+'</div><div class="slots">'+g[1].map(m=>'<div class="s'+(sel.time===hhmm(m)?' on':'')+'" data-t="'+hhmm(m)+'">'+t12(m)+'</div>').join('')+'</div>').join(''):'<div class="err">مفيش مواعيد فاضية في اليوم ده. جرّب يوم تاني.</div>'}
+    h+='</div>';
+  }else{
+    const tm=toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time),dt=new Date(sel.date+'T12:00:00');
+    h+='<div class="card"><h2>بياناتك</h2><div class="hint">خطوة أخيرة وتتأكد حجزك</div><div class="recap"><div class="sum"><span>الحلاق</span><b>'+esc(bar.name)+'</b></div><div class="sum"><span>الخدمات</span><b>'+esc(P.services.filter(x=>sel.svc[x.id]).map(x=>x.name).join(' + '))+'</b></div><div class="sum"><span>الميعاد</span><b>'+DAYN[dt.getDay()]+' '+dt.getDate()+' '+MON[dt.getMonth()]+' • '+t12(tm)+'</b></div><div class="sum"><span>المدة</span><b>'+t.d+' دقيقة</b></div><div class="sum"><span>الإجمالي التقريبي</span><b style="color:var(--gold)">'+t.p+' ج.م</b></div></div>'
+      +'<input class="t" id="nm" placeholder="الاسم" maxlength="60" autocomplete="name"><input class="t" id="ph" placeholder="رقم الموبايل (01xxxxxxxxx)" inputmode="tel" dir="ltr" maxlength="14" autocomplete="tel"><textarea class="t" id="nt" rows="2" placeholder="ملاحظات (اختياري)" maxlength="200"></textarea><div class="err" id="er"></div><button class="btn full" id="go">تأكيد وإرسال الطلب</button><div class="mut" style="margin-top:10px">الطلب بيوصل للصالون وبيتأكد معاك. السعر النهائي بيتحدد وقت الخدمة.</div></div>';
+  }
   A.innerHTML=h;
-  A.querySelectorAll('[data-b]').forEach(e=>e.onclick=()=>{const b=bs.find(x=>x.id===e.dataset.b);if(!b.available)return;sel.barber=b.id;sel.date=sel.time=null;render()});
-  A.querySelectorAll('[data-s]').forEach(e=>e.onchange=()=>{sel.svc[e.dataset.s]=e.checked;sel.time=null;render()});
+  let fb=document.getElementById('fbar');if(!fb){fb=document.createElement('div');fb.id='fbar';fb.className='bar';document.body.appendChild(fb)}
+  fb.style.display=foot?'block':'none';fb.innerHTML=foot?'<div class="in">'+foot+'</div>':'';
+  A.querySelectorAll('[data-g]').forEach(e=>e.onclick=()=>{const g=Number(e.dataset.g);if(g<step){step=g;render()}});
+  const bk=$('bk');if(bk)bk.onclick=()=>{step--;render();scrollTo(0,0)};
+  A.querySelectorAll('[data-b]').forEach(e=>e.onclick=()=>{const b=bs.find(x=>x.id===e.dataset.b);if(!b.available)return;if(sel.barber!==b.id){sel.date=sel.time=null}sel.barber=b.id;step=2;render();scrollTo(0,0)});
+  A.querySelectorAll('[data-s]').forEach(e=>e.onclick=()=>{sel.svc[e.dataset.s]=!sel.svc[e.dataset.s];sel.time=null;sel.date=null;render()});
+  const nx=document.getElementById('nx');if(nx)nx.onclick=()=>{step=3;render();scrollTo(0,0)};
   A.querySelectorAll('[data-d]').forEach(e=>e.onclick=()=>{if(e.dataset.off)return;sel.date=e.dataset.d;sel.time=null;render()});
-  A.querySelectorAll('[data-t]').forEach(e=>e.onclick=()=>{sel.time=e.dataset.t;render();setTimeout(()=>{const n=$('nm');n&&n.scrollIntoView({behavior:'smooth',block:'center'})},50)});
+  A.querySelectorAll('[data-q]').forEach(e=>e.onclick=()=>{const q=e.dataset.q.split('|');sel.date=q[0];sel.time=q[1];step=4;render();scrollTo(0,0)});
+  A.querySelectorAll('[data-t]').forEach(e=>e.onclick=()=>{sel.time=e.dataset.t;step=4;render();scrollTo(0,0)});
   const go=$('go');if(go)go.onclick=submit}
 async function submit(){
   const er=$('er'),go=$('go');er.textContent='';
@@ -130,9 +174,9 @@ async function submit(){
   go.disabled=true;go.textContent='جاري الإرسال...';
   let ok=false,last=null;
   for(let n=1;n<=3&&!ok;n++){try{await db.ref('booking_requests/'+phone+'_'+sel.date+'_'+n).set(obj);ok=true}catch(e){last=e}}
-  if(!ok){go.disabled=false;go.textContent='إرسال طلب الحجز';er.textContent=(last&&/permission/i.test(last.message||''))?'مش قادرين نستلم طلب جديد منك على اليوم ده (وصلت للحد الأقصى). اتصل بينا.':'حصلت مشكلة في الإرسال. جرّب تاني بعد شوية.';return}
+  if(!ok){go.disabled=false;go.textContent='تأكيد وإرسال الطلب';er.textContent=(last&&/permission/i.test(last.message||''))?'مش قادرين نستلم طلب جديد منك على اليوم ده (وصلت للحد الأقصى). اتصل بينا.':'حصلت مشكلة في الإرسال. جرّب تاني بعد شوية.';return}
   try{localStorage.setItem('bk_'+iso(new Date()),String(cnt+1))}catch(e){}
-  $('app').innerHTML='<div class="card msg"><div class="big">✅</div><h2 style="color:var(--ok)">وصلنا طلبك</h2><p>'+esc(name)+'، طلبك مع <b>'+esc(b.name)+'</b> يوم <b>'+esc(sel.date)+'</b> الساعة <b>'+t12(toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time))+'</b> اتبعت.</p><p>هنتواصل معاك لتأكيد الحجز.</p>'+(P.salon.phone?'<p><a dir="ltr" href="tel:'+esc(P.salon.phone)+'">'+esc(P.salon.phone)+'</a></p>':'')+'</div>'}
+  document.getElementById('fbar')&&(document.getElementById('fbar').style.display='none');$('app').innerHTML='<div class="card msg"><div class="big">✅</div><h2 style="color:var(--ok)">وصلنا طلبك</h2><p>'+esc(name)+'، طلبك مع <b>'+esc(b.name)+'</b> يوم <b>'+esc(sel.date)+'</b> الساعة <b>'+t12(toMin(sel.time)<toMin(P.open)?toMin(sel.time)+1440:toMin(sel.time))+'</b> اتبعت.</p><p>هنتواصل معاك لتأكيد الحجز.</p>'+(P.salon.phone?'<p><a dir="ltr" href="tel:'+esc(P.salon.phone)+'">'+esc(P.salon.phone)+'</a></p>':'')+'</div>'}
 db.ref('booking_public').once('value').then(s=>{P=s.val();if(P&&P.salon){$('sn').textContent=P.salon.name||'TOMMY BARBER';$('ss').textContent=P.salon.sub||'';document.title='احجز - '+(P.salon.name||'')}if(P){P.barbers=P.barbers||[];P.services=P.services||[]}render()}).catch(()=>{$('app').innerHTML='<div class="card msg"><p>تعذر تحميل الصفحة. جرّب تاني.</p></div>'});
 </script>
 </body>
