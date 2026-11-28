@@ -14,7 +14,7 @@
         function ptGuard(owner) { if (ptCan(owner)) return true; showToast('تقدر تعدّل بنودك إنت بس', 'error'); return false; }
         function ptData() {
             const p = appState.partners = appState.partners || {};
-            if (!p.list || !p.list.length) p.list = [{ id: 'p_fady', name: 'فادي', target: 350000 }, { id: 'p_zizo', name: 'زيزو', target: 350000 }, { id: 'p_hani', name: 'هاني', target: 350000 }];
+            if (!p.list) p.list = [];
             p.exp = p.exp || []; p.tr = p.tr || []; p.owed = p.owed || []; p.ext = p.ext || []; p.log = p.log || []; p.trash = p.trash || [];
             // المحذوف يفضل محذوف حتى لو جهاز قديم رجّعه في المزامنة (إلا لو اتعمل له استرجاع)
             if (p.trash.length) { const gone = new Set(p.trash.map(x => x.kind + ':' + x.id)); ['exp', 'tr', 'owed', 'ext'].forEach(k => { if (p[k].some(x => gone.has(k + ':' + x.id))) p[k] = p[k].filter(x => !gone.has(k + ':' + x.id)); }); }
@@ -77,15 +77,16 @@
             if (!currentUser?.permissions?.partners) { root.innerHTML = ''; return; }
             const d = ptData(), c = ptCalc(), sup = ptSuper(), me = ptMine();
             if (ptOpen) { const r = c.rows.find(x => x.p.id === ptOpen); if (r) { root.innerHTML = ptStatement(r); return; } ptOpen = null; }
+            if (!d.list.length) { root.innerHTML = `<div class="${ptCard} text-center py-8"><h2 class="text-sm font-black text-gold">الشركاء</h2><p class="text-gray-300 leading-relaxed">لسه ماتسجّلش شركاء. سجّل الشركاء (كام شريك، واسم كل واحد، وحصته)، واختار الشريك الإداري اللي بيدير المشروع.</p>${sup ? `<button onclick="ptEditPartners()" class="${ptBtnG} py-2.5">إعداد الشركاء</button>` : '<p class="text-gray-500">المدير الأساسي هو اللي يعدّ الشركاء.</p>'}</div>`; return; }
             const cards = c.rows.map(r => { const pct = r.p.target > 0 ? Math.max(0, Math.min(100, Math.round(r.net / r.p.target * 100))) : 100, can = ptCan(r.p.id);
-                return `<div class="${ptCard}"><div class="flex items-center justify-between"><b class="text-white text-sm">${esc(r.p.name)}${me === r.p.id ? ' <span class="text-[10px] text-gold">(إنت)</span>' : ''}</b><span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${r.rem <= 0 ? 'bg-emerald-950/60 text-emerald-300' : 'bg-amber-950/60 text-amber-300'}">${r.rem <= 0 ? (r.rem < 0 ? 'زيادة ' + ptM(-r.rem) : 'خلّص حصته ✓') : 'متبقي ' + ptM(r.rem)}</span></div>
+                return `<div class="${ptCard}"><div class="flex items-center justify-between"><b class="text-white text-sm">${esc(r.p.name)}${r.p.mgr ? ' <span class="text-[10px] bg-gold/20 text-gold rounded px-1.5 py-0.5">الشريك الإداري</span>' : ''}${me === r.p.id ? ' <span class="text-[10px] text-gold">(إنت)</span>' : ''}</b><span class="px-2 py-0.5 rounded-lg text-[11px] font-black ${r.rem <= 0 ? 'bg-emerald-950/60 text-emerald-300' : 'bg-amber-950/60 text-amber-300'}">${r.rem <= 0 ? (r.rem < 0 ? 'زيادة ' + ptM(-r.rem) : 'خلّص حصته ✓') : 'متبقي ' + ptM(r.rem)}</span></div>
                 <div class="grid grid-cols-2 gap-2 text-center"><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">مساهمته الصافية</div><b class="text-gold">${ptM(r.net)}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">حصته</div><b class="text-white">${ptM(r.p.target)}</b></div></div>
                 <div class="h-2 rounded-full bg-darkbg overflow-hidden"><div class="h-full bg-gold" style="width:${pct}%"></div></div>${r.unconf ? `<div class="text-amber-300">${r.unconf} تحويل لسه ما أكدش استلامه</div>` : ''}
                 <div class="flex flex-wrap gap-1.5 pt-1"><button onclick="ptView('${r.p.id}')" class="${ptBtnG}">كشف الحساب</button>${can ? `<button onclick="ptAddExp(null,'${r.p.id}')" class="${ptBtn}">+ بند</button><button onclick="ptNote('${r.p.id}')" class="${ptBtn}">📝 دفتر</button><button onclick="ptAddTr(null,'${r.p.id}')" class="${ptBtn}">+ تحويل</button>` : ''}<button onclick="ptPrint('${r.p.id}')" class="${ptBtn}">🖨</button></div></div>`; }).join('');
             const settle = c.settle.length ? c.settle.map(s => `<div class="flex justify-between bg-darkbg rounded-xl px-3 py-2"><span><b class="text-white">${esc(ptName(s.from))}</b> يدفع لـ <b class="text-white">${esc(ptName(s.to))}</b></span><b class="text-gold">${ptM(s.amt)}</b></div>`).join('') : '<p class="text-emerald-300">الحسابات متساوية.</p>';
             const owedG = ptGroupBy(d.owed, 'payee'), owedTot = d.owed.reduce((s, x) => s + (Number(x.amt) || 0), 0), extTot = d.ext.reduce((s, x) => s + (Number(x.amt) || 0), 0);
             const gm = ptGroupBy(d.exp, 'item').map(g => `<div class="flex justify-between bg-darkbg rounded-xl px-3 py-2"><span class="text-white">${esc(g.name)} <span class="text-gray-500">(${g.n})</span></span><b class="text-gold">${ptM(g.sum)}</b></div>`).join('');
-            const missing = sup ? ptSeedMissing() : 0;
+            const missing = sup && !d.noSeed && d.seeded && d.list.length >= 2 ? ptSeedMissing() : 0;   // كشف فادي الأولي بس لو اتستورد قبل كده (مش بيظهر لأي عميل جديد)
             root.innerHTML = `<div class="flex flex-wrap items-center gap-2"><h2 class="text-sm font-black text-gold ml-2">الشركاء</h2>${sup ? `<button onclick="ptEditPartners()" class="mr-auto ${ptBtn}">الشركاء والحصص</button>` : ''}</div>
               <div class="grid grid-cols-3 gap-2 text-xs"><div class="bg-panelbg border border-bordergold rounded-xl p-3 text-center"><div class="text-gray-400">إجمالي المصروف</div><b class="text-gold text-base">${ptM(c.total)}</b></div><div class="bg-panelbg border border-bordergold rounded-xl p-3 text-center"><div class="text-gray-400">إجمالي المتبقي على الشركاء</div><b class="text-amber-300 text-base">${ptM(c.rows.reduce((s, r) => s + Math.max(0, r.rem), 0))}</b></div><div class="bg-panelbg border border-bordergold rounded-xl p-3 text-center"><div class="text-gray-400">نصيب كل شريك بالتساوي</div><b class="text-white text-base">${ptM(c.share)}</b></div></div>
               <div class="grid gap-3 md:grid-cols-3">${cards}</div>
@@ -97,6 +98,7 @@
               <details class="${ptCard}"><summary class="text-sm font-black text-white cursor-pointer">كل المصروفات مجمّعة حسب الاسم (${ptM(c.total)})</summary><div class="space-y-1.5 pt-2">${gm || '<p class="text-gray-500">مفيش.</p>'}</div></details>
               ${sup ? `<details class="${ptCard}"><summary class="text-sm font-black text-white cursor-pointer">سلة المحذوفات (${d.trash.length})</summary><div class="space-y-1.5 pt-2">${d.trash.map((x, i) => `<div class="flex items-center justify-between gap-2 bg-darkbg rounded-xl px-3 py-2"><div class="min-w-0"><div class="text-white font-bold truncate">${ptKindName[x.kind] || ''}: ${esc(x.rec.item || ('تحويل ' + ptName(x.rec.from) + ' ← ' + ptName(x.rec.to)))} ${ptM(x.rec.amt)}</div><div class="text-gray-500">حذفه ${esc(x.by)} • ${esc(ptDT(x.at))}</div></div><button onclick="ptRestore(${i})" class="${ptBtnG} !px-2 !py-1 shrink-0">استرجاع</button></div>`).join('') || '<p class="text-gray-500">فاضية.</p>'}</div></details>` : ''}
               <details class="${ptCard}"><summary class="text-sm font-black text-white cursor-pointer">سجل التعديلات (${d.log.length})</summary><div class="space-y-1 pt-2 max-h-72 overflow-y-auto">${d.log.slice(0, 150).map(l => `<div class="bg-darkbg rounded-lg px-3 py-1.5"><span class="text-gray-500">${esc(ptDT(l.at))} • ${esc(l.by)}</span><br><span class="text-gray-200">${esc(l.t)}</span></div>`).join('') || '<p class="text-gray-500">مفيش.</p>'}</div></details>
+              ${sup ? `<details class="${ptCard}"><summary class="text-sm font-black text-red-300 cursor-pointer">إعادة الضبط (للمدير الأساسي)</summary><div class="space-y-2 pt-2"><p class="text-gray-400 leading-relaxed">للبدء من جديد (مثلاً قبل عرض البرنامج على عميل). المسح نهائي، فاعمل نسخة احتياطية الأول لو محتاجها.</p><button onclick="ptResetData()" class="w-full bg-red-950/40 border border-red-800/60 text-red-300 font-bold py-2 rounded-xl">تصفير الحركات (بنود وتحويلات ومستحقات) مع إبقاء الشركاء</button><button onclick="ptResetAll()" class="w-full bg-red-950/40 border border-red-800/60 text-red-300 font-bold py-2 rounded-xl">مسح الشركاء والحركات والبدء من الصفر</button></div></details>` : ''}
               ${missing ? `<button onclick="ptSeed()" class="w-full ${ptBtn} text-gold py-2">استيراد/استرجاع كشف فادي الأولي (${missing} بند ناقص)</button>` : ''}`;
         }
         function ptView(id) { ptOpen = id; renderPartners(); window.scrollTo(0, 0); }
@@ -116,7 +118,7 @@
         function ptToggleGroup() { ptGroup = !ptGroup; renderPartners(); }
         function ptSave(msg) { saveState(); renderPartners(); if (msg) showToast(msg); }
         // المالك الافتراضي للإضافة: الشريك المربوط بالمستخدم، أو اللي مفتوح دفتره، أو أول شريك (للمدير)
-        const ptDefOwner = pre => ptMine() || pre || ptOpen || ptData().list[0].id;
+        const ptDefOwner = pre => ptMine() || pre || ptOpen || (ptData().list[0] || {}).id;
         const ptOwnerSel = (sel, label) => ptSuper() ? `<div><label class="${ptLbl}">${label}</label><select id="pt-by" class="${ptInp}">${ptOpts(sel)}</select></div>` : `<input type="hidden" id="pt-by" value="${esc(ptMine() || '')}"><p class="text-gray-400 text-xs">${label}: <b class="text-white">${esc(ptName(ptMine()))}</b></p>`;
         function ptAddExp(id, pre) {
             const d = ptData(), e = id ? d.exp.find(x => x.id === id) : null;
@@ -214,27 +216,33 @@
             ptLog('استرجاع ' + (x.rec.item || 'تحويل ' + x.rec.amt) + ' (حذفه ' + x.by + ')'); ptSave('تم الاسترجاع');
         }
         const ptKindName = { exp: 'بند', tr: 'تحويل', owed: 'التزام', ext: 'بند خارجي' };
-        // إدارة الشركاء (المدير العام بس): تعديل الاسم والحصة، إضافة شريك، حذف شريك فاضي
+        // إدارة الشركاء (المدير الأساسي بس): الاسم والحصة والشريك الإداري، إضافة شريك، حذف شريك فاضي
+        function ptReadRows() { const d = ptData(), mi = (document.querySelector('input[name="pt-mgr"]:checked') || {}).value; d.list.forEach((p, i) => { const n = byId('pn-' + i), g = byId('pg-' + i); if (n && n.value.trim()) p.name = n.value.trim(); if (g && g.value !== '') p.target = Number(g.value) || 0; p.mgr = String(i) === mi; }); }
         function ptEditPartners() {
-            if (!ptSuper()) { showToast('للمدير العام بس', 'error'); return; }
+            if (!ptSuper()) { showToast('للمدير الأساسي بس', 'error'); return; }
             const d = ptData(), used = id => d.exp.some(e => e.by === id) || d.tr.some(t => t.from === id || t.to === id) || (appState.users || []).some(u => u.partnerId === id);
-            askBox('الشركاء والحصص', `<div class="space-y-2">${d.list.map((p, i) => `<div class="grid grid-cols-[1fr_1fr_auto] gap-2 items-center"><input id="pn-${i}" class="${ptInp}" value="${esc(p.name)}" placeholder="الاسم (مثلاً: مستر هاني)"><input id="pg-${i}" type="number" min="0" class="${ptInp}" value="${p.target}">${used(p.id) ? '<span class="w-6"></span>' : `<button type="button" onclick="ptRemovePartner('${p.id}')" class="text-red-400 font-black">×</button>`}</div>`).join('')}<button type="button" onclick="ptAddPartner()" class="w-full bg-darkbg border border-bordergold text-gold font-black py-2 rounded-xl">+ شريك جديد</button><p class="text-gray-500 text-xs">الاسم والحصة المتفق عليها. الشريك اللي عليه حركات أو مربوط بمستخدم مايتحذفش.</p></div>`, () => {
-                const vals = d.list.map((p, i) => ({ name: byId('pn-' + i).value.trim(), target: Number(byId('pg-' + i).value) }));
-                if (vals.some(v => !v.name || !(v.target >= 0))) { showToast('راجع الأسماء والحصص', 'error'); return false; }
-                d.list.forEach((p, i) => { p.name = vals[i].name; p.target = vals[i].target; }); ptLog('تعديل الشركاء والحصص'); ptSave('تم الحفظ');
+            askBox('الشركاء والحصص', `<div class="space-y-2"><p class="text-gray-400 text-xs leading-relaxed">اكتب اسم كل شريك وحصته المتفق عليها، واختار <b class="text-white">الشريك الإداري</b> (اللي بيدير المشروع).</p>${d.list.length ? `<div class="grid grid-cols-[auto_1fr_1fr_auto] gap-2 text-[10px] text-gray-500 px-1"><span>إداري</span><span>الاسم</span><span>الحصة</span><span></span></div>` : '<p class="text-amber-300 text-xs">لسه مفيش شركاء. اضغط "+ شريك جديد".</p>'}${d.list.map((p, i) => `<div class="grid grid-cols-[auto_1fr_1fr_auto] gap-2 items-center"><input type="radio" name="pt-mgr" value="${i}" ${p.mgr ? 'checked' : ''} class="accent-gold"><input id="pn-${i}" class="${ptInp}" value="${esc(p.name)}" placeholder="اسم الشريك"><input id="pg-${i}" type="number" min="0" class="${ptInp}" value="${p.target}" placeholder="الحصة"><span class="w-6 text-center">${used(p.id) ? '' : `<button type="button" onclick="ptRemovePartner('${p.id}')" class="text-red-400 font-black">×</button>`}</span></div>`).join('')}<button type="button" onclick="ptAddPartner()" class="w-full bg-darkbg border border-bordergold text-gold font-black py-2 rounded-xl">+ شريك جديد</button><p class="text-gray-500 text-xs">الشريك اللي عليه حركات أو مربوط بمستخدم مايتحذفش.</p></div>`, () => {
+                ptReadRows(); if (d.list.some(p => !p.name || !(p.target >= 0))) { showToast('راجع الأسماء والحصص', 'error'); return false; }
+                ptLog('تعديل الشركاء والحصص'); ptSave('تم الحفظ');
             }, 'حفظ');
         }
         function ptAddPartner() {
             if (!ptSuper()) return; const d = ptData(); if (d.list.length >= 8) { showToast('الحد الأقصى 8 شركاء', 'error'); return; }
-            const keep = d.list.map((p, i) => ({ name: byId('pn-' + i) ? byId('pn-' + i).value : p.name, target: byId('pg-' + i) ? byId('pg-' + i).value : p.target }));
-            d.list.forEach((p, i) => { if (keep[i].name.trim()) p.name = keep[i].name.trim(); if (keep[i].target !== '') p.target = Number(keep[i].target) || 0; });
-            d.list.push({ id: 'p' + Date.now().toString(36), name: 'شريك جديد', target: d.list[0] ? d.list[0].target : 0 }); ptLog('إضافة شريك جديد'); saveState(); byId('ask-box')?.remove(); renderPartners(); ptEditPartners();
+            ptReadRows(); d.list.push({ id: 'p' + Date.now().toString(36), name: 'شريك ' + (d.list.length + 1), target: d.list.length ? d.list[d.list.length - 1].target : 0, mgr: false });
+            ptLog('إضافة شريك جديد'); saveState(); byId('ask-box')?.remove(); renderPartners(); ptEditPartners();
         }
         function ptRemovePartner(id) {
             if (!ptSuper()) return; const d = ptData();
-            if (d.list.length <= 1) { showToast('لازم يفضل شريك واحد على الأقل', 'error'); return; }
             if (d.exp.some(e => e.by === id) || d.tr.some(t => t.from === id || t.to === id) || (appState.users || []).some(u => u.partnerId === id)) { showToast('عليه حركات أو مربوط بمستخدم', 'error'); return; }
-            const nm = ptName(id); d.list = d.list.filter(p => p.id !== id); ptLog('حذف شريك ' + nm); saveState(); byId('ask-box')?.remove(); renderPartners(); ptEditPartners();
+            ptReadRows(); const nm = ptName(id); d.list = d.list.filter(p => p.id !== id); ptLog('حذف شريك ' + nm); saveState(); byId('ask-box')?.remove(); renderPartners(); ptEditPartners();
+        }
+        function ptResetData() {
+            if (!ptSuper()) { showToast('للمدير الأساسي بس', 'error'); return; }
+            confirmDanger('هيتمسح كل البنود والتحويلات والمستحقات والمدفوعات الخارجية وسلة المحذوفات وسجل الشركاء. الشركاء وحصصهم هيفضلوا.', () => { const d = ptData(); d.exp = []; d.tr = []; d.owed = []; d.ext = []; d.trash = []; d.log = []; d.noSeed = true; d.seeded = false; ptOpen = null; ptLog('تصفير حركات الشركاء'); ptSave('تم التصفير'); });
+        }
+        function ptResetAll() {
+            if (!ptSuper()) { showToast('للمدير الأساسي بس', 'error'); return; }
+            confirmDanger('هيتمسح كل الشركاء وحصصهم وكل حركاتهم، وتبدأ إعداد الشركاء من الصفر. المستخدمين المربوطين بشركاء هيتفك ربطهم.', () => { const d = ptData(); d.list = []; d.exp = []; d.tr = []; d.owed = []; d.ext = []; d.trash = []; d.log = []; d.noSeed = true; d.seeded = false; ptOpen = null; (appState.users || []).forEach(u => { delete u.partnerId; }); ptLog('مسح الشركاء والبدء من الصفر'); ptSave('تم المسح. ابدأ بإعداد الشركاء'); });
         }
         // استيراد كشف فادي الأولي (مرة واحدة). z = دفعها زيكو (برّه الحساب)، y = دفعها زيزو
         const PT_SEED = [['بضاعة الكهرباء', 20000], ['مصنعية محمد الكهربائي', 5000], ['أدوات تنظيف', 500], ['شحن كارت الكهرباء', 200], ['دفع استلام شحن الأربع أعدان', 70], ['أبو السعود', 10000], ['خطوط فودافون', 450], ['شحن كارت الكهرباء', 500, 'z'], ['جمال النجار', 250], ['مسامير زائد زاوية', 130], ['أدوات لتنظيف القزاز الواجهة', 150], ['أكل للنظافة القزاز والأرضية', 150], ['شحن كارت الكهرباء', 500], ['شحن كارت المياه', 500, 'z'], ['قير الباركيه', 200], ['سيليكون للباركيه', 120], ['جمال النجار للباركيه', 1700], ['أنس', 5000], ['ما شابك للسيراميك', 130], ['مادة لزق السيراميك', 1260], ['بلاط', 11000, 'y'], ['تسقية البلاط بالألوان', 170], ['مصنعية تركيب البلاط بالوزر', 3500], ['حسين النقاش', 10000], ['حسين النقاش', 5000], ['تنظيف المكان ورمي الزبالة', 250], ['خرطوم 6 م للتكييف', 170], ['ترسيكل الخشب من البيت الحديث', 150], ['أبو السعود', 16000], ['شحن كارت الكهرباء', 500, 'z'], ['شحن كارت المياه', 500, 'z'], ['شحن كارت المياه', 500, 'z'], ['إصلاح كمبيوتر', 1700], ['واي فاي + مشترك + كابلين باور + وصلة + بادا', 850], ['أنس', 7000], ['كاميرات', 9500]];
@@ -246,7 +254,7 @@
             return n;
         }
         function ptSeed() {
-            if (!ptSuper()) return; const n = ptSeedMissing(); if (!n) { showToast('كل البنود موجودة'); return; }
+            if (!ptSuper() || ptData().list.length < 1) return; const n = ptSeedMissing(); if (!n) { showToast('كل البنود موجودة'); return; }
             askConfirm(`هيضيف ${n} بند ناقص من كشف فادي الأولي (البلاط 11,000 على زيزو، وبنود زيكو في "خارج حساب الشركاء"، والتزام متبقي الكاميرات 7,270). اللي موجود فعلاً مش هيتكرر.`, () => {
                 const d = ptData(); d.trash = d.trash.filter(x => !/^seed/.test(x.id)); const gone = new Set(), fady = d.list[0].id, zizo = (d.list[1] || d.list[0]).id;
                 PT_SEED.forEach((r, i) => {

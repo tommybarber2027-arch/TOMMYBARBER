@@ -39,6 +39,26 @@
             const blob = new Blob([JSON.stringify(rec, null, 1)], { type: 'application/json' }), a = document.createElement('a');
             a.href = URL.createObjectURL(blob); a.download = 'tommy-archive-' + rec.month + '.json'; document.body.appendChild(a); a.click(); a.remove();
         }
+        function arCommit(m) {
+            const d = arCollect(m), n = d.invoices.length + d.finExpenses.length + d.finAdv.length + d.shifts.length + d.bookings.length; if (!n) return null;
+            const rec = { id: 'ar' + Date.now().toString(36) + m.replace('-', ''), month: m, at: new Date().toISOString(), by: currentUser.displayName, summary: arSummary(d, m), vaultDelta: arVaultDelta(d), data: JSON.parse(JSON.stringify(d)) };
+            const ids = k => new Set(d[k].map(x => x.id));
+            const maxInv = d.invoices.reduce((t, i) => Math.max(t, i.id), 0); appState.lastInvId = Math.max(appState.lastInvId || 0, maxInv, ...appState.invoices.map(i => i.id), 0);
+            appState.invoices = appState.invoices.filter(x => !ids('invoices').has(x.id));
+            ['finExpenses', 'finAdv', 'advances', 'bookings'].forEach(k => { const s = ids(k); appState[k] = (appState[k] || []).filter(x => !s.has(x.id)); });
+            const ss = ids('shifts'); appState.shifts = appState.shifts.filter(x => !ss.has(x.id));
+            appState.vaultBase = Number(appState.vaultBase || 0) + rec.vaultDelta; arArr().unshift(rec); logAudit('أرشفة شهر ' + m); return rec;
+        }
+        function arDoAll() {
+            if (!currentUser?.permissions?.archive) { showToast('غير مصرح لك', 'error'); return; }
+            const ms = arMonths().filter(m => { const d = arCollect(m); return d.invoices.length + d.finExpenses.length + d.finAdv.length + d.shifts.length + d.bookings.length > 0; });
+            if (!ms.length) { showToast('مفيش شهور قديمة تتأرشف', 'error'); return; }
+            askConfirm(`هنأرشف كل الشهور المنتهية دفعة واحدة (${ms.length} شهر: ${ms.join('، ')}). كل الفواتير والمصاريف والسلف والشيفتات والحجوزات المنتهية فيها هتتشال من الشغل اليومي والتقارير وتتحفظ هنا في الأرشيف، ورصيد الخزنة مش هيتغير. الشهر الحالي مش بيتأرشف. تقدر ترجّع أي شهر. نسخة ملف واحدة هتنزل على جهازك.`, () => {
+                const recs = ms.map(arCommit).filter(Boolean); saveState();
+                const blob = new Blob([JSON.stringify(recs, null, 1)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'tommy-archive-all-' + getTodayISO() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+                renderAll(); showToast('تمت أرشفة ' + recs.length + ' شهر');
+            }, 'أرشف الكل');
+        }
         function arDo() {
             if (!currentUser?.permissions?.archive) { showToast('غير مصرح لك', 'error'); return; }
             const m = document.getElementById('ar-month').value; if (!m) { showToast('اختار الشهر', 'error'); return; }
@@ -46,14 +66,7 @@
             if (!n) { showToast('مفيش بيانات في الشهر ده', 'error'); return; }
             const sm = arSummary(d, m);
             askConfirm(`هنأرشف شهر ${m}: ${d.invoices.length} فاتورة، ${d.shifts.length} شيفت، ${d.finExpenses.length} مصروف، ${d.finAdv.length} سلفة، ${d.bookings.length} حجز منتهي. هتتشال من الشاشات اليومية والتقارير، ورصيد الخزنة مش هيتغير. تنبيه: مرتبات وعمولات الشهر ده مش هتتحسب بعد الأرشفة، فاتأكد إنك صرفتها. الأرشيف بيتحفظ جوه البرنامج وبينزل منه نسخة ملف على جهازك.`, () => {
-                const rec = { id: 'ar' + Date.now().toString(36), month: m, at: new Date().toISOString(), by: currentUser.displayName, summary: sm, vaultDelta: arVaultDelta(d), data: JSON.parse(JSON.stringify(d)) };
-                const ids = k => new Set(d[k].map(x => x.id));
-                const maxInv = d.invoices.reduce((t, i) => Math.max(t, i.id), 0); appState.lastInvId = Math.max(appState.lastInvId || 0, maxInv, ...appState.invoices.map(i => i.id), 0);
-                appState.invoices = appState.invoices.filter(x => !ids('invoices').has(x.id));
-                ['finExpenses', 'finAdv', 'advances', 'bookings'].forEach(k => { const s = ids(k); appState[k] = (appState[k] || []).filter(x => !s.has(x.id)); });
-                const ss = ids('shifts'); appState.shifts = appState.shifts.filter(x => !ss.has(x.id));
-                appState.vaultBase = Number(appState.vaultBase || 0) + rec.vaultDelta;
-                arArr().unshift(rec); logAudit('أرشفة شهر ' + m); saveState(); arDownload(rec); renderAll(); showToast('تمت الأرشفة ونزلت نسخة على جهازك');
+                const rec = arCommit(m); if (!rec) return; saveState(); arDownload(rec); renderAll(); showToast('تمت الأرشفة ونزلت نسخة على جهازك');
             }, 'أرشف');
         }
         function arRestore(id) {
@@ -93,7 +106,7 @@
             if (!currentUser?.permissions?.archive) { root.innerHTML = '<p class="text-gray-400 text-xs">للمدير فقط.</p>'; return; }
             const months = arMonths(), card = 'bg-panelbg border border-bordergold rounded-2xl p-4 space-y-2 text-xs';
             root.innerHTML = `<div class="${card}"><h2 class="text-sm font-black text-gold">أرشفة شهر</h2><p class="text-gray-300 leading-relaxed">بتنقل فواتير وشيفتات ومصاريف وسلف وحجوزات منتهية في شهر قديم من الشغل اليومي للأرشيف. الشهر الحالي مش بيتأرشف. تقدر تفتحه وتطبع منه وترجّعه في أي وقت.</p>
-              <div class="flex gap-2"><select id="ar-month" class="flex-1 bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">${months.map(m => `<option>${m}</option>`).join('') || '<option value="">مفيش شهور قديمة</option>'}</select><button onclick="arDo()" class="bg-gold text-black font-black px-4 rounded-xl">أرشف</button></div></div>
+              <div class="flex gap-2"><select id="ar-month" class="flex-1 bg-darkbg border border-bordergold rounded-xl px-3 py-2 text-white">${months.map(m => `<option>${m}</option>`).join('') || '<option value="">مفيش شهور قديمة</option>'}</select><button onclick="arDo()" class="bg-gold text-black font-black px-4 rounded-xl">أرشف</button></div><button onclick="arDoAll()" class="w-full bg-darkbg border border-bordergold text-gold font-black py-2 rounded-xl">أرشفة كل الشهور المنتهية دفعة واحدة</button><div class="bg-darkbg rounded-xl p-3 text-gray-400 leading-relaxed"><b class="text-gray-200">الفرق بين الأرشيف والمسح:</b><br>• <b class="text-white">الأرشيف</b>: بيحفظ تاريخ الشهور القديمة بعيد عن الشغل اليومي والتقارير، وتقدر تفتحه وتطبعه وترجّعه.<br>• <b class="text-white">بداية جديدة / المسح</b> (من الإعدادات): بيمسح نهائي ومفيش رجوع.</div></div>
               ${arArr().map(r => `<div class="${card}"><div class="flex justify-between items-center"><b class="text-white text-sm">شهر ${esc(r.month)}</b><span class="text-gray-500">أُرشف ${dwDT(r.at)} • ${esc(r.by || '')}</span></div>
                 <div class="grid grid-cols-3 gap-2 text-center"><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">كسبت</div><b class="text-emerald-400">${arMoney(r.summary.income)}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">صرفت</div><b class="text-red-400">${arMoney(r.summary.out)}</b></div><div class="bg-darkbg rounded-xl p-2"><div class="text-gray-400">${r.summary.net < 0 ? 'خسران' : 'ربحان'}</div><b class="${r.summary.net < 0 ? 'text-red-400' : 'text-gold'}">${arMoney(Math.abs(r.summary.net))}</b></div></div>
                 <div class="grid grid-cols-4 gap-2"><button onclick="arOpen('${r.id}')" class="bg-gold text-black font-black py-2 rounded-xl">${archOpen === r.id ? 'إخفاء' : 'فتح'}</button><button onclick="arPrint('${r.id}')" class="bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl">طباعة</button><button onclick="arDownload(arArr().find(x=>x.id==='${r.id}'))" class="bg-darkbg border border-bordergold text-gray-200 font-bold py-2 rounded-xl">ملف</button><button onclick="arRestore('${r.id}')" class="bg-darkbg border border-red-800 text-red-300 font-bold py-2 rounded-xl">إرجاع</button></div>${archOpen === r.id ? arDetail(r) : ''}</div>`).join('') || '<p class="text-gray-500 text-xs text-center py-6">لسه مفيش شهور مؤرشفة.</p>'}`;
